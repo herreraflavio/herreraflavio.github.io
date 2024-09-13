@@ -1,0 +1,34 @@
+width: 300px; */
+    /* height: 300px; */
+    transform: scale(0.4986) /* Scale the image to 150% of its size */ rotate(92deg) /* Rotate the image by 45 degrees */ skew(2.5deg, 5deg) /* Skew the image on both axes */ translate(24px, -50px);
+    filter: grayscale(0%) sepia(0%) brightness(200%) contrast(250%) blur(0.1px) hue-rotate(280deg);
+    /* border: 5px dashed hotpink; */
+    /* box-shadow: 10px 10px 30px rgba(0, 255, 255, 0.5); */
+    /* opacity: 0.8; */
+    /* perspective: 1000px;
+
+
+  /* Set image size and ensure it fits the container */
+  width: 300px;
+  height: 300px;
+
+  /* Apply multiple transforms: scale, rotate, skew, and translate */
+  transform: scale(1.5) /* Scale the image to 150% of its size */ rotate(45deg)
+    /* Rotate the image by 45 degrees */ skew(20deg, 10deg)
+    /* Skew the image on both axes */ translate(20px, -10px); /* Move the image 20px right, 10px up */
+
+  /* Apply crazy filters */
+  filter: grayscale(100%) /* Make the image grayscale */ sepia(50%)
+    /* Add a sepia tone */ brightness(150%) /* Increase the brightness */
+    contrast(200%) /* Double the contrast */ blur(3px)
+    /* Blur the image slightly */ hue-rotate(180deg); /* Rotate the hue (color shift) */
+
+  /* Add a border and box-shadow */
+  border: 5px dashed hotpink;
+  box-shadow: 10px 10px 30px rgba(0, 255, 255, 0.5);
+
+  /* Make the image a bit transparent */
+  opacity: 0.8;
+
+  /* Add perspective to enhance the skew effect */
+  perspective: 1000px;

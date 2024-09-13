@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Transform Playground</title>
+    <style>
+      .playground-image {
+        width: 300px;
+        height: 300px;
+        transform-origin: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Image Transform Playground</h1>
+
+    <div style="display: flex; flex-wrap: wrap">
+      <div style="width: 500px; border: solid 4px black; height: 500px">
+        <div style="padding: 5px">
+          <label>Scale (Zoom):</label>
+          <input
+            type="number"
+            id="scaleInput"
+            min="0.5"
+            max="3"
+            step="0.1"
+            value="1.7"
+            placeholder="Scale"
+          />
+          <br /><br />
+          <label>Rotate (Degrees):</label>
+          <input
+            type="number"
+            id="rotateInput"
+            min="0"
+            max="360"
+            step="1"
+            value="45"
+            placeholder="Rotate"
+          />
+          <br /><br />
+          <label>Skew X (Degrees):</label>
+          <input
+            type="number"
+            id="skewXInput"
+            min="-50"
+            max="50"
+            step="1"
+            value="20"
+            placeholder="Skew X"
+          />
+          <br /><br />
+          <label>Skew Y (Degrees):</label>
+          <input
+            type="number"
+            id="skewYInput"
+            min="-50"
+            max="50"
+            step="1"
+            value="10"
+            placeholder="Skew Y"
+          />
+          <br /><br />
+          <label>Translate X (Pixels):</label>
+          <input
+            type="number"
+            id="translateXInput"
+            min="-100"
+            max="100"
+            step="1"
+            value="70"
+            placeholder="Translate X"
+          />
+          <br /><br />
+          <label>Translate Y (Pixels):</label>
+          <input
+            type="number"
+            id="translateYInput"
+            min="-100"
+            max="100"
+            step="1"
+            value="-30"
+            placeholder="Translate Y"
+          />
+          <br /><br />
+          <label>Grayscale (%) :</label>
+          <input
+            type="number"
+            id="grayscaleInput"
+            min="0"
+            max="100"
+            step="1"
+            value="100"
+            placeholder="Grayscale"
+          />
+          <br /><br />
+          <label>Sepia (%) :</label>
+          <input
+            type="number"
+            id="sepiaInput"
+            min="0"
+            max="100"
+            step="1"
+            value="50"
+            placeholder="Sepia"
+          />
+          <br /><br />
+          <label>Brightness (%) :</label>
+          <input
+            type="number"
+            id="brightnessInput"
+            min="50"
+            max="200"
+            step="1"
+            value="150"
+            placeholder="Brightness"
+          />
+          <br /><br />
+          <label>Contrast (%) :</label>
+          <input
+            type="number"
+            id="contrastInput"
+            min="100"
+            max="300"
+            step="1"
+            value="200"
+            placeholder="Contrast"
+          />
+          <br /><br />
+          <label>Blur (Pixels) :</label>
+          <input
+            type="number"
+            id="blurInput"
+            min="0"
+            max="10"
+            step="0.1"
+            value="0"
+            placeholder="Blur"
+          />
+          <br /><br />
+          <label>Hue Rotate (Degrees) :</label>
+          <input
+            type="number"
+            id="hueInput"
+            min="0"
+            max="360"
+            step="1"
+            value="180"
+            placeholder="Hue Rotate"
+          />
+          <br /><br />
+        </div>
+      </div>
+
+      <div
+        style="overflow: auto; width: 500px; height: 500px; border: solid 4px"
+      >
+        <img
+          id="playgroundImage"
+          class="playground-image"
+          src="../static/images/cool.png"
+          alt="Demo Image"
+        />
+      </div>
+    </div>
+
+    <script>
+      const image = document.getElementById("playgroundImage");
+
+      // Inputs
+      const scaleInput = document.getElementById("scaleInput");
+      const rotateInput = document.getElementById("rotateInput");
+      const skewXInput = document.getElementById("skewXInput");
+      const skewYInput = document.getElementById("skewYInput");
+      const translateXInput = document.getElementById("translateXInput");
+      const translateYInput = document.getElementById("translateYInput");
+      const grayscaleInput = document.getElementById("grayscaleInput");
+      const sepiaInput = document.getElementById("sepiaInput");
+      const brightnessInput = document.getElementById("brightnessInput");
+      const contrastInput = document.getElementById("contrastInput");
+      const blurInput = document.getElementById("blurInput");
+      const hueInput = document.getElementById("hueInput");
+
+      // Function to apply transformations and filters
+      function updateImageTransform() {
+        const scale = scaleInput.value;
+        const rotate = rotateInput.value;
+        const skewX = skewXInput.value;
+        const skewY = skewYInput.value;
+        const translateX = translateXInput.value;
+        const translateY = translateYInput.value;
+        const grayscale = grayscaleInput.value;
+        const sepia = sepiaInput.value;
+        const brightness = brightnessInput.value;
+        const contrast = contrastInput.value;
+        const blur = blurInput.value;
+        const hueRotate = hueInput.value;
+
+        // Apply transform
+        image.style.transform = `
+        scale(${scale}) 
+        rotate(${rotate}deg) 
+        skew(${skewX}deg, ${skewY}deg) 
+        translate(${translateX}px, ${translateY}px)
+      `;
+
+        // Apply filter
+        image.style.filter = `
+        grayscale(${grayscale}%) 
+        sepia(${sepia}%) 
+        brightness(${brightness}%) 
+        contrast(${contrast}%) 
+        blur(${blur}px) 
+        hue-rotate(${hueRotate}deg)
+      `;
+      }
+
+      // Add event listeners to all inputs to trigger the update
+      scaleInput.addEventListener("input", updateImageTransform);
+      rotateInput.addEventListener("input", updateImageTransform);
+      skewXInput.addEventListener("input", updateImageTransform);
+      skewYInput.addEventListener("input", updateImageTransform);
+      translateXInput.addEventListener("input", updateImageTransform);
+      translateYInput.addEventListener("input", updateImageTransform);
+      grayscaleInput.addEventListener("input", updateImageTransform);
+      sepiaInput.addEventListener("input", updateImageTransform);
+      brightnessInput.addEventListener("input", updateImageTransform);
+      contrastInput.addEventListener("input", updateImageTransform);
+      blurInput.addEventListener("input", updateImageTransform);
+      hueInput.addEventListener("input", updateImageTransform);
+
+      // Initial transformation on page load
+      updateImageTransform();
+    </script>
+  </body>
+</html>
