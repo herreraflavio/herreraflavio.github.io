@@ -1,0 +1,45 @@
+.image-div {
+  border: solid 2px black;
+  margin: 2.5px;
+}
+
+.image {
+  height: calc(100vh / 8.8);
+  display: block;
+}
+
+.bracket-image {
+  height: calc(100vh / 5.5);
+  width: 100px;
+  display: block;
+  margin: 0 auto;
+}
+
+.bracket-image-medium {
+  height: calc(100vh / 3.9);
+  width: 100px;
+  display: block;
+  margin: 0 auto;
+}
+
+.bracket-image-large {
+  height: calc(100vh / 1.95);
+  width: 100px;
+  display: block;
+  margin: 0 auto;
+}
+
+.line {
+  width: 50px;
+  height: 65px;
+}
+
+.flip {
+  transform: scaleX(-1);
+}
+
+.bracket-div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
