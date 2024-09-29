@@ -1,6 +1,7 @@
 .image-div {
   border: solid 2px black;
   margin: 2.5px;
+  width: fit-content;
 }
 
 .image {
