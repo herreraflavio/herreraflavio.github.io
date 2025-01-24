@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRN Manager</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .crn-list {
+        margin-top: 20px;
+      }
+      .crn-item {
+        margin: 5px 0;
+      }
+      .error-message {
+        color: red;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <span>Enter CRN:</span>
+    <input type="text" id="crnInput" placeholder="Enter CRN here" />
+    <button id="addButton">Add</button>
+    <p id="errorMessage" class="error-message"></p>
+
+    <div class="crn-list" id="crnList">
+      <h3>CRN List:</h3>
+      <ul id="crnListItems">
+        <!-- Dynamically added CRNs will appear here -->
+      </ul>
+    </div>
+
+    <button id="generateButton">Generate Calendar</button>
+
+    <script>
+      // Get references to DOM elements
+      const crnInput = document.getElementById("crnInput");
+      const addButton = document.getElementById("addButton");
+      const crnListItems = document.getElementById("crnListItems");
+      const errorMessage = document.getElementById("errorMessage");
+      const generateButton = document.getElementById("generateButton");
+
+      // Array to store CRN numbers
+      const crnList = [];
+
+      // Function to validate CRN
+      const isValidCRN = (crn) => {
+        const crnPattern = /^\d{5}$/; // Only 5 digits
+        return crnPattern.test(crn);
+      };
+
+      // Function to add a CRN to the list
+      const addCRN = () => {
+        const crnValue = crnInput.value.trim(); // Get the input value and trim whitespace
+
+        if (isValidCRN(crnValue)) {
+          // Clear any previous error message
+          errorMessage.textContent = "";
+
+          // Add CRN to the list array
+          crnList.push(Number(crnValue));
+
+          // Create a new list item
+          const listItem = document.createElement("li");
+          listItem.textContent = crnValue;
+          listItem.classList.add("crn-item");
+
+          // Append the new list item to the CRN list
+          crnListItems.appendChild(listItem);
+
+          let term = "202510";
+
+          addEvent(term, crnValue);
+
+          // Clear the input field
+          crnInput.value = "";
+        } else {
+          // Display error message
+          errorMessage.textContent =
+            "CRN must be exactly 5 digits long and contain only numbers.";
+        }
+      };
+
+      // Example usage:
+      const events = [];
+
+      // Function to handle calendar generation
+      function generateCalendar() {
+        // Helper function to convert HH:MM -> HHMM00 (ICS wants "HHMMSS" - here we set seconds = 00)
+        const formatTime = (time) => time.replace(":", "") + "00";
+
+        const daysMap = {
+          Monday: "MO",
+          Tuesday: "TU",
+          Wednesday: "WE",
+          Thursday: "TH",
+          Friday: "FR",
+          Saturday: "SA",
+          Sunday: "SU",
+        };
+
+        // Generates a unique UID for each event
+        const generateUID = (index) => {
+          // You can change the domain part to something relevant to you
+          return `${Date.now()}-event-${index}@yourdomain.com`;
+        };
+
+        // Generates a DTSTAMP in the proper format (UTC, "YYYYMMDDTHHMMSSZ")
+        const generateDTStamp = () => {
+          const now = new Date();
+          // Convert to the format YYYYMMDDTHHMMSSZ
+          return now.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+        };
+
+        const generateEvent = (eventDetails, index) => {
+          const {
+            title,
+            description,
+            location,
+            startTime,
+            endTime,
+            daysOfWeek,
+            alarmMinutesBefore,
+          } = eventDetails;
+
+          // For simplicity, all events start on the same date "20250122"
+          // Change these if you need a different start date per event
+          const startDateTime = `20250122T${formatTime(startTime)}`;
+          const endDateTime = `20250122T${formatTime(endTime)}`;
+
+          // Convert day names to BYDAY=MO,WE,FR, etc.
+          const repeatDays = daysOfWeek.map((day) => daysMap[day]).join(",");
+
+          // Create the negative trigger time for the alarm (e.g., -PT30M)
+          const alarmTrigger = `-PT${alarmMinutesBefore}M`;
+
+          // UID and DTSTAMP for ICS compliance
+          const uid = generateUID(index);
+          const dtStamp = generateDTStamp();
+
+          // Return an ICS-compliant VEVENT block
+          return [
+            "BEGIN:VEVENT",
+            `UID:${uid}`,
+            `DTSTAMP:${dtStamp}`,
+            `SUMMARY:${title}`,
+            `DESCRIPTION:${description}`,
+            `LOCATION:${location}`,
+            `DTSTART:${startDateTime}`,
+            `DTEND:${endDateTime}`,
+            `RRULE:FREQ=WEEKLY;BYDAY=${repeatDays}`,
+            "BEGIN:VALARM",
+            `TRIGGER:${alarmTrigger}`,
+            "ACTION:DISPLAY",
+            `DESCRIPTION:Reminder for ${title}`,
+            "END:VALARM",
+            "END:VEVENT",
+          ].join("\r\n");
+        };
+
+        // Generate all events, joining them with a new line
+        const events = eventDetailsList
+          .map((eventDetails, i) => generateEvent(eventDetails, i))
+          .join("\r\n");
+
+        // Build the entire ICS file content
+        const icsContent = [
+          "BEGIN:VCALENDAR",
+          "VERSION:2.0",
+          "PRODID:-//Your Organization//Your Product//EN",
+          "CALSCALE:GREGORIAN",
+          events,
+          "END:VCALENDAR",
+        ].join("\r\n");
+
+        // Create a Blob object of the ICS content
+        const blob = new Blob([icsContent], {
+          type: "text/calendar;charset=utf-8",
+        });
+
+        // Create a download link
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "calendar.ics";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      /**
+       * Fetches the subjects.json file from the provided URL and finds the code
+       * matching the given description.
+       *
+       * @param {string} description - The description to match (e.g., "Anthropology").
+       * @returns {Promise<string|null>} - The matching code if found, or null if no match.
+       */
+      async function getCodeByDescription(description) {
+        const jsonFileUrl = "https://flavioherrera.com/subjects.json";
+
+        try {
+          // Fetch the JSON file
+          const response = await fetch(jsonFileUrl);
+
+          if (!response.ok) {
+            throw new Error(
+              `Failed to fetch JSON file: ${response.statusText}`
+            );
+          }
+
+          // Parse the JSON content
+          const data = await response.json();
+
+          // Find the item with the matching description
+          const foundItem = data.find(
+            (item) => item.description === description
+          );
+
+          // Return the code if a match is found, or null if not
+          return foundItem ? foundItem.code : null;
+        } catch (error) {
+          console.error("Error fetching JSON file:", error.message);
+          return null;
+        }
+      }
+
+      // First API request function
+      const fetchFacultyMeetingTimes = async (term, crn) => {
+        const url = `https://reg-prod.ec.ucmerced.edu/StudentRegistrationSsb/ssb/searchResults/getFacultyMeetingTimes?term=${term}&courseReferenceNumber=${crn}`;
+
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json(); // Parse JSON response
+          const returnData = {
+            buildingDescription: data.fmt[0].meetingTime.buildingDescription,
+            room: data.fmt[0].meetingTime.room,
+            meetingTime: [
+              data.fmt[0].meetingTime.monday && "Monday",
+              data.fmt[0].meetingTime.tuesday && "Tuesday",
+              data.fmt[0].meetingTime.wednesday && "Wednesday",
+              data.fmt[0].meetingTime.thursday && "Thursday",
+              data.fmt[0].meetingTime.friday && "Friday",
+            ].filter(Boolean),
+            meetingType: data.fmt[0].meetingTime.meetingType,
+            beginTime: data.fmt[0].meetingTime.beginTime,
+            endTime: data.fmt[0].meetingTime.endTime,
+            displayName: data.fmt[0].faculty[0].displayName,
+            emailAddress: data.fmt[0].faculty[0].emailAddress,
+          };
+
+          return returnData;
+        } catch (error) {
+          console.error("Error fetching faculty meeting times:", error.message);
+          return null;
+        }
+      };
+
+      // Second API request function
+      const fetchClassDetails = async (term, crn) => {
+        const url =
+          "https://reg-prod.ec.ucmerced.edu/StudentRegistrationSsb/ssb/searchResults/getClassDetails";
+        const formData = new URLSearchParams(); // Create form data
+        formData.append("term", term);
+        formData.append("courseReferenceNumber", crn);
+
+        try {
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded", // Set form data content type
+            },
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const html = await response.text(); // Parse HTML response
+
+          // Helper function to remove HTML tags
+          const stripHTML = (htmlString) =>
+            htmlString.replace(/<[^>]*>/g, "").trim();
+
+          // Split the HTML by the span class
+          const sections = html.split('<span class="status-bold">');
+
+          const result = {};
+          sections.forEach((section, index) => {
+            if (index === 0) return; // Skip the first split part
+            const keyMatch = section.match(/([^<]*)<\/span>/);
+            if (!keyMatch) return;
+            const key = keyMatch[1].replace(":", "").trim();
+            const remainingText = section.slice(keyMatch[0].length);
+            const value = stripHTML(remainingText);
+            result[key] = value;
+          });
+
+          const returnData = {
+            subject: result["Subject"],
+            courseNumber: result["Course Number"],
+          };
+
+          return returnData;
+        } catch (error) {
+          console.error("Error fetching class details:", error.message);
+          return null;
+        }
+      };
+
+      const addEvent = async (term, crn) => {
+        console.log("Fetching faculty meeting times...");
+        const stObj1 = await fetchFacultyMeetingTimes(term, crn);
+
+        // console.log("Faculty Meeting Times: ", stObj1);
+
+        console.log("Fetching class details...");
+        const stObj2 = await fetchClassDetails(term, crn);
+
+        // console.log("Class Details: ", stObj2);
+        let short_title;
+
+        try {
+          // Await the asynchronous function call
+          const code = await getCodeByDescription(stObj2.subject);
+
+          if (code) {
+            // console.log(`Code for Anthropology: ${code}`); // Outputs: "Code for Anthropology: ANTH"
+            short_title = `${code} ${stObj2.courseNumber} ${stObj1.meetingType}`;
+            //  console.log("Short Title: ", short_title);
+          } else {
+            console.log("No match found for the given description.");
+          }
+        } catch (error) {
+          console.error("Error fetching code by description:", error);
+        }
+
+        const event = {
+          title: short_title || "Class Title",
+          description:
+            `${stObj1.buildingDescription} | Room ${stObj1.room} \n ${stObj1.displayName} \n ${stObj1.emailAddress}` ||
+            "Class Description",
+          location: "Main Campus",
+          startTime:
+            `${stObj1.beginTime.slice(0, 2)}:${stObj1.beginTime.slice(2, 4)}` ||
+            "13:30", // 1:30 PM
+
+          endTime:
+            `${stObj1.endTime.slice(0, 2)}:${stObj1.endTime.slice(2, 4)}` ||
+            "14:45", // 2:45 PM
+          daysOfWeek: stObj1.meetingTime || ["Monday", "Wednesday", "Friday"],
+          alarmMinutesBefore: 30,
+        };
+
+        events.push(event);
+        console.log("Combined Object: ", event);
+      };
+
+      // Add event listener to the button
+      addButton.addEventListener("click", addCRN);
+
+      // Allow pressing "Enter" to add the CRN
+      crnInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+          addCRN();
+        }
+      });
+
+      // Input field restriction to display a warning for invalid input
+      crnInput.addEventListener("input", () => {
+        const crnValue = crnInput.value;
+        if (/[^\d]/.test(crnValue)) {
+          errorMessage.textContent = "Only numbers are allowed.";
+        } else if (crnValue.length > 5) {
+          errorMessage.textContent = "CRN must not exceed 5 digits.";
+        } else if (crnValue.length < 5 && crnValue.length > 0) {
+          errorMessage.textContent = "CRN must be exactly 5 digits long.";
+        } else {
+          errorMessage.textContent = "";
+        }
+      });
+
+      // Add event listener to the generate button
+      generateButton.addEventListener("click", generateCalendar);
+    </script>
+  </body>
+</html>
