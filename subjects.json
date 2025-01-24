@@ -1,0 +1,194 @@
+[
+  {
+    "code": "AE",
+    "description": "Aerospace Engineering"
+  },
+  {
+    "code": "ANTH",
+    "description": "Anthropology"
+  },
+  {
+    "code": "BIOE",
+    "description": "Bioengineering"
+  },
+  {
+    "code": "BIO",
+    "description": "Biological Sciences"
+  },
+  {
+    "code": "CHE",
+    "description": "Chemical Engineering"
+  },
+  {
+    "code": "CHEM",
+    "description": "Chemistry"
+  },
+  {
+    "code": "CCST",
+    "description": "Chicano Chicana Studies"
+  },
+  {
+    "code": "CHN",
+    "description": "Chinese"
+  },
+  {
+    "code": "CE",
+    "description": "Civil Engineering"
+  },
+  {
+    "code": "COGS",
+    "description": "Cognitive Science"
+  },
+  {
+    "code": "CRS",
+    "description": "Community Research and Service"
+  },
+  {
+    "code": "CSE",
+    "description": "Computer Science &amp; Engineering"
+  },
+  {
+    "code": "CRES",
+    "description": "Critical Race &amp; Ethnic Studies"
+  },
+  {
+    "code": "DSC",
+    "description": "Data Science &amp; Computing"
+  },
+  {
+    "code": "ECON",
+    "description": "Economics"
+  },
+  {
+    "code": "EDUC",
+    "description": "Education"
+  },
+  {
+    "code": "EECS",
+    "description": "Elect. Engr. &amp; Comp. Sci."
+  },
+  {
+    "code": "EE",
+    "description": "Electrical Engineering"
+  },
+  {
+    "code": "ENGR",
+    "description": "Engineering"
+  },
+  {
+    "code": "ENG",
+    "description": "English"
+  },
+  {
+    "code": "ENVE",
+    "description": "Environmental Engineering"
+  },
+  {
+    "code": "EH",
+    "description": "Environmental Humanities"
+  },
+  {
+    "code": "ES",
+    "description": "Environmental Systems (GR)"
+  },
+  {
+    "code": "ESS",
+    "description": "Environmental Systems Science"
+  },
+  {
+    "code": "FRE",
+    "description": "French"
+  },
+  {
+    "code": "GASP",
+    "description": "Global Arts Studies Program"
+  },
+  {
+    "code": "HS",
+    "description": "Heritage Studies"
+  },
+  {
+    "code": "HIST",
+    "description": "History"
+  },
+  {
+    "code": "IH",
+    "description": "Interdisciplinary Humanities"
+  },
+  {
+    "code": "JPN",
+    "description": "Japanese"
+  },
+  {
+    "code": "MGMT",
+    "description": "Management"
+  },
+  {
+    "code": "MBSE",
+    "description": "Materials &amp; BioMat Sci &amp; Engr"
+  },
+  {
+    "code": "MSE",
+    "description": "Materials Science &amp; Engr"
+  },
+  {
+    "code": "MATH",
+    "description": "Mathematics"
+  },
+  {
+    "code": "ME",
+    "description": "Mechanical Engineering"
+  },
+  {
+    "code": "MIST",
+    "description": "Mgmt of Innov, Sust, and Tech"
+  },
+  {
+    "code": "NSED",
+    "description": "Natural Sciences Education"
+  },
+  {
+    "code": "PHIL",
+    "description": "Philosophy"
+  },
+  {
+    "code": "PHYS",
+    "description": "Physics"
+  },
+  {
+    "code": "POLI",
+    "description": "Political Science"
+  },
+  {
+    "code": "PSY",
+    "description": "Psychology"
+  },
+  {
+    "code": "PH",
+    "description": "Public Health"
+  },
+  {
+    "code": "QSB",
+    "description": "Quantitative &amp; Systems Biology"
+  },
+  {
+    "code": "SOC",
+    "description": "Sociology"
+  },
+  {
+    "code": "SPAN",
+    "description": "Spanish"
+  },
+  {
+    "code": "SPRK",
+    "description": "Spark"
+  },
+  {
+    "code": "USTU",
+    "description": "Undergraduate Studies"
+  },
+  {
+    "code": "WRI",
+    "description": "Writing"
+  }
+]

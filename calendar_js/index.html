@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Download ICS Example</title>
+  </head>
+  <body>
+    <h1>Download ICS Example</h1>
+    <p>Click the button to download an ICS file with a recurring event.</p>
+
+    <button onclick="downloadICS()">Download ICS</button>
+
+    <script>
+      function downloadICS() {
+        // The ICS (iCalendar) content
+        const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Example Corp//NONSGML v1.0//EN
+X-APPLE-CALENDAR-COLOR:#FF0000
+BEGIN:VEVENT
+UID:math-141-20250120T133000
+DTSTAMP:20250110T100000Z
+DTSTART:20250120T133000
+DTEND:20250120T144500
+RRULE:FREQ=WEEKLY;BYDAY=MO,WE,FR
+SUMMARY:math 141
+DESCRIPTION:this is math class room 10
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+`;
+
+        // Create a Blob of the ICS content, with type text/calendar
+        const blob = new Blob([icsContent], { type: "text/calendar" });
+
+        // Create a temporary download link
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "math141.ics"; // The filename for the downloaded ICS
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    </script>
+  </body>
+</html>

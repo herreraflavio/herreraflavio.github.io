@@ -3,9 +3,177 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>CRN Manager</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .crn-list {
+        margin-top: 20px;
+      }
+      .crn-item {
+        margin: 5px 0;
+      }
+      .error-message {
+        color: red;
+        font-size: 0.9em;
+      }
+    </style>
   </head>
   <body>
-    create calendar
+    <span>Enter CRN:</span>
+    <input type="text" id="crnInput" placeholder="Enter CRN here" />
+    <button id="addButton">Add</button>
+    <p id="errorMessage" class="error-message"></p>
+
+    <div class="crn-list" id="crnList">
+      <h3>CRN List:</h3>
+      <ul id="crnListItems">
+        <!-- Dynamically added CRNs will appear here -->
+      </ul>
+    </div>
+
+    <button id="generateButton">Generate Calendar</button>
+
+    <script>
+      // Get references to DOM elements
+      const crnInput = document.getElementById("crnInput");
+      const addButton = document.getElementById("addButton");
+      const crnListItems = document.getElementById("crnListItems");
+      const errorMessage = document.getElementById("errorMessage");
+      const generateButton = document.getElementById("generateButton");
+
+      // Array to store CRN numbers
+      const crnList = [];
+
+      // Function to validate CRN
+      const isValidCRN = (crn) => {
+        const crnPattern = /^\d{5}$/; // Only 5 digits
+        return crnPattern.test(crn);
+      };
+
+      // Function to add a CRN to the list
+      const addCRN = () => {
+        const crnValue = crnInput.value.trim(); // Get the input value and trim whitespace
+
+        if (isValidCRN(crnValue)) {
+          // Clear any previous error message
+          errorMessage.textContent = "";
+
+          // Add CRN to the list array
+          crnList.push(Number(crnValue));
+
+          // Create a new list item
+          const listItem = document.createElement("li");
+          listItem.textContent = crnValue;
+          listItem.classList.add("crn-item");
+
+          // Append the new list item to the CRN list
+          crnListItems.appendChild(listItem);
+
+          // Clear the input field
+          crnInput.value = "";
+        } else {
+          // Display error message
+          errorMessage.textContent =
+            "CRN must be exactly 5 digits long and contain only numbers.";
+        }
+      };
+
+      // Function to handle calendar generation
+      const generateCalendar = () => {
+        if (crnList.length === 0) {
+          alert("Please add at least one CRN before generating the calendar.");
+          return;
+        }
+
+        // Header for the .ics file
+        let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN`;
+
+        // Helper function to generate a random color ID
+        const getRandomColorId = () => Math.floor(Math.random() * 11) + 1; // Google Calendar supports color IDs 1-11
+
+        // Helper function to determine if an event repeats
+        const isRepeatingEvent = () => Math.random() < 0.5; // 50% chance of being a repeating event
+
+        // Add each CRN as an event
+        crnList.forEach((crn, index) => {
+          const randomOffsetDays = Math.floor(Math.random() * 30); // Random offset within the next 30 days
+          const startDate = new Date(Date.now() + randomOffsetDays * 86400000); // Random start date
+          const endDate = new Date(startDate.getTime() + 3600000); // 1-hour duration
+          const uid = `${crn}-${Date.now()}@example.com`; // Unique identifier
+          const colorId = getRandomColorId();
+          const repeating = isRepeatingEvent();
+
+          icsContent += `
+BEGIN:VEVENT
+SUMMARY:Event for CRN ${crn}
+DESCRIPTION:This is a sample event for CRN ${crn}.
+LOCATION:Online
+DTSTART:${formatDateForICS(startDate)}
+DTEND:${formatDateForICS(endDate)}
+UID:${uid}
+COLOR:${colorId}
+${repeating ? "RRULE:FREQ=WEEKLY;COUNT=5" : ""}
+END:VEVENT`;
+        });
+
+        // Footer for the .ics file
+        icsContent += `
+END:VCALENDAR`;
+
+        // Create a downloadable .ics file
+        const blob = new Blob([icsContent], { type: "text/calendar" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "calendar.ics";
+        link.click();
+      };
+
+      // Helper function to format dates for .ics (YYYYMMDDTHHMMSSZ)
+      const formatDateForICS = (date) => {
+        const pad = (n) => (n < 10 ? "0" + n : n);
+        return (
+          date.getUTCFullYear() +
+          pad(date.getUTCMonth() + 1) +
+          pad(date.getUTCDate()) +
+          "T" +
+          pad(date.getUTCHours()) +
+          pad(date.getUTCMinutes()) +
+          pad(date.getUTCSeconds()) +
+          "Z"
+        );
+      };
+
+      // Add event listener to the button
+      addButton.addEventListener("click", addCRN);
+
+      // Allow pressing "Enter" to add the CRN
+      crnInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+          addCRN();
+        }
+      });
+
+      // Input field restriction to display a warning for invalid input
+      crnInput.addEventListener("input", () => {
+        const crnValue = crnInput.value;
+        if (/[^\d]/.test(crnValue)) {
+          errorMessage.textContent = "Only numbers are allowed.";
+        } else if (crnValue.length > 5) {
+          errorMessage.textContent = "CRN must not exceed 5 digits.";
+        } else if (crnValue.length < 5 && crnValue.length > 0) {
+          errorMessage.textContent = "CRN must be exactly 5 digits long.";
+        } else {
+          errorMessage.textContent = "";
+        }
+      });
+
+      // Add event listener to the generate button
+      generateButton.addEventListener("click", generateCalendar);
+    </script>
   </body>
 </html>
