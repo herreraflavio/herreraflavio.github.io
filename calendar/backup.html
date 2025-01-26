@@ -53,9 +53,9 @@
         return crnPattern.test(crn);
       };
 
-      // Function to add a CRN to the list
+      // ----- MAIN LOGIC FOR ADDING A CRN -----
       const addCRN = () => {
-        const crnValue = crnInput.value.trim(); // Get the input value and trim whitespace
+        const crnValue = crnInput.value.trim(); // Get the input value
 
         if (isValidCRN(crnValue)) {
           // Clear any previous error message
@@ -72,6 +72,12 @@
           // Append the new list item to the CRN list
           crnListItems.appendChild(listItem);
 
+          // Example term; change this as needed
+          const term = "202510";
+
+          // Fetch data & push to events array
+          addEvent(term, crnValue);
+
           // Clear the input field
           crnInput.value = "";
         } else {
@@ -81,74 +87,7 @@
         }
       };
 
-      // Function to handle calendar generation
-      const generateCalendar = () => {
-        if (crnList.length === 0) {
-          alert("Please add at least one CRN before generating the calendar.");
-          return;
-        }
-
-        // Header for the .ics file
-        let icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN`;
-
-        // Helper function to generate a random color ID
-        const getRandomColorId = () => Math.floor(Math.random() * 11) + 1; // Google Calendar supports color IDs 1-11
-
-        // Helper function to determine if an event repeats
-        const isRepeatingEvent = () => Math.random() < 0.5; // 50% chance of being a repeating event
-
-        // Add each CRN as an event
-        crnList.forEach((crn, index) => {
-          const randomOffsetDays = Math.floor(Math.random() * 30); // Random offset within the next 30 days
-          const startDate = new Date(Date.now() + randomOffsetDays * 86400000); // Random start date
-          const endDate = new Date(startDate.getTime() + 3600000); // 1-hour duration
-          const uid = `${crn}-${Date.now()}@example.com`; // Unique identifier
-          const colorId = getRandomColorId();
-          const repeating = isRepeatingEvent();
-
-          icsContent += `
-BEGIN:VEVENT
-SUMMARY:Event for CRN ${crn}
-DESCRIPTION:This is a sample event for CRN ${crn}.
-LOCATION:Online
-DTSTART:${formatDateForICS(startDate)}
-DTEND:${formatDateForICS(endDate)}
-UID:${uid}
-COLOR:${colorId}
-${repeating ? "RRULE:FREQ=WEEKLY;COUNT=5" : ""}
-END:VEVENT`;
-        });
-
-        // Footer for the .ics file
-        icsContent += `
-END:VCALENDAR`;
-
-        // Create a downloadable .ics file
-        const blob = new Blob([icsContent], { type: "text/calendar" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "calendar.ics";
-        link.click();
-      };
-
-      // Helper function to format dates for .ics (YYYYMMDDTHHMMSSZ)
-      const formatDateForICS = (date) => {
-        const pad = (n) => (n < 10 ? "0" + n : n);
-        return (
-          date.getUTCFullYear() +
-          pad(date.getUTCMonth() + 1) +
-          pad(date.getUTCDate()) +
-          "T" +
-          pad(date.getUTCHours()) +
-          pad(date.getUTCMinutes()) +
-          pad(date.getUTCSeconds()) +
-          "Z"
-        );
-      };
-
-      // Add event listener to the button
+      // Listen for button click to add CRN
       addButton.addEventListener("click", addCRN);
 
       // Allow pressing "Enter" to add the CRN
@@ -172,8 +111,215 @@ END:VCALENDAR`;
         }
       });
 
-      // Add event listener to the generate button
+      // ----- CALENDAR GENERATION LOGIC -----
+      const events = [];
+      const eventDetailsList = events; // We'll build this as we fetch data
+
+      // Convert HH:MM to HHMM00 for ICS
+      const formatTime = (time) => time.replace(":", "") + "00";
+
+      // Map for day names
+      const daysMap = {
+        Monday: "MO",
+        Tuesday: "TU",
+        Wednesday: "WE",
+        Thursday: "TH",
+        Friday: "FR",
+        Saturday: "SA",
+        Sunday: "SU",
+      };
+
+      const generateUID = (index) => {
+        return `${Date.now()}-event-${index}@yourdomain.com`;
+      };
+
+      const generateDTStamp = () => {
+        const now = new Date();
+        // Convert to format YYYYMMDDTHHMMSSZ
+        return now.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+      };
+
+      const generateEvent = (eventDetails, index) => {
+        const {
+          title,
+          description,
+          location,
+          startTime,
+          endTime,
+          daysOfWeek,
+          alarmMinutesBefore,
+        } = eventDetails;
+
+        // You can change the date below if you want a different "start" date
+        const startDateTime = `20250122T${formatTime(startTime)}`;
+        const endDateTime = `20250122T${formatTime(endTime)}`;
+
+        // Convert day names to RRULE day codes
+        const repeatDays = daysOfWeek.map((day) => daysMap[day]).join(",");
+
+        const alarmTrigger = `-PT${alarmMinutesBefore}M`;
+        const uid = generateUID(index);
+        const dtStamp = generateDTStamp();
+
+        return [
+          "BEGIN:VEVENT",
+          `UID:${uid}`,
+          `DTSTAMP:${dtStamp}`,
+          `SUMMARY:${title}`,
+          `DESCRIPTION:${description}`,
+          `LOCATION:${location}`,
+          `DTSTART:${startDateTime}`,
+          `DTEND:${endDateTime}`,
+          `RRULE:FREQ=WEEKLY;BYDAY=${repeatDays}`,
+          "BEGIN:VALARM",
+          `TRIGGER:${alarmTrigger}`,
+          "ACTION:DISPLAY",
+          `DESCRIPTION:Reminder for ${title}`,
+          "END:VALARM",
+          "END:VEVENT",
+        ].join("\r\n");
+      };
+
+      function generateCalendar() {
+        const allEvents = eventDetailsList
+          .map((eventDetails, i) => generateEvent(eventDetails, i))
+          .join("\r\n");
+
+        const icsContent = [
+          "BEGIN:VCALENDAR",
+          "VERSION:2.0",
+          "PRODID:-//Your Organization//Your Product//EN",
+          "CALSCALE:GREGORIAN",
+          allEvents,
+          "END:VCALENDAR",
+        ].join("\r\n");
+
+        const blob = new Blob([icsContent], {
+          type: "text/calendar;charset=utf-8",
+        });
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "calendar.ics";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      // Listen for button click to generate the .ics file
       generateButton.addEventListener("click", generateCalendar);
+
+      // ----- SUBJECT LOOKUP LOGIC -----
+      async function getCodeByDescription(description) {
+        const jsonFileUrl = "https://flavioherrera.com/subjects.json";
+
+        try {
+          const response = await fetch(jsonFileUrl);
+          if (!response.ok) {
+            throw new Error(
+              `Failed to fetch JSON file: ${response.statusText}`
+            );
+          }
+          const data = await response.json();
+          const foundItem = data.find(
+            (item) => item.description === description
+          );
+          return foundItem ? foundItem.code : null;
+        } catch (error) {
+          console.error("Error fetching JSON file:", error.message);
+          return null;
+        }
+      }
+
+      // ----- API CALLS (Pointing to your Node.js Server) -----
+      const fetchFacultyMeetingTimes = async (term, crn) => {
+        // Hit your Node server’s GET endpoint
+        // const url = `http://localhost:4050/api/facultyMeetingTimes?term=${term}&crn=${crn}`;
+        const url = `https://hackerflavio.com/api/facultyMeetingTimes?term=${term}&crn=${crn}`;
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          // Server already returns JSON
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error("Error fetching faculty meeting times:", error.message);
+          return null;
+        }
+      };
+
+      const fetchClassDetails = async (term, crn) => {
+        // Hit your Node server’s POST endpoint
+        // const url = "http://localhost:4050/api/classDetails";
+        const url = "https://hackerflavio.com/api/classDetails";
+        try {
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ term, crn }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          // Server returns { subject, courseNumber }
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error("Error fetching class details:", error.message);
+          return null;
+        }
+      };
+
+      // ----- FUNCTION TO FETCH & COMBINE DATA INTO AN EVENT -----
+      const addEvent = async (term, crn) => {
+        console.log("Fetching faculty meeting times...");
+        const stObj1 = await fetchFacultyMeetingTimes(term, crn);
+        if (!stObj1) return;
+
+        console.log("Fetching class details...");
+        const stObj2 = await fetchClassDetails(term, crn);
+        if (!stObj2) return;
+
+        let short_title;
+        try {
+          const code = await getCodeByDescription(stObj2.subject);
+          if (code) {
+            // e.g. "MATH 101 Lecture"
+            short_title = `${code} ${stObj2.courseNumber} ${stObj1.meetingType}`;
+          } else {
+            console.log("No match found for the given subject description.");
+          }
+        } catch (error) {
+          console.error("Error fetching code by description:", error);
+        }
+
+        const event = {
+          title: short_title || "Class Title",
+          description:
+            `${stObj1.buildingDescription} | Room ${stObj1.room}\n` +
+            `${stObj1.displayName}\n` +
+            `${stObj1.emailAddress}`,
+          location: "Main Campus",
+          startTime: stObj1.beginTime
+            ? `${stObj1.beginTime.slice(0, 2)}:${stObj1.beginTime.slice(2, 4)}`
+            : "13:30", // fallback
+          endTime: stObj1.endTime
+            ? `${stObj1.endTime.slice(0, 2)}:${stObj1.endTime.slice(2, 4)}`
+            : "14:45", // fallback
+          daysOfWeek: stObj1.meetingTime.length
+            ? stObj1.meetingTime
+            : ["Monday", "Wednesday", "Friday"],
+          alarmMinutesBefore: 30,
+        };
+
+        events.push(event);
+        console.log("Combined Event Object: ", event);
+      };
     </script>
   </body>
 </html>

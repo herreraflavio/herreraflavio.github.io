@@ -3,11 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Responsive Calendar (Two Spacers, CRN Inline, Expandable Events)
-    </title>
+    <title>Responsive Calendar with Two Spacers in Time Column</title>
     <style>
-      /* Basic page styling */
       body {
         font-family: Arial, sans-serif;
         margin-left: 10px;
@@ -17,54 +14,15 @@
         height: 100vh;
       }
 
-      /* CRN input and error message */
-      .crn-input-section {
-        margin-bottom: 10px;
-      }
-      .error-message {
-        color: red;
-        font-size: 0.9em;
-      }
-      button {
-        margin-top: 5px;
-        padding: 6px 12px;
-        cursor: pointer;
-      }
-
-      /* CRN list on a single line */
-      .crn-list-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 5px;
-      }
-      .crn-label {
-        font-weight: bold;
-      }
-      #crnListItems {
-        display: flex;
-        gap: 8px;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-      .crn-item {
-        background: #f3f3f3;
-        padding: 4px 8px;
-        border-radius: 4px;
-      }
-
-      /* MAIN CALENDAR LAYOUT */
+      /* CRN input, calendar layout, etc. ... (same as your code) */
       .calendar-wrapper {
         display: grid;
         grid-template-columns: 60px repeat(7, 1fr);
         column-gap: 1px;
         border: 1px solid #ccc;
-        height: 80vh; /* responsive height: 80% of viewport */
+        height: 80vh; /* responsive height */
         background-color: #fafafa;
       }
-
-      /* TIME COLUMN */
       .time-column {
         position: relative;
         background-color: #f5f5f5;
@@ -81,15 +39,13 @@
         color: #666;
       }
 
-      /* DAY COLUMN */
+      /* day columns, day-header, timeline-area, etc. unchanged */
       .day-column {
         position: relative;
         border-left: 1px solid #ccc;
         background-color: #fff;
         height: 100%;
       }
-
-      /* The top 5% is the day header.  */
       .day-header {
         position: absolute;
         top: 0;
@@ -102,8 +58,6 @@
         border-bottom: 1px solid #ccc;
         line-height: 1.6;
       }
-
-      /* The timeline-area from 5% to 100% of the column */
       .timeline-area {
         position: absolute;
         top: 5%;
@@ -111,8 +65,6 @@
         right: 0;
         bottom: 0;
       }
-
-      /* Each hour line is at top = "some %" within .timeline-area */
       .hour-line {
         position: absolute;
         left: 0;
@@ -121,7 +73,7 @@
         background-color: #eee;
       }
 
-      /* EVENT ITEM */
+      /* events, expand-on-click, etc. ... (same as your code) */
       .event-item {
         position: absolute;
         left: 5%;
@@ -132,13 +84,10 @@
         border: 1px solid #b3e0ff;
         cursor: pointer;
         transition: filter 0.2s ease;
-        overflow: hidden; /* hide content until expanded */
       }
       .event-item:hover {
-        /* slight dim to indicate clickable */
         filter: brightness(0.95);
       }
-      /* When expanded, remove forced height & allow auto */
       .event-item.expanded {
         height: auto !important;
         z-index: 999;
@@ -153,8 +102,6 @@
       .event-title {
         margin-bottom: 2px;
       }
-
-      /* Hidden details: shown when expanded */
       .event-details {
         font-size: 0.75em;
         color: #444;
@@ -172,36 +119,29 @@
     </style>
   </head>
   <body>
-    <div style="font-size: 35px; margin-bottom: 10px">
-      Responsive Calendar (Two Spacers, CRN Inline, Expandable Events)
+    <div style="font-size: 35px">
+      Responsive Calendar with Two Spacers in Time Column
     </div>
 
-    <!-- CRN input + error message -->
+    <!-- CRN input, etc. (same as your code) -->
     <div class="crn-input-section">
       <span>Enter CRN:</span>
       <input type="text" id="crnInput" placeholder="5-digit CRN" />
       <button id="addButton">Add</button>
       <p id="errorMessage" class="error-message"></p>
     </div>
-
-    <!-- CRN List on a single line -->
-    <div class="crn-list-container">
+    <div class="crn-list">
       <span class="crn-label">CRN List:</span>
       <ul id="crnListItems"></ul>
     </div>
-
-    <!-- Generate ICS button -->
     <button id="generateButton">Generate Calendar (.ics)</button>
 
-    <!-- Main calendar container -->
     <div class="calendar-wrapper" id="calendarWrapper"></div>
 
     <script>
-      // ---------------------------
-      // CONFIG
-      // ---------------------------
-      const startHour = 7; // 7 AM
-      const endHour = 22; // 10 PM
+      // ------- CONFIG ----------
+      const startHour = 7;
+      const endHour = 22;
       const dayOrder = [
         "Sunday",
         "Monday",
@@ -212,11 +152,8 @@
         "Saturday",
       ];
 
-      // We'll place hour lines/events from 5% to 100% in the day columns => 95% timeline
-      // For the time column, we place 2 spacers from 0..5% and 5..10%, then labels from 10..100%.
+      // timeline for day columns is 5..100% => 95% for hours
       const totalMinutes = (endHour - startHour) * 60;
-
-      // Day columns: 5..100% => 95% for hours
       function getTopPercent(minOffset) {
         const fraction = minOffset / totalMinutes;
         return (5 + fraction * 95).toFixed(3) + "%";
@@ -226,9 +163,12 @@
         return (fraction * 95).toFixed(3) + "%";
       }
 
-      // Time column labels: 10..100 => 90% for hours (two 5% spacers)
+      // (\*) For the TIME COLUMN, we want 2 spacers from 0..5% and 5..10%,
+      // then hour labels from 10%..100%.
+      // We'll define a function to map minuteOffset => 10..100%
       function getTimeColumnTopPercent(minOffset) {
-        const fraction = minOffset / totalMinutes;
+        const fraction = minOffset / totalMinutes; // 0..1
+        // scale it into 90% (from 10% -> 100%)
         return (10 + fraction * 90).toFixed(3) + "%";
       }
 
@@ -245,41 +185,23 @@
         return `${h12}:${String(mm).padStart(2, "0")} ${suffix}`;
       }
 
-      // 12 random pastel colors
-      // const eventColors = [
-      //   "#e2f3ff",
-      //   "#ffd9e2",
-      //   "#d9ffe2",
-      //   "#ffefcc",
-      //   "#e8d9ff",
-      //   "#fff9cc",
-      //   "#d9fafa",
-      //   "#fbdcfa",
-      //   "#dce9fb",
-      //   "#faf2dc",
-      //   "#dceefb",
-      //   "#fbe9dc",
-      // ];
-
-      // Example set of 12 vibrant, easily distinguishable colors
+      // random pastel colors
       const eventColors = [
-        "rgba(255, 0, 0, 0.5)", // Red
-        "rgba(0, 255, 0, 0.5)", // Green
-        "rgba(0, 0, 255, 0.5)", // Blue
-        "rgba(255, 255, 0, 0.5)", // Yellow
-        "rgba(255, 0, 255, 0.5)", // Magenta
-        "rgba(0, 255, 255, 0.5)", // Cyan
-        "rgba(255, 127, 0, 0.5)", // Vivid Orange
-        "rgba(127, 0, 255, 0.5)", // Vivid Purple
-        "rgba(255, 0, 127, 0.5)", // Vivid Pink
-        "rgba(127, 255, 0, 0.5)", // Lime
-        "rgba(0, 127, 255, 0.5)", // Azure
-        "rgba(255, 191, 0, 0.5)", // Amber
+        "#e2f3ff",
+        "#ffd9e2",
+        "#d9ffe2",
+        "#ffefcc",
+        "#e8d9ff",
+        "#fff9cc",
+        "#d9fafa",
+        "#fbdcfa",
+        "#dce9fb",
+        "#faf2dc",
+        "#dceefb",
+        "#fbe9dc",
       ];
 
-      // ---------------------------
-      // DOM REFERENCES
-      // ---------------------------
+      // DOM references
       const crnInput = document.getElementById("crnInput");
       const addButton = document.getElementById("addButton");
       const crnListItems = document.getElementById("crnListItems");
@@ -287,42 +209,40 @@
       const generateButton = document.getElementById("generateButton");
       const calendarWrapper = document.getElementById("calendarWrapper");
 
-      // We'll store CRNs + events
+      // we'll store CRNs & events
       const crnList = [];
       const events = [];
 
-      // ---------------------------
-      // BUILD CALENDAR LAYOUT
-      // ---------------------------
+      // ---------- BUILD LAYOUT -----------
       function buildCalendarLayout() {
         // 1) TIME COLUMN
         const timeCol = document.createElement("div");
         timeCol.classList.add("time-column");
         calendarWrapper.appendChild(timeCol);
 
-        // (A) Two spacers (each 5% of column)
+        // (A) Two "spacer" blocks, each 5% of column height
         for (let s = 0; s < 2; s++) {
           const spaceDiv = document.createElement("div");
           spaceDiv.classList.add("time-label");
           spaceDiv.style.position = "absolute";
-          spaceDiv.style.top = s * 5 + "%"; // 0% first, 5% second
+          spaceDiv.style.top = s * 5 + "%"; // 0% for first, 5% for second
           spaceDiv.style.height = "5%";
           spaceDiv.style.textAlign = "right";
-          spaceDiv.style.color = "transparent"; // invisible placeholder
+          // make it invisible or a placeholder
+          spaceDiv.style.color = "transparent";
           timeCol.appendChild(spaceDiv);
         }
 
-        // (B) Hour labels from 7 AM to 10 PM => 10..100%
+        // (B) Hour labels from 7 AM -> 10 PM, placed from 10%..100%
         for (let h = startHour; h <= endHour; h++) {
           const minOff = (h - startHour) * 60;
-          const topP = getTimeColumnTopPercent(minOff);
+          const topP = getTimeColumnTopPercent(minOff); // from 10..100
 
           const labelDiv = document.createElement("div");
           labelDiv.classList.add("time-label");
           labelDiv.style.position = "absolute";
           labelDiv.style.top = `calc(${topP} - 13px)`;
           labelDiv.innerText = formatHourLabel(h);
-
           timeCol.appendChild(labelDiv);
         }
 
@@ -333,18 +253,18 @@
           dayCol.setAttribute("data-day", day);
           calendarWrapper.appendChild(dayCol);
 
-          // day-header top 0..5%
+          // header top 0..5%
           const header = document.createElement("div");
           header.classList.add("day-header");
           header.innerText = day;
           dayCol.appendChild(header);
 
-          // timeline area (5..100%)
+          // timeline area
           const timelineArea = document.createElement("div");
           timelineArea.classList.add("timeline-area");
           dayCol.appendChild(timelineArea);
 
-          // hour lines in day columns
+          // hour lines in day columns (5..100)
           for (let hh = startHour; hh <= endHour; hh++) {
             const line = document.createElement("div");
             line.classList.add("hour-line");
@@ -355,17 +275,15 @@
       }
       buildCalendarLayout();
 
-      // Helper to get timeline area for a day
       function getTimelineArea(day) {
         const col = calendarWrapper.querySelector(
           `.day-column[data-day="${day}"]`
         );
-        return col ? col.querySelector(".timeline-area") : null;
+        if (!col) return null;
+        return col.querySelector(".timeline-area");
       }
 
-      // ---------------------------
-      // CRN LOGIC
-      // ---------------------------
+      // ---------- CRN logic -----------
       function isValidCRN(crn) {
         return /^\d{5}$/.test(crn);
       }
@@ -378,16 +296,14 @@
         errorMessage.textContent = "";
         crnList.push(Number(crnValue));
 
-        // Show in UI
         const li = document.createElement("li");
         li.textContent = crnValue;
         li.classList.add("crn-item");
         crnListItems.appendChild(li);
 
-        // Example term
+        // example term
         const term = "202510";
         addEvent(term, crnValue);
-
         crnInput.value = "";
       }
       addButton.addEventListener("click", addCRN);
@@ -407,11 +323,9 @@
         }
       });
 
-      // ---------------------------
-      // RENDER EVENTS
-      // ---------------------------
+      // ---------- RENDER EVENTS -----------
       function renderCalendar() {
-        // remove old events
+        // remove old .event-item
         document
           .querySelectorAll(".day-column .event-item")
           .forEach((el) => el.remove());
@@ -471,7 +385,7 @@
             detailsDiv.appendChild(descPara);
             detailsDiv.appendChild(alarmPara);
 
-            // expand/collapse on click
+            // expand/collapse
             evDiv.addEventListener("click", () => {
               if (evDiv.classList.contains("expanded")) {
                 evDiv.classList.remove("expanded");
@@ -491,9 +405,7 @@
         });
       }
 
-      // ---------------------------
-      // ICS GENERATION
-      // ---------------------------
+      // ---------- ICS generation, API calls, etc. -----------
       const eventDetailsList = events;
       function generateUID(i) {
         return `${Date.now()}-event-${i}@yourdomain.com`;
@@ -516,12 +428,10 @@
           daysOfWeek,
           alarmMinutesBefore,
         } = ed;
-
-        const baseDate = "20250122"; // example date for repeating rule
+        const baseDate = "20250122";
         const startDT = `${baseDate}T${formatTimeForICS(startTime)}`;
         const endDT = `${baseDate}T${formatTimeForICS(endTime)}`;
 
-        // iCalendar day codes
         const rruleDays = daysOfWeek.map((d) => daysMap[d]).join(",");
         const alarmTrigger = `-PT${alarmMinutesBefore}M`;
         const uid = generateUID(i);
@@ -568,9 +478,6 @@
       }
       generateButton.addEventListener("click", generateCalendarFile);
 
-      // ---------------------------
-      // API CALLS
-      // ---------------------------
       const daysMap = {
         Sunday: "SU",
         Monday: "MO",
@@ -621,9 +528,7 @@
         }
       }
 
-      // ---------------------------
-      // ADD EVENT
-      // ---------------------------
+      // Add event
       async function addEvent(term, crn) {
         console.log("Fetching faculty meeting times...");
         const stObj1 = await fetchFacultyMeetingTimes(term, crn);
@@ -636,22 +541,20 @@
         let shortTitle;
         try {
           const code = await getCodeByDescription(stObj2.subject);
-          if (code) {
+          if (code)
             shortTitle = `${code} ${stObj2.courseNumber} ${stObj1.meetingType}`;
-          }
         } catch (e) {
           console.error("Error subject code:", e);
         }
 
-        // choose a random pastel color once
-        const indexToRemove = Math.floor(Math.random() * eventColors.length);
-        const randomColor = eventColors[indexToRemove];
-
-        eventColors.splice(indexToRemove, 1);
+        const randomColor =
+          eventColors[Math.floor(Math.random() * eventColors.length)];
 
         const eventObj = {
           title: shortTitle || "Class Title",
-          description: `${stObj1.buildingDescription} | Room ${stObj1.room}<br>${stObj1.displayName}<br>${stObj1.emailAddress}`,
+          description:
+            `${stObj1.buildingDescription} | Room ${stObj1.room}\n` +
+            `${stObj1.displayName}\n${stObj1.emailAddress}`,
           location: "Main Campus",
           startTime: stObj1.beginTime
             ? stObj1.beginTime.slice(0, 2) + ":" + stObj1.beginTime.slice(2, 4)
@@ -668,7 +571,6 @@
 
         events.push(eventObj);
         console.log("Created Event:", eventObj);
-
         renderCalendar();
       }
     </script>
