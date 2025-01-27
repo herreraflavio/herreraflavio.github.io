@@ -595,6 +595,23 @@
           return null;
         }
       }
+
+      async function getProfessorRatingByName(name) {
+        const jsonUrl = "https://flavioherrera.com/rate_my_professor.json";
+        try {
+          const res = await fetch(jsonUrl);
+          if (!res.ok)
+            throw new Error(`Cannot fetch subjects: ${res.statusText}`);
+          const data = await res.json();
+          const found = data.find(
+            (item) => `${item.node.fistName} ${item.node.lastName}` === name
+          );
+          return found ? found.name : null;
+        } catch (err) {
+          console.error("Error fetching subject code:", err);
+          return null;
+        }
+      }
       async function fetchFacultyMeetingTimes(term, crn) {
         const url = `https://hackerflavio.com/api/facultyMeetingTimes?term=${term}&crn=${crn}`;
         try {
@@ -643,6 +660,18 @@
         } catch (e) {
           console.error("Error subject code:", e);
         }
+
+        let professorRating;
+        try {
+          const rating = await getProfessorRatingByName(stObj1.displayName);
+          if (rating) {
+            professorRating = `Rating: ${rating}`;
+          }
+        } catch (e) {
+          console.error("Error subject code:", e);
+        }
+        console.log("testing");
+        console.log(professorRating);
 
         // choose a random pastel color once
         const indexToRemove = Math.floor(Math.random() * eventColors.length);
