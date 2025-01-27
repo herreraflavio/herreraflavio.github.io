@@ -186,9 +186,56 @@
     </div>
 
     <!-- CRN List on a single line -->
-    <div class="crn-list-container">
-      <span class="crn-label">CRN List:</span>
-      <ul id="crnListItems"></ul>
+    <div class="crn-list-container" style="position: relative">
+      <div style="flex-grow: 1">
+        <span class="crn-label">CRN List:</span>
+        <ul id="crnListItems"></ul>
+      </div>
+      <div style="width: 240px; display: flex; align-items: center">
+        Average Difficulty score:
+        <div
+          style="
+            margin-left: 5px;
+            margin-right: 5px;
+            background-color: #006400;
+            font-weight: bold;
+            width: 32px;
+            text-align: center;
+            color: #000;
+          "
+          id="averageScore"
+        >
+          0.0
+        </div>
+        <div onclick="showRatings()">
+          <img
+            id="myImage"
+            src="/calendar/expand.png"
+            alt=""
+            style="width: 15px; display: block; cursor: pointer"
+          />
+        </div>
+      </div>
+      <div
+        id="ratings"
+        style="
+          position: absolute;
+          top: 30px;
+          right: 20px;
+          min-height: 200px;
+          width: 350px;
+          border: solid;
+          border-radius: 5%;
+          background-color: white;
+          z-index: 99;
+          padding: 20px;
+          visibility: hidden;
+          max-height: 600px;
+          overflow-y: scroll;
+        "
+      >
+        Add Classes (CRN) to See Ratings Populate
+      </div>
     </div>
 
     <!-- Generate ICS button -->
@@ -291,6 +338,7 @@
       // We'll store CRNs + events
       const crnList = [];
       const events = [];
+      const ratings = [];
 
       // ---------------------------
       // BUILD CALENDAR LAYOUT
@@ -603,15 +651,105 @@
           if (!res.ok)
             throw new Error(`Cannot fetch subjects: ${res.statusText}`);
           const data = await res.json();
-          const found = data.find(
-            (item) => `${item.node.fistName} ${item.node.lastName}` === name
-          );
-          return found ? found.name : null;
+          console.log(name);
+
+          let match;
+
+          console.log(data[0].node.firstName);
+          for (i = 0; i < data.length; i++) {
+            if (
+              `${data[i].node.firstName.trim()} ${data[
+                i
+              ].node.lastName.trim()}` === name
+            ) {
+              console.log(
+                "avgDifficulty: " +
+                  data[i].node.avgDifficulty +
+                  ", avgRating: " +
+                  data[i].node.avgRating
+              );
+              match = data[i].node;
+              return match;
+            }
+          }
+          return null;
         } catch (err) {
           console.error("Error fetching subject code:", err);
           return null;
         }
       }
+
+      let avgDifficultyScore = [];
+
+      async function getColorsRankings(first, second, third) {
+        console.log(first, second, third);
+        const getColor = (value, max, invert = false, findavg = false) => {
+          const percentile = (value / max) * 100; // Convert to percentage
+
+          if (invert) {
+            console.log(percentile);
+            if (!findavg) {
+              if (percentile != 0 || percentile != -1) {
+                avgDifficultyScore.push(100 - percentile);
+              }
+            }
+
+            // Inverted logic for higher = better
+            if (percentile >= 80) {
+              return "#006400"; // Dark Green
+            } else if (percentile >= 60) {
+              return "#32CD32"; // Light Green
+            } else if (percentile >= 40) {
+              return "#FFFF00"; // Yellow
+            } else if (percentile >= 20) {
+              return "#FFA500"; // Orange
+            } else {
+              return "#FF0000"; // Red
+            }
+          } else {
+            console.log(percentile);
+            if (!findavg) {
+              if (percentile != 0 || percentile != -1) {
+                avgDifficultyScore.push(percentile);
+              }
+            }
+
+            // Default logic: lower = better
+            if (percentile <= 20) {
+              return "#006400"; // Dark Green
+            } else if (percentile <= 40) {
+              return "#32CD32"; // Light Green
+            } else if (percentile <= 60) {
+              return "#FFFF00"; // Yellow
+            } else if (percentile <= 80) {
+              return "#FFA500"; // Orange
+            } else {
+              return "#FF0000"; // Red
+            }
+          }
+        };
+
+        // First number: lower = better (default logic)
+        const color1 = getColor(first, 5);
+
+        // Second and third numbers: higher = better (inverted logic)
+        const color2 = getColor(second, 5, true);
+        const color3 = getColor(third, 100, true);
+
+        let averageScore = 0;
+        for (i = 0; i < avgDifficultyScore.length; i++) {
+          averageScore += avgDifficultyScore[i];
+        }
+
+        averageScore = averageScore / avgDifficultyScore.length;
+
+        const color4 = getColor(averageScore, 100, false, true);
+
+        console.log(avgDifficultyScore);
+
+        return [color1, color2, color3, color4, averageScore];
+      }
+
       async function fetchFacultyMeetingTimes(term, crn) {
         const url = `https://hackerflavio.com/api/facultyMeetingTimes?term=${term}&crn=${crn}`;
         try {
@@ -652,8 +790,9 @@
         if (!stObj2) return;
 
         let shortTitle;
+        let code;
         try {
-          const code = await getCodeByDescription(stObj2.subject);
+          code = await getCodeByDescription(stObj2.subject);
           if (code) {
             shortTitle = `${code} ${stObj2.courseNumber} ${stObj1.meetingType}`;
           }
@@ -663,9 +802,54 @@
 
         let professorRating;
         try {
-          const rating = await getProfessorRatingByName(stObj1.displayName);
+          let firstLast = stObj1.displayName.split(",");
+          let fullName = `${firstLast[1].trim()} ${firstLast[0].trim()}`;
+          console.log("full name: " + fullName);
+          const rating = await getProfessorRatingByName(fullName);
+
           if (rating) {
+            const getColors = await getColorsRankings(
+              rating.avgDifficulty,
+              rating.avgRating,
+              rating.wouldTakeAgainPercent
+            );
+            let warningText = "";
+            if (
+              rating.avgDifficulty == 0 ||
+              rating.avgRating == 0 ||
+              rating.wouldTakeAgainPercent == -1
+            ) {
+              warningText =
+                "This professor might not have a rating and this will not be factored into average difficulty score";
+            } else {
+              warningText = "";
+            }
+
             professorRating = `Rating: ${rating}`;
+            ratings.push(rating);
+            document.getElementById("ratings").innerHTML += `
+            <div style="border-top: solid;padding-top:3.5px;padding-bottom:3.5px;margin-top:5px;">
+            <div>${code} ${stObj2.courseNumber} ${stObj1.meetingType}</div>
+            <div>Name: ${fullName}</div>
+            <div>avgDifficulty: <div style="background-color:${getColors[0]}">${rating.avgDifficulty}</div></div>
+            <div>avgRating:  <div style="background-color:${getColors[1]}">${rating.avgRating}</div></div>
+            <div>Would take again percent:  <div style="background-color:${getColors[2]}">${rating.wouldTakeAgainPercent}</div></div>
+            <div>${warningText}</div>
+            </div>
+            `;
+            document.getElementById("averageScore").style.backgroundColor =
+              getColors[3];
+            document.getElementById("averageScore").innerHTML =
+              getColors[4].toFixed(1);
+          } else {
+            alert("Lecturer was not found in ratemyprofessors database");
+            document.getElementById("ratings").innerHTML += `
+            <div style="border-top: solid;padding-top:3.5px;padding-bottom:3.5px;margin-top:5px;">
+            <div>${code} ${stObj2.courseNumber} ${stObj1.meetingType}</div>
+            <div>Name: ${fullName}</div>
+            <div>this instructor is currently not in ratemyprofessors database :(</div>
+            </div>
+            `;
           }
         } catch (e) {
           console.error("Error subject code:", e);
@@ -700,6 +884,19 @@
         console.log("Created Event:", eventObj);
 
         renderCalendar();
+      }
+      let isHidden = true;
+      function showRatings() {
+        if (isHidden) {
+          document.getElementById("ratings").style.visibility = "visible";
+          const imgElement = document.getElementById("myImage");
+          imgElement.src = "/calendar/close.png"; // Update with the new image URL
+        } else {
+          document.getElementById("ratings").style.visibility = "hidden";
+          const imgElement = document.getElementById("myImage");
+          imgElement.src = "/calendar/expand.png"; // Update with the new image URL
+        }
+        isHidden = !isHidden;
       }
     </script>
   </body>
