@@ -20519,7 +20519,7 @@
       y = m[1],
       v = (0, i.useRef)(null);
     (0, i.useEffect)(function () {
-      fetch("/course_histogram/percent_failed.json")
+      fetch("https://flavioherrera.com/course_histogram/percent_failed.json")
         .then(function (e) {
           return e.json();
         })
@@ -20556,7 +20556,9 @@
           g(e),
           u([]),
           y(-1),
-          fetch("/course_histogram/percent_failed.json")
+          fetch(
+            "https://flavioherrera.com/course_histogram/percent_failed.json"
+          )
             .then(function (e) {
               return e.json();
             })
