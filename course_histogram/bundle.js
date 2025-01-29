@@ -20572,106 +20572,151 @@
     return t
       ? i.createElement(
           "div",
-          null,
-          i.createElement("h2", null, "Failure Rates for ", d),
-          i.createElement("input", {
-            type: "text",
-            placeholder: "Search for a class...",
-            value: p,
-            onChange: function (e) {
-              var t = e.target.value;
-              g(t),
-                y(-1),
-                t.length > 0
-                  ? u(
-                      o.filter(function (e) {
-                        return e.toLowerCase().includes(t.toLowerCase());
-                      })
-                    )
-                  : u([]);
+          {
+            style: {
+              height: "100vh",
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             },
-            onKeyDown: function (e) {
-              "ArrowDown" === e.key
-                ? y(function (e) {
-                    var t,
-                      n = e < l.length - 1 ? e + 1 : e;
-                    return (
-                      v.current &&
-                        (null === (t = v.current.children[n]) ||
-                          void 0 === t ||
-                          t.scrollIntoView({ block: "nearest" })),
-                      n
-                    );
-                  })
-                : "ArrowUp" === e.key
-                ? y(function (e) {
-                    var t,
-                      n = e > 0 ? e - 1 : e;
-                    return (
-                      v.current &&
-                        (null === (t = v.current.children[n]) ||
-                          void 0 === t ||
-                          t.scrollIntoView({ block: "nearest" })),
-                      n
-                    );
-                  })
-                : "Enter" === e.key && b >= 0 && _(l[b]);
-            },
-            style: { width: "100%", padding: "10px", marginBottom: "10px" },
-          }),
-          l.length > 0 &&
-            i.createElement(
-              "ul",
-              {
-                ref: v,
-                style: {
-                  border: "1px solid #ccc",
-                  padding: "5px",
-                  maxHeight: "150px",
-                  overflowY: "auto",
-                },
+          },
+          i.createElement(
+            "div",
+            {
+              style: {
+                width: "75%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
               },
-              l.map(function (e, t) {
-                return i.createElement(
-                  "li",
-                  {
-                    key: e,
-                    style: {
-                      cursor: "pointer",
-                      padding: "5px",
-                      backgroundColor: t === b ? "#ddd" : "transparent",
-                    },
-                    onClick: function () {
-                      return _(e);
-                    },
-                  },
-                  e
-                );
+            },
+            i.createElement(
+              "div",
+              { style: { width: "100%" } },
+              i.createElement(
+                "h2",
+                { style: { textAlign: "center" } },
+                "Failure Rates for ",
+                d,
+                " ;)"
+              ),
+              i.createElement("input", {
+                type: "text",
+                placeholder: "Search for a class...",
+                value: p,
+                onChange: function (e) {
+                  var t = e.target.value;
+                  g(t),
+                    y(-1),
+                    t.length > 0
+                      ? u(
+                          o.filter(function (e) {
+                            return e.toLowerCase().includes(t.toLowerCase());
+                          })
+                        )
+                      : u([]);
+                },
+                onKeyDown: function (e) {
+                  "ArrowDown" === e.key
+                    ? y(function (e) {
+                        var t,
+                          n = e < l.length - 1 ? e + 1 : e;
+                        return (
+                          v.current &&
+                            (null === (t = v.current.children[n]) ||
+                              void 0 === t ||
+                              t.scrollIntoView({ block: "nearest" })),
+                          n
+                        );
+                      })
+                    : "ArrowUp" === e.key
+                    ? y(function (e) {
+                        var t,
+                          n = e > 0 ? e - 1 : e;
+                        return (
+                          v.current &&
+                            (null === (t = v.current.children[n]) ||
+                              void 0 === t ||
+                              t.scrollIntoView({ block: "nearest" })),
+                          n
+                        );
+                      })
+                    : "Enter" === e.key && b >= 0 && _(l[b]);
+                },
+                style: { width: "90%", padding: "10px", marginBottom: "10px" },
               })
             ),
-          i.createElement(Fr, {
-            data: t,
-            options: {
-              responsive: !0,
-              plugins: {
-                legend: { display: !1 },
-                title: {
-                  display: !0,
-                  text: "Failure Rates Over Semesters for ".concat(d),
-                },
-              },
-              scales: {
-                x: { title: { display: !0, text: "Semester" } },
-                y: {
-                  beginAtZero: !0,
+            i.createElement(
+              "div",
+              { style: { position: "relative", width: "100%" } },
+              i.createElement(
+                "div",
+                { style: { width: "100%", position: "absolute", top: "0" } },
+                l.length > 0 &&
+                  i.createElement(
+                    "ul",
+                    {
+                      ref: v,
+                      style: {
+                        border: "1px solid #ccc",
+                        padding: "5px",
+                        maxHeight: "150px",
+                        overflowY: "auto",
+                        width: "90%",
+                        position: "absolute",
+                        backgroundColor: "Canvas",
+                      },
+                    },
+                    l.map(function (e, t) {
+                      return i.createElement(
+                        "li",
+                        {
+                          key: e,
+                          style: {
+                            cursor: "pointer",
+                            padding: "5px",
+                            backgroundColor: t === b ? "#ddd" : "transparent",
+                          },
+                          onClick: function () {
+                            return _(e);
+                          },
+                        },
+                        e
+                      );
+                    })
+                  )
+              )
+            )
+          ),
+          i.createElement(
+            "div",
+            { style: { width: "90%", height: "100vh", overflow: "hidden" } },
+            i.createElement(Fr, {
+              data: t,
+              options: {
+                responsive: !0,
+                maintainAspectRatio: !1,
+                plugins: {
+                  legend: { display: !1 },
                   title: {
                     display: !0,
-                    text: "Failure Percentage / Number of Records Failed",
+                    text: "Failure Rates Over Semesters for ".concat(d),
+                  },
+                },
+                scales: {
+                  x: { title: { display: !0, text: "Semester" } },
+                  y: {
+                    beginAtZero: !0,
+                    title: {
+                      display: !0,
+                      text: "Failure Percentage / Number of Records Failed",
+                    },
                   },
                 },
               },
-            },
-          })
+            })
+          )
         )
       : i.createElement("p", null, "Loading chart...");
   };
