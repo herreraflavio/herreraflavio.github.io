@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UC Merced 3D Web Scene with Polygon</title>
+    <script src="https://js.arcgis.com/4.29/"></script>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+    <script>
+      require([
+        "esri/WebScene",
+        "esri/views/SceneView",
+        "esri/Graphic",
+        "esri/layers/GraphicsLayer",
+        "esri/geometry/Polygon",
+      ], function (WebScene, SceneView, Graphic, GraphicsLayer, Polygon) {
+        // Load your Web Scene
+        const scene = new WebScene({
+          portalItem: {
+            id: "64312cb9e9d148659e881d0954ba119e", // Your Web Scene ID
+          },
+        });
+
+        // Create a SceneView to display it
+        const view = new SceneView({
+          container: "viewDiv",
+          map: scene,
+        });
+
+        // Wait for the scene to load
+        view.when(() => {
+          console.log("Web Scene Loaded");
+
+          // Create a GraphicsLayer to hold the polygon
+          const graphicsLayer = new GraphicsLayer();
+          scene.add(graphicsLayer);
+
+          // Define Polygon Geometry (near UC Merced)
+          const polygon = new Polygon({
+            rings: [
+              [-120.4285, 37.3625], // Point 1 (Longitude, Latitude)
+              [-120.4282, 37.3625], // Point 2
+              [-120.4282, 37.3628], // Point 3
+              [-120.4285, 37.3628], // Point 4
+              [-120.4285, 37.3625], // Close the polygon
+            ],
+            spatialReference: { wkid: 4326 }, // WGS 84
+          });
+
+          // Define Symbol (Red Fill with Transparent Border)
+          const fillSymbol = {
+            type: "simple-fill",
+            color: [255, 0, 0, 0.4], // Red with 40% transparency
+            outline: {
+              color: [255, 0, 0],
+              width: 2,
+            },
+          };
+
+          // Create Graphic and Add to Layer
+          const polygonGraphic = new Graphic({
+            geometry: polygon,
+            symbol: fillSymbol,
+          });
+
+          graphicsLayer.add(polygonGraphic);
+          console.log("Polygon added to Web Scene");
+        });
+      });
+    </script>
+  </body>
+</html>
