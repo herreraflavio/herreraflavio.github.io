@@ -1,0 +1,479 @@
+<!-- current working one, use this code -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Polygons, Points, and Text Labels</title>
+
+    <!-- ArcGIS JS API stylesheet and script -->
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.31/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.31/"></script>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      /* Sidebar (nav bar) styling */
+      #sidebar {
+        width: 300px;
+        height: 100%;
+        background-color: #f8f8f8;
+        overflow-y: auto;
+      }
+
+      /* Container for the map view */
+      #viewDiv {
+        height: 100%;
+        flex-grow: 1;
+      }
+
+      /* Basic styling for list items */
+      .list-item {
+        cursor: pointer;
+        padding: 5px;
+        border-bottom: 1px solid #ccc;
+      }
+      .list-item:hover {
+        background-color: #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar / Nav Bar -->
+    <div style="display: flex; height: 100vh; width: 100vw">
+      <div id="sidebar">
+        <div style="padding: 25px">
+          <h3>Geometries from GeoJSON</h3>
+          <p>Click a feature name to zoom and see its popup.</p>
+          <h4>Polygons</h4>
+          <div id="polygonList"></div>
+          <h4>Points</h4>
+          <div id="pointList"></div>
+          <h4>Labels</h4>
+          <div id="labelList"></div>
+        </div>
+      </div>
+      <!-- Map container -->
+      <div id="viewDiv"></div>
+    </div>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/Graphic",
+        "esri/layers/GraphicsLayer",
+        "esri/widgets/Popup",
+      ], function (Map, MapView, Graphic, GraphicsLayer, Popup) {
+        // ----------------------------------------------------------------------
+        // 1. Create the Map and View
+        // ----------------------------------------------------------------------
+        const map = new Map({
+          basemap: "osm", // Uses Web Mercator
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          // Center near Merced (ArcGIS will project internally to Web Mercator)
+          center: [-120.424445, 37.364469],
+          zoom: 16,
+          popup: {
+            dockEnabled: false, // Ensures popups are available
+            defaultPopupTemplateEnabled: true, // Allows popups from sidebar
+          },
+        });
+
+        // **Manually create a popup instance**
+        view.popup = new Popup({
+          view: view,
+        });
+
+        // ----------------------------------------------------------------------
+        // 2. Create separate layers for polygons, points, and text labels
+        // ----------------------------------------------------------------------
+        const polygonsLayer = new GraphicsLayer();
+        const pointsLayer = new GraphicsLayer();
+        const labelsLayer = new GraphicsLayer();
+
+        // Add them in the order you want (labels last = on top)
+        map.addMany([polygonsLayer, pointsLayer, labelsLayer]);
+
+        // ----------------------------------------------------------------------
+        // 3. Fetch polygons (shapes.json) - array of FeatureCollections
+        // ----------------------------------------------------------------------
+        fetch("./shapefile/shapes.json")
+          .then((response) => response.json())
+          .then((geojsonPolygonsArray) => {
+            const polygonGraphics = [];
+
+            // shapes.json is an array of FeatureCollections
+            geojsonPolygonsArray.forEach((featureCollection, fcIndex) => {
+              featureCollection.features.forEach((feature, fIndex) => {
+                if (feature.geometry.type === "Polygon") {
+                  const coords = feature.geometry.coordinates[0];
+                  const polygonGraphic = createPolygonGraphic(
+                    coords,
+                    feature,
+                    fcIndex,
+                    fIndex
+                  );
+                  polygonsLayer.add(polygonGraphic);
+                  polygonGraphics.push(polygonGraphic);
+                } else if (feature.geometry.type === "MultiPolygon") {
+                  feature.geometry.coordinates.forEach((polyCoords, idx) => {
+                    const polygonGraphic = createPolygonGraphic(
+                      polyCoords[0],
+                      feature,
+                      fcIndex,
+                      `${fIndex}-${idx}`
+                    );
+                    polygonsLayer.add(polygonGraphic);
+                    polygonGraphics.push(polygonGraphic);
+                  });
+                }
+              });
+            });
+
+            // Build the sidebar list for polygons
+            buildSidebarList(
+              polygonGraphics,
+              document.getElementById("polygonList")
+            );
+          })
+          .catch((err) => {
+            console.error("Error loading polygons (shapes.json):", err);
+          });
+
+        // ----------------------------------------------------------------------
+        // 4. Fetch points (points.json) - also an array of FeatureCollections
+        // ----------------------------------------------------------------------
+        fetch("./shapefile/points.json")
+          .then((response) => response.json())
+          .then((geojsonPointsArray) => {
+            const pointGraphics = [];
+
+            geojsonPointsArray.forEach((featureCollection, fcIndex) => {
+              featureCollection.features.forEach((feature, fIndex) => {
+                if (feature.geometry.type === "Point") {
+                  const coords = feature.geometry.coordinates;
+                  const pointGraphic = createPointGraphic(
+                    coords,
+                    feature,
+                    fcIndex,
+                    fIndex
+                  );
+                  pointsLayer.add(pointGraphic);
+                  pointGraphics.push(pointGraphic);
+                }
+              });
+            });
+
+            // Build the sidebar list for points
+            buildSidebarList(
+              pointGraphics,
+              document.getElementById("pointList")
+            );
+          })
+          .catch((err) => {
+            console.error("Error loading points (points.json):", err);
+          });
+
+        // ----------------------------------------------------------------------
+        // 5. Fetch label text (labels.json) - array of FeatureCollections
+        //    We'll treat them like points, but with text symbols.
+        // ----------------------------------------------------------------------
+        fetch("./shapefile/labels.json")
+          .then((response) => response.json())
+          .then((labelsArray) => {
+            const labelGraphics = [];
+
+            labelsArray.forEach((featureCollection, fcIndex) => {
+              featureCollection.features.forEach((feature, fIndex) => {
+                if (feature.geometry.type === "Point") {
+                  const coords = feature.geometry.coordinates;
+                  const labelGraphic = createLabelGraphic(
+                    coords,
+                    feature,
+                    fcIndex,
+                    fIndex
+                  );
+                  labelsLayer.add(labelGraphic);
+                  labelGraphics.push(labelGraphic);
+                }
+              });
+            });
+
+            // If you want them in the sidebar, build a list
+            buildSidebarList(
+              labelGraphics,
+              document.getElementById("labelList")
+            );
+          })
+          .catch((err) => {
+            console.error("Error loading labels (labels.json):", err);
+          });
+
+        // ----------------------------------------------------------------------
+        // Helper functions
+        // ----------------------------------------------------------------------
+        function hideGraphicById(graphicsLayer, graphicId) {
+          const graphic = graphicsLayer.graphics.items.find(
+            (g) => g.attributes.id === graphicId
+          );
+          if (graphic) {
+            graphic.visible = false; // Hide it
+          }
+        }
+
+        // ----------------------------------------------------------------------
+        // createPolygonGraphic
+        // ----------------------------------------------------------------------
+        function createPolygonGraphic(rings, feature, fcIndex, fIndex) {
+          const properties = feature.properties || {};
+          const uniqueId = `polygon-${fcIndex}-${fIndex}`; // Unique ID
+          return new Graphic({
+            geometry: {
+              type: "polygon",
+              rings: rings,
+              spatialReference: { wkid: 3857 },
+            },
+            attributes: {
+              id: uniqueId,
+              name: properties.Name || `Polygon ${fcIndex}-${fIndex}`,
+              description:
+                properties.Description || `FID: ${properties.FID || 0}`,
+            },
+            symbol: {
+              type: "simple-fill",
+              color: [51, 51, 204, 0.2],
+              outline: {
+                color: "white",
+                width: 1,
+              },
+            },
+            popupTemplate: {
+              title: "{name}",
+              content: (event) => {
+                const g = event.graphic;
+                return `
+                  <p><b>Description:</b> ${g.attributes.description}</p>
+                  <p><i>Polygon coords (Web Mercator):</i><br/>
+                    ${JSON.stringify(g.geometry.rings)}
+                  </p>
+                `;
+              },
+            },
+          });
+        }
+
+        // ----------------------------------------------------------------------
+        // createPointGraphic: for normal points (picture or simple marker)
+        // ----------------------------------------------------------------------
+        function createPointGraphic(coords, feature, fcIndex, fIndex) {
+          const properties = feature.properties || {};
+          return new Graphic({
+            geometry: {
+              type: "point",
+              x: coords[0],
+              y: coords[1],
+              spatialReference: { wkid: 3857 },
+            },
+            attributes: {
+              name: properties.Name || `Point ${fcIndex}-${fIndex}`,
+              description:
+                properties.Description || `FID: ${properties.FID || 0}`,
+            },
+            symbol: {
+              type: "picture-marker",
+              url: "https://thumbs.dreamstime.com/b/parking-card-pay-station-concept-icon-vector-illustration-214497240.jpg",
+              width: "24px",
+              height: "24px",
+            },
+            popupTemplate: {
+              title: "{name}",
+              content: (event) => {
+                const g = event.graphic;
+                return `
+                  <p><b>Description:</b> ${g.attributes.description}</p>
+                  <p><i>Coordinates (Web Mercator):</i> 
+                    [${g.geometry.x.toFixed(2)}, ${g.geometry.y.toFixed(2)}]
+                  </p>
+                `;
+              },
+            },
+          });
+        }
+
+        // ----------------------------------------------------------------------
+        // createLabelGraphic: for "labels" (using a text symbol)
+        // ----------------------------------------------------------------------
+        function createLabelGraphic(coords, feature, fcIndex, fIndex) {
+          const properties = feature.properties || {};
+          const labelText = properties.Label || `Label ${fcIndex}-${fIndex}`;
+
+          return new Graphic({
+            geometry: {
+              type: "point",
+              x: coords[0],
+              y: coords[1],
+              spatialReference: { wkid: 3857 },
+            },
+            attributes: {
+              name: labelText, // shown in sidebar
+              description: properties.Description || "",
+            },
+            symbol: {
+              type: "text", // Use a TextSymbol
+              color: "black",
+              haloColor: "white",
+              haloSize: "2px",
+              text: labelText, // the actual text to display
+              font: {
+                size: 14,
+                family: "sans-serif",
+                weight: "bold",
+              },
+            },
+            popupTemplate: {
+              title: "{name}",
+              content: (event) => {
+                const g = event.graphic;
+                return `
+                  <p><b>Description:</b> ${g.attributes.description}</p>
+                  <p><i>Label Coordinates (Web Mercator):</i> 
+                    [${g.geometry.x.toFixed(2)}, ${g.geometry.y.toFixed(2)}]
+                  </p>
+                `;
+              },
+            },
+          });
+        }
+
+        // ----------------------------------------------------------------------
+        // buildSidebarList: generic for polygons, points, or labels
+        // ----------------------------------------------------------------------
+        function buildSidebarList(graphics, container) {
+          graphics.forEach((graphic) => {
+            const listItem = document.createElement("div");
+            listItem.className = "list-item";
+
+            // Create a span for the feature name
+            const nameSpan = document.createElement("span");
+            nameSpan.textContent = graphic.attributes.name;
+
+            // Create the "Show/Hide" button
+            const toggleButton = document.createElement("button");
+            toggleButton.textContent = "Hide";
+            toggleButton.style.marginLeft = "10px"; // Space between text and button
+            toggleButton.style.cursor = "pointer";
+
+            // Function to toggle visibility
+            function toggleVisibility() {
+              const isVisible = graphic.visible;
+              graphic.visible = !isVisible; // Toggle visibility
+
+              // Update button text and style
+              toggleButton.textContent = isVisible ? "Show" : "Hide";
+              listItem.style.opacity = isVisible ? "0.5" : "1"; // Dim when hidden
+            }
+
+            // Toggle button event listener
+            toggleButton.addEventListener("click", (event) => {
+              event.stopPropagation(); // Prevent triggering the zoom on click
+              toggleVisibility();
+            });
+
+            // Append the name and button to the list item
+            listItem.appendChild(nameSpan);
+            listItem.appendChild(toggleButton);
+
+            // Click event for zooming and showing popup
+            // listItem.addEventListener("click", () => {
+            //   const isPoint = graphic.geometry.type === "point";
+            //   const isPolygon = graphic.geometry.type === "polygon";
+            //   const isLabel = graphic.symbol.type === "text"; // Detect labels
+
+            //   view
+            //     .goTo({
+            //       target: graphic.geometry,
+            //       zoom: isLabel
+            //         ? 18
+            //         : isPoint
+            //         ? 19
+            //         : isPolygon
+            //         ? 17
+            //         : undefined,
+            //     })
+            //     .then(() => {
+            //       view.popup.open({
+            //         features: [graphic],
+            //         location:
+            //           isLabel || isPoint
+            //             ? graphic.geometry
+            //             : graphic.geometry.extent.center,
+            //       });
+            //     });
+            // });
+            listItem.addEventListener("click", () => {
+              const isPoint = graphic.geometry.type === "point";
+              const isPolygon = graphic.geometry.type === "polygon";
+              const isLabel = graphic.symbol.type === "text"; // Detect labels
+
+              // Adjust popup location before opening
+              let popupLocation = isLabel
+                ? {
+                    x: graphic.geometry.x,
+                    y: graphic.geometry.y + 8,
+                    spatialReference: { wkid: 3857 },
+                  } // Offset +8 for labels
+                : isPoint
+                ? {
+                    x: graphic.geometry.x,
+                    y: graphic.geometry.y + 5,
+                    spatialReference: { wkid: 3857 },
+                  } // Offset +5 for points
+                : graphic.geometry.extent.center; // No offset for polygons
+
+              view
+                .goTo({
+                  target: graphic.geometry,
+                  zoom: isLabel
+                    ? 18
+                    : isPoint
+                    ? 19
+                    : isPolygon
+                    ? 17
+                    : undefined,
+                })
+                .then(() => {
+                  view.popup.location = popupLocation; // Set location BEFORE opening the popup
+                  view.popup.open({
+                    features: [graphic],
+                    location: popupLocation,
+                  });
+                });
+            });
+
+            // Append the entire list item to the sidebar container
+            container.appendChild(listItem);
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

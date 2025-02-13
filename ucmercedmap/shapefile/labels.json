@@ -1,0 +1,41 @@
+[
+  {
+    "type": "FeatureCollection",
+    "name": "Merced Labels",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "Label": "UC Merced Library",
+          "Description": "City Hall location"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-13405708.83751199, 4490227.4595919941]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Label": "Parking Lot Scholars",
+          "Description": "Transportation hub"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-13406326.305813713, 4489840.563314789]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Label": "Bellevue Lot",
+          "Description": "University of California, Merced"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-13406001.827290896, 4489428.2727848664]
+        }
+      }
+    ]
+  }
+]
