@@ -1,0 +1,24 @@
+{
+  "type": "FeatureCollection",
+  "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+  "features": [
+    {
+      "type": "Feature",
+      "id": 0,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-13405708.83751199, 4490276.4595919941]
+      },
+      "properties": { "FID": 0, "Id": 0 }
+    },
+    {
+      "type": "Feature",
+      "id": 1,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-13405716.343783945, 4490281.0602102876]
+      },
+      "properties": { "FID": 1, "Id": 0 }
+    }
+  ]
+}

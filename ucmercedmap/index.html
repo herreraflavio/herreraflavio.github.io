@@ -90,8 +90,8 @@
           container: "viewDiv",
           map: map,
           // Center near Merced (ArcGIS will project internally to Web Mercator)
-          center: [-120.424445, 37.364469],
-          zoom: 16,
+          center: [-120.424445, 37.363569],
+          zoom: 17,
           popup: {
             dockEnabled: false, // Ensures popups are available
             defaultPopupTemplateEnabled: true, // Allows popups from sidebar
@@ -126,9 +126,12 @@
               featureCollection.features.forEach((feature, fIndex) => {
                 if (feature.geometry.type === "Polygon") {
                   const coords = feature.geometry.coordinates[0];
+                  const color = feature.properties.Color || "gray";
+
                   const polygonGraphic = createPolygonGraphic(
                     coords,
                     feature,
+                    color,
                     fcIndex,
                     fIndex
                   );
@@ -138,7 +141,9 @@
                   feature.geometry.coordinates.forEach((polyCoords, idx) => {
                     const polygonGraphic = createPolygonGraphic(
                       polyCoords[0],
+
                       feature,
+                      "red",
                       fcIndex,
                       `${fIndex}-${idx}`
                     );
@@ -213,7 +218,9 @@
                     fIndex
                   );
                   labelsLayer.add(labelGraphic);
-                  labelGraphics.push(labelGraphic);
+                  if (feature.properties.display === "true") {
+                    labelGraphics.push(labelGraphic);
+                  }
                 }
               });
             });
@@ -243,7 +250,7 @@
         // ----------------------------------------------------------------------
         // createPolygonGraphic
         // ----------------------------------------------------------------------
-        function createPolygonGraphic(rings, feature, fcIndex, fIndex) {
+        function createPolygonGraphic(rings, feature, color, fcIndex, fIndex) {
           const properties = feature.properties || {};
           const uniqueId = `polygon-${fcIndex}-${fIndex}`; // Unique ID
           return new Graphic({
@@ -260,9 +267,9 @@
             },
             symbol: {
               type: "simple-fill",
-              color: [51, 51, 204, 0.2],
+              color: color,
               outline: {
-                color: "white",
+                color: "black",
                 width: 1,
               },
             },
@@ -402,33 +409,6 @@
             listItem.appendChild(nameSpan);
             listItem.appendChild(toggleButton);
 
-            // Click event for zooming and showing popup
-            // listItem.addEventListener("click", () => {
-            //   const isPoint = graphic.geometry.type === "point";
-            //   const isPolygon = graphic.geometry.type === "polygon";
-            //   const isLabel = graphic.symbol.type === "text"; // Detect labels
-
-            //   view
-            //     .goTo({
-            //       target: graphic.geometry,
-            //       zoom: isLabel
-            //         ? 18
-            //         : isPoint
-            //         ? 19
-            //         : isPolygon
-            //         ? 17
-            //         : undefined,
-            //     })
-            //     .then(() => {
-            //       view.popup.open({
-            //         features: [graphic],
-            //         location:
-            //           isLabel || isPoint
-            //             ? graphic.geometry
-            //             : graphic.geometry.extent.center,
-            //       });
-            //     });
-            // });
             listItem.addEventListener("click", () => {
               const isPoint = graphic.geometry.type === "point";
               const isPolygon = graphic.geometry.type === "polygon";

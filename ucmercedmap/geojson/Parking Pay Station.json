@@ -1,0 +1,69 @@
+{
+  "type": "FeatureCollection",
+  "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+  "features": [
+    {
+      "type": "Feature",
+      "id": 0,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-13405962.21535241, 4489563.1433956549]
+      },
+      "properties": { "FID": 0, "Id": 0 }
+    },
+    {
+      "type": "Feature",
+      "id": 1,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-13405964.439560067, 4489474.543735493]
+      },
+      "properties": { "FID": 1, "Id": 0 }
+    },
+    {
+      "type": "Feature",
+      "id": 2,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-13406148.767511182, 4489474.543735493]
+      },
+      "properties": { "FID": 2, "Id": 0 }
+    },
+    {
+      "type": "Feature",
+      "id": 3,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-13406149.984197328, 4489559.7117657112]
+      },
+      "properties": { "FID": 3, "Id": 0 }
+    },
+    {
+      "type": "Feature",
+      "id": 4,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-13406326.305813713, 4489840.563314789]
+      },
+      "properties": { "FID": 4, "Id": 0 }
+    },
+    {
+      "type": "Feature",
+      "id": 5,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-13406334.061452512, 4489682.8606921434]
+      },
+      "properties": { "FID": 5, "Id": 0 }
+    },
+    {
+      "type": "Feature",
+      "id": 6,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-13406304.729588903, 4489539.3139661429]
+      },
+      "properties": { "FID": 6, "Id": 0 }
+    }
+  ]
+}
