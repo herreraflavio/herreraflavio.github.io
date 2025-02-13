@@ -18,7 +18,12 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#ffa50085" }
+        "properties": {
+          "FID": 0,
+          "Id": 0,
+          "Color": "#ffa50085",
+          "Name": "Bellevue Lot-Green Zone"
+        }
       }
     ]
   },

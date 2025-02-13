@@ -218,7 +218,7 @@
                     fIndex
                   );
                   labelsLayer.add(labelGraphic);
-                  if (feature.properties.display === "true") {
+                  if (feature.properties.display === true) {
                     labelGraphics.push(labelGraphic);
                   }
                 }
@@ -333,42 +333,70 @@
           const properties = feature.properties || {};
           const labelText = properties.Label || `Label ${fcIndex}-${fIndex}`;
 
-          return new Graphic({
-            geometry: {
-              type: "point",
-              x: coords[0],
-              y: coords[1],
-              spatialReference: { wkid: 3857 },
-            },
-            attributes: {
-              name: labelText, // shown in sidebar
-              description: properties.Description || "",
-            },
-            symbol: {
-              type: "text", // Use a TextSymbol
-              color: "black",
-              haloColor: "white",
-              haloSize: "2px",
-              text: labelText, // the actual text to display
-              font: {
-                size: 14,
-                family: "sans-serif",
-                weight: "bold",
+          if (properties.display) {
+            return new Graphic({
+              geometry: {
+                type: "point",
+                x: coords[0],
+                y: coords[1],
+                spatialReference: { wkid: 3857 },
               },
-            },
-            popupTemplate: {
-              title: "{name}",
-              content: (event) => {
-                const g = event.graphic;
-                return `
+              attributes: {
+                name: labelText, // shown in sidebar
+                description: properties.Description || "",
+              },
+              symbol: {
+                type: "text", // Use a TextSymbol
+                color: "black",
+                haloColor: "white",
+                haloSize: "2px",
+                text: labelText, // the actual text to display
+                font: {
+                  size: 14,
+                  family: "sans-serif",
+                  weight: "bold",
+                },
+              },
+
+              popupTemplate: {
+                title: "{name}",
+                content: (event) => {
+                  const g = event.graphic;
+                  return `
                   <p><b>Description:</b> ${g.attributes.description}</p>
                   <p><i>Label Coordinates (Web Mercator):</i> 
                     [${g.geometry.x.toFixed(2)}, ${g.geometry.y.toFixed(2)}]
                   </p>
                 `;
+                },
               },
-            },
-          });
+            });
+          } else {
+            return new Graphic({
+              geometry: {
+                type: "point",
+                x: coords[0],
+                y: coords[1],
+                spatialReference: { wkid: 3857 },
+              },
+              attributes: {
+                name: labelText, // shown in sidebar
+                description: properties.Description || "",
+              },
+              symbol: {
+                type: "text", // Use a TextSymbol
+                color: "black",
+                haloColor: "white",
+                haloSize: "2px",
+                text: labelText, // the actual text to display
+                font: {
+                  size: 14,
+                  family: "sans-serif",
+                  weight: "bold",
+                },
+              },
+            });
+          }
         }
 
         // ----------------------------------------------------------------------

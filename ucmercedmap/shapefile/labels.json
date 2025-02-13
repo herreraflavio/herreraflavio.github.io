@@ -6,7 +6,7 @@
       {
         "type": "Feature",
         "properties": {
-          "Label": "Polygon 0-0 Center",
+          "Label": "Bellevue Lot-Gold Zone",
           "Description": "Auto-generated center of mass"
         },
         "geometry": {
@@ -173,7 +173,7 @@
         "properties": {
           "Label": "University of California, Merced",
           "Description": "Auto-generated center of mass",
-          "display": "true"
+          "display": true
         },
         "geometry": {
           "type": "Point",
