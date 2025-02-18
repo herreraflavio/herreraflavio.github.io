@@ -2,6 +2,11 @@
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#ffa50085",
+      "name": "Bellevue Lot-Gold Zone",
+      "content_url": "/popups/bellevue_lot_gold_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -20,9 +25,7 @@
         },
         "properties": {
           "FID": 0,
-          "Id": 0,
-          "Color": "#ffa50085",
-          "Name": "Bellevue Lot-Green Zone"
+          "Id": 0
         }
       }
     ]
@@ -30,6 +33,11 @@
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#00440091",
+      "name": "Bellevue Lot-Green Zone",
+      "content_url": "/popups/bellevue_lot_green_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -56,13 +64,18 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#00440091" }
+        "properties": { "FID": 0, "Id": 0 }
       }
     ]
   },
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#80808063",
+      "name": "Bellevue Lot-H Zone",
+      "content_url": "/popups/bellevue_lot_h_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -82,13 +95,18 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#80808063" }
+        "properties": { "FID": 0, "Id": 0 }
       }
     ]
   },
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#80808063",
+      "name": "Bus Staging Zone",
+      "content_url": "/popups/bus_staging_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -105,13 +123,18 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#80808063" }
+        "properties": { "FID": 0, "Id": 0 }
       }
     ]
   },
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#00004e78",
+      "name": "ECEC Lot-Blue Zone",
+      "content_url": "/popups/ecec_lot_blue_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -129,13 +152,18 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#00004e78" }
+        "properties": { "FID": 0, "Id": 0 }
       }
     ]
   },
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#ffa50085",
+      "name": "Le Grand Lot-Gold Zone",
+      "content_url": "/popups/le_grand_lot_gold_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -167,13 +195,18 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#ffa50085" }
+        "properties": { "FID": 0, "Id": 0 }
       }
     ]
   },
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#ffa50085",
+      "name": "Library Lot 1-Gold Zone",
+      "content_url": "/popups/library_lot_1_gold_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -197,13 +230,18 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#ffa50085" }
+        "properties": { "FID": 0, "Id": 0 }
       }
     ]
   },
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#ffa50085",
+      "name": "Library Lot 2-Gold Zone",
+      "content_url": "/popups/library_lot_2_gold_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -222,13 +260,18 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#ffa50085" }
+        "properties": { "FID": 0, "Id": 0 }
       }
     ]
   },
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#80808063",
+      "name": "North Bowl Lot 1-Slate Zone",
+      "content_url": "/popups/north_bowl_lot_1_slate_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -254,13 +297,18 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#80808063" }
+        "properties": { "FID": 0, "Id": 0 }
       }
     ]
   },
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#80808063",
+      "name": "North Bowl Lot 2-Slate Zone",
+      "content_url": "/popups/north_bowl_lot_2_slate_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -277,13 +325,18 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#80808063" }
+        "properties": { "FID": 0, "Id": 0 }
       }
     ]
   },
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#00004e78",
+      "name": "P3 Lot-Blue Zone",
+      "content_url": "/popups/p3_lot_blue_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -300,13 +353,19 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#00004e78" }
+        "properties": { "FID": 0, "Id": 0 }
       }
     ]
   },
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#8b0000a3",
+      "name": "restricted Zone",
+      "content_url": "/popups/restricted_zone.html"
+    },
+
     "features": [
       {
         "type": "Feature",
@@ -370,6 +429,11 @@
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#00004e78",
+      "name": "Scholars Lot-Blue Zone",
+      "content_url": "/popups/scholars_lot_blue_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -392,13 +456,18 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#80808063" }
+        "properties": { "FID": 0, "Id": 0 }
       }
     ]
   },
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "color": "#80808063",
+      "name": "Scholars Lot-H Zone",
+      "content_url": "/popups/scholars_lot_h_zone.html"
+    },
     "features": [
       {
         "type": "Feature",
@@ -425,7 +494,7 @@
             ]
           ]
         },
-        "properties": { "FID": 0, "Id": 0, "Color": "#80808063" }
+        "properties": { "FID": 0, "Id": 0 }
       }
     ]
   }

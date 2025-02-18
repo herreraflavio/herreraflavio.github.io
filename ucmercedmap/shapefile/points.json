@@ -2,6 +2,11 @@
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "name": "Parking Pay Station",
+      "content_url": "/popups/parking_pay_station.html",
+      "imgURL": "https://thumbs.dreamstime.com/b/parking-card-pay-station-concept-icon-vector-illustration-214497240.jpg"
+    },
     "features": [
       {
         "type": "Feature",
@@ -71,6 +76,11 @@
   {
     "type": "FeatureCollection",
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "name": "EV Charging Station",
+      "content_url": "/popups/ev_charging_station.html",
+      "imgURL": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Symbol_electric_vehicle_charging_stations.jpg"
+    },
     "features": [
       {
         "type": "Feature",
