@@ -683,6 +683,7 @@
             // Toggle button event listener
             toggleButton.addEventListener("click", (event) => {
               event.stopPropagation(); // Prevent triggering the zoom on click
+
               toggleVisibility();
             });
 
@@ -694,6 +695,12 @@
               const isPoint = graphic.geometry.type === "point";
               const isPolygon = graphic.geometry.type === "polygon";
               const isLabel = graphic.symbol.type === "text"; // Detect labels
+
+              nodeList = document.querySelectorAll(".list-item");
+              for (let i = 0; i < nodeList.length; i++) {
+                nodeList[i].style.backgroundColor = "white";
+              }
+              listItem.style.backgroundColor = "gray";
 
               // Adjust popup location before opening
               let popupLocation = isLabel
