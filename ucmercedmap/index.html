@@ -534,9 +534,7 @@
                   return fetch(g.attributes.content_url)
                     .then((res) => res.text())
                     .then((html) => {
-                      return (
-                        baseContent + `<div class="popup-content">${html}</div>`
-                      );
+                      return `<div class="popup-content">${html}</div>`;
                     })
                     .catch((err) => {
                       console.error("Error loading popup content:", err);
