@@ -386,98 +386,16 @@
             });
           }
 
-          // function createPolygonGraphic(
-          //   rings,
-          //   properties,
-          //   color,
-          //   fcIndex,
-          //   fIndex,
-          //   uniqueId
-          // ) {
-          //   console.log("unique id:", uniqueId);
-          //   return new Graphic({
-          //     geometry: {
-          //       type: "polygon",
-          //       rings: rings,
-          //       spatialReference: { wkid: 3857 },
-          //     },
-          //     attributes: {
-          //       id: uniqueId,
-          //       name: properties.name || `Polygon ${fcIndex}-${fIndex}`,
-          //       description:
-          //         properties.description || `FID: ${properties.FID || 0}`,
-          //       content_url: properties.content_url || null, // Add content URL if available
-          //     },
-          //     // symbol: {
-          //     //   type: "simple-fill",
-          //     //   color: color,
-          //     //   outline: {
-          //     //     color: "black",
-          //     //     width: 1,
-          //     //   },
-          //     // },
-          //     symbol: {
-          //       type: "picture-fill", // Use picture-fill instead of simple-fill
-          //       url: "https://static.vecteezy.com/system/resources/previews/049/009/860/non_2x/aerial-top-view-of-empty-parking-lots-dronegraphy-photo.jpg", // The image URL
-          //       width: 150, // Adjust width of the image
-          //       height: 150, // Adjust height of the image
-          //       outline: {
-          //         color: "black",
-          //         width: 1,
-          //       },
-          //     },
-          //     popupTemplate: {
-          //       title: "{name}",
-          //       content: (event) => {
-          //         const g = event.graphic;
-          //         let baseContent = `<div>This popup has no content</div>`;
-
-          //         if (g.attributes.content_url) {
-          //           // Fetch external HTML content
-          //           return fetch(`${g.attributes.content_url}`)
-          //             .then((res) => res.text())
-          //             .then((html) => {
-          //               return `<div class="popup-content">${html}</div>`;
-          //             })
-          //             .catch((err) => {
-          //               console.error("Error loading popup content:", err);
-          //               return (
-          //                 baseContent +
-          //                 `<p style="color:red;">Error loading additional details.</p>`
-          //               );
-          //             });
-          //         } else {
-          //           // No external content, return base content
-          //           return baseContent;
-          //         }
-          //       },
-          //     },
-          //   });
-          // }
-
           function createPolygonGraphic(
             rings,
             properties,
             color,
             fcIndex,
             fIndex,
-            uniqueId,
-            view // Pass the map view to listen for zoom changes
+            uniqueId
           ) {
             console.log("unique id:", uniqueId);
-
-            let symbol = {
-              type: "picture-fill",
-              url: "https://static.vecteezy.com/system/resources/previews/049/009/860/non_2x/aerial-top-view-of-empty-parking-lots-dronegraphy-photo.jpg",
-              width: 100, // Initial size (adjust based on your map scale)
-              height: 100,
-              outline: {
-                color: "black",
-                width: 1,
-              },
-            };
-
-            const graphic = new Graphic({
+            return new Graphic({
               geometry: {
                 type: "polygon",
                 rings: rings,
@@ -488,9 +406,26 @@
                 name: properties.name || `Polygon ${fcIndex}-${fIndex}`,
                 description:
                   properties.description || `FID: ${properties.FID || 0}`,
-                content_url: properties.content_url || null,
+                content_url: properties.content_url || null, // Add content URL if available
               },
-              symbol: symbol,
+              symbol: {
+                type: "simple-fill",
+                color: color,
+                outline: {
+                  color: "black",
+                  width: 1,
+                },
+              },
+              // symbol: {
+              //   type: "picture-fill", // Use picture-fill instead of simple-fill
+              //   url: "https://static.vecteezy.com/system/resources/previews/049/009/860/non_2x/aerial-top-view-of-empty-parking-lots-dronegraphy-photo.jpg", // The image URL
+              //   width: 150, // Adjust width of the image
+              //   height: 150, // Adjust height of the image
+              //   outline: {
+              //     color: "black",
+              //     width: 1,
+              //   },
+              // },
               popupTemplate: {
                 title: "{name}",
                 content: (event) => {
@@ -498,6 +433,7 @@
                   let baseContent = `<div>This popup has no content</div>`;
 
                   if (g.attributes.content_url) {
+                    // Fetch external HTML content
                     return fetch(`${g.attributes.content_url}`)
                       .then((res) => res.text())
                       .then((html) => {
@@ -511,33 +447,97 @@
                         );
                       });
                   } else {
+                    // No external content, return base content
                     return baseContent;
                   }
                 },
               },
             });
-
-            //this would require math, maybe can implement so that we can have background image sized correctly
-
-            // 🔥 Adjust image size dynamically on zoom 🔥
-            view.watch("scale", (newScale) => {
-              // alert("scalling");
-              const baseSize = 1000; // Adjust this value as needed
-              const scaleFactor = 11000 - newScale;
-              // console.log(scaleFactor);
-              // Set minimum and maximum size limits to avoid distortion
-              const minSize = 50;
-              const maxSize = 500;
-
-              let newDim = Math.min(maxSize, 10 / scaleFactor);
-              console.log(newScale);
-              console.log(newDim);
-              graphic.symbol.width = (1 / (scaleFactor / 100)) * scaleFactor;
-              graphic.symbol.height = (1 / (scaleFactor / 1000)) * scaleFactor;
-            });
-
-            return graphic;
           }
+
+          // function createPolygonGraphic(
+          //   rings,
+          //   properties,
+          //   color,
+          //   fcIndex,
+          //   fIndex,
+          //   uniqueId,
+          //   view // Pass the map view to listen for zoom changes
+          // ) {
+          //   console.log("unique id:", uniqueId);
+
+          //   let symbol = {
+          //     type: "picture-fill",
+          //     url: "https://static.vecteezy.com/system/resources/previews/049/009/860/non_2x/aerial-top-view-of-empty-parking-lots-dronegraphy-photo.jpg",
+          //     width: 100, // Initial size (adjust based on your map scale)
+          //     height: 100,
+          //     outline: {
+          //       color: "black",
+          //       width: 1,
+          //     },
+          //   };
+
+          //   const graphic = new Graphic({
+          //     geometry: {
+          //       type: "polygon",
+          //       rings: rings,
+          //       spatialReference: { wkid: 3857 },
+          //     },
+          //     attributes: {
+          //       id: uniqueId,
+          //       name: properties.name || `Polygon ${fcIndex}-${fIndex}`,
+          //       description:
+          //         properties.description || `FID: ${properties.FID || 0}`,
+          //       content_url: properties.content_url || null,
+          //     },
+          //     symbol: symbol,
+          //     popupTemplate: {
+          //       title: "{name}",
+          //       content: (event) => {
+          //         const g = event.graphic;
+          //         let baseContent = `<div>This popup has no content</div>`;
+
+          //         if (g.attributes.content_url) {
+          //           return fetch(`${g.attributes.content_url}`)
+          //             .then((res) => res.text())
+          //             .then((html) => {
+          //               return `<div class="popup-content">${html}</div>`;
+          //             })
+          //             .catch((err) => {
+          //               console.error("Error loading popup content:", err);
+          //               return (
+          //                 baseContent +
+          //                 `<p style="color:red;">Error loading additional details.</p>`
+          //               );
+          //             });
+          //         } else {
+          //           return baseContent;
+          //         }
+          //       },
+          //     },
+          //   });
+
+          //   //this would require math, maybe can implement so that we can have background image sized correctly
+
+          //   // 🔥 Adjust image size dynamically on zoom 🔥
+          //   view.watch("scale", (newScale) => {
+          //     // alert("scalling");
+          //     const baseSize = 1000; // Adjust this value as needed
+          //     const scaleFactor = 11000 - newScale;
+          //     // console.log(scaleFactor);
+          //     // Set minimum and maximum size limits to avoid distortion
+          //     const minSize = 50;
+          //     const maxSize = 500;
+
+          //     let newDim = Math.min(maxSize, 10 / scaleFactor);
+          //     console.log(newScale);
+          //     console.log(newDim);
+          //     graphic.symbol.width = (1 / (scaleFactor / 100)) * scaleFactor;
+          //     graphic.symbol.height = (1 / (scaleFactor / 1000)) * scaleFactor;
+          //   });
+
+          //   return graphic;
+          // }
 
           function createPointGraphic(coords, properties, fcIndex, fIndex) {
             return new Graphic({
