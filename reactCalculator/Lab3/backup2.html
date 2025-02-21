@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div>
+        <div class="output">
+          <div id="output">0</div>
+        </div>
+        <div class="leftside-row">
+          <div class="btn num highlight">7</div>
+          <div class="btn num highlight">8</div>
+          <div class="btn num highlight">9</div>
+        </div>
+        <div class="leftside-row">
+          <div class="btn num highlight">4</div>
+          <div class="btn num highlight">5</div>
+          <div class="btn num highlight">6</div>
+        </div>
+        <div class="leftside-row">
+          <div class="btn num highlight">1</div>
+          <div class="btn num highlight">2</div>
+          <div class="btn num highlight">3</div>
+        </div>
+        <div class="leftside-row">
+          <div class="btn num highlight">0</div>
+          <div class="btn num highlight">.</div>
+          <div
+            class="btn operator highlight"
+            onclick="runOperation('=', 'eq')"
+            id="eq"
+          >
+            =
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column">
+        <div class="rightside-row">
+          <div class="btn clear">C</div>
+        </div>
+        <div class="rightside-row">
+          <div
+            class="btn operator"
+            onclick="runOperation('\\', 'div')"
+            id="div"
+          >
+            \
+          </div>
+        </div>
+        <div class="rightside-row">
+          <div class="btn operator" onclick="runOperation('X', 'mul')" id="mul">
+            X
+          </div>
+        </div>
+        <div class="rightside-row">
+          <div class="btn operator" onclick="runOperation('-','sub')" id="sub">
+            -
+          </div>
+        </div>
+        <div class="rightside-row">
+          <div class="btn operator" onclick="runOperation('+', 'add')" id="add">
+            +
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const nums = document.querySelectorAll(".num");
+      const output = document.getElementById("output");
+      const operators = document.querySelectorAll(".operator");
+      const clearBtn = document.querySelector(".clear");
+
+      let currHighlighted;
+      let currenOperation = "";
+      let lastNum = null;
+      const currStack = [null, null, null];
+
+      function insertNumber(number) {
+        if (number == ".") {
+          if (
+            !output.innerText.includes(".") &&
+            number == "." &&
+            output.innerText != ""
+          ) {
+            output.innerText += number;
+          }
+        } else {
+          if (output.innerText == "0") {
+            output.innerText = number;
+          } else {
+            output.innerText += number;
+          }
+        }
+
+        if (currStack[1] == null) {
+          currStack[0] = output.innerText;
+        } else {
+          currStack[2] = output.innerText;
+          lastNum = output.innerText;
+        }
+
+        console.log(currStack);
+
+        currHighlighted
+          ? (currHighlighted.style.backgroundColor = "#70ad47")
+          : null;
+      }
+
+      function clearOutput(content) {
+        output.innerText = content;
+      }
+
+      function performCalculation(firstNum, operator, secondNum) {
+        console.log(firstNum, operator, secondNum);
+        if (operator == "+") {
+          currStack.push(firstNum + secondNum);
+        } else if (operator == "-") {
+          currStack.push(firstNum - secondNum);
+        } else if (operator == "X") {
+          currStack.push(firstNum * secondNum);
+        } else if (operator == "\\") {
+          currStack.push(firstNum / secondNum);
+        }
+
+        output.innerHTML = currStack[0];
+        currStack.push(operator);
+        currStack.push(null);
+        console.log(currStack);
+      }
+
+      function checkStack() {
+        console.log("checking stack...", currStack.length);
+        if (currStack.length == 3 && currStack[2] != null) {
+          firstNum = parseFloat(currStack.shift());
+          operator = currStack.shift();
+          secondNum = parseFloat(currStack.shift());
+          performCalculation(firstNum, operator, secondNum);
+        }
+      }
+
+      nums.forEach((num) => {
+        num.addEventListener("click", function (event) {
+          console.log("num clicked:", num);
+          number = num.innerText;
+          if (currenOperation == "") {
+            insertNumber(number);
+          } else {
+            clearOutput("");
+            insertNumber(number);
+            currenOperation = "";
+          }
+        });
+      });
+
+      function runOperation(op, element) {
+        currenOperation = op;
+        console.log(currenOperation);
+
+        if (currenOperation != "=") {
+          checkStack();
+          currStack[1] = currenOperation;
+          if (currHighlighted) {
+            currHighlighted.style.backgroundColor = "#70ad47";
+          }
+          currHighlighted = document.getElementById(element);
+          currHighlighted.style.backgroundColor = "yellow";
+        } else {
+          if (
+            currStack[0] != null &&
+            currStack[1] != null &&
+            currStack[2] == null &&
+            lastNum != null
+          ) {
+            firstNum = parseFloat(currStack.shift());
+            operator = currStack.shift();
+            dummyRemove = currStack.shift();
+
+            performCalculation(firstNum, operator, parseFloat(lastNum));
+          } else {
+            checkStack();
+          }
+        }
+
+        console.log(currStack);
+      }
+
+      // operators.forEach((operator) => {
+      //   operator.addEventListener("click", function (event) {
+      //     console.log("operator clicked:", operator);
+      //     currenOperation = operator.textContent;
+      //     console.log(currenOperation);
+
+      //     if (currenOperation != "=") {
+      //       checkStack();
+      //       currStack[1] = currenOperation;
+      //       if (currHighlighted) {
+      //         currHighlighted.style.backgroundColor = "#70ad47";
+      //       }
+      //       currHighlighted = this;
+      //       currHighlighted.style.backgroundColor = "yellow";
+      //     } else {
+      //       if (
+      //         currStack[0] != null &&
+      //         currStack[1] != null &&
+      //         currStack[2] == null &&
+      //         lastNum != null
+      //       ) {
+      //         alert("equating here");
+      //         firstNum = parseFloat(currStack.shift());
+      //         operator = currStack.shift();
+      //         dummyRemove = currStack.shift();
+
+      //         performCalculation(firstNum, operator, parseFloat(lastNum));
+      //       } else {
+      //         checkStack();
+      //       }
+      //     }
+
+      //     console.log(currStack);
+      //   });
+      // });
+
+      clearBtn.addEventListener("click", function (event) {
+        console.log("operator clicked:", clearBtn);
+        clearOutput("0");
+      });
+    </script>
+  </body>
+</html>
