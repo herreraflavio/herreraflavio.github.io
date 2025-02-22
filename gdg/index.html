@@ -206,7 +206,7 @@
       canvas.addEventListener("wheel", (event) => {
         event.preventDefault();
 
-        let zoomIntensity = event.ctrlKey ? 0.002 : 0.05;
+        let zoomIntensity = event.ctrlKey ? 0.002 : 0.002;
         let zoomFactor = Math.exp(event.deltaY * -zoomIntensity);
         let mouseX = event.offsetX;
         let mouseY = event.offsetY;
