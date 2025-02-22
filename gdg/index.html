@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Campus Map</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      canvas {
+        background: #f0f0f0;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas" width="800" height="600"></canvas>
+
+    <script>
+      // Get canvas and context
+      const canvas = document.getElementById("myCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // Camera settings
+      let camera = {
+        x: 0,
+        y: 0,
+        zoom: 1,
+        isDragging: false,
+        lastX: 0,
+        lastY: 0,
+      };
+
+      let mapData = null;
+      let patterns = {}; // Stores SVG pattern images
+
+      // Load JSON map data
+      fetch("campus-map.json")
+        .then((response) => response.json())
+        .then((data) => {
+          mapData = data;
+          loadPatterns();
+        });
+
+      // Load SVG patterns
+      function loadPatterns() {
+        if (!mapData) return;
+
+        let loadCount = 0;
+        const totalPatterns = mapData.elements.length;
+
+        mapData.elements.forEach((building) => {
+          if (building.fillType === "svg") {
+            const img = new Image();
+            img.src = building.fillSource;
+            img.onload = () => {
+              patterns[building.fillSource] = {
+                img,
+                scale: building.patternScale || 1,
+              };
+              loadCount++;
+              if (loadCount === totalPatterns) {
+                render(); // Render once all patterns are loaded
+              }
+            };
+          }
+        });
+      }
+
+      // Function to draw everything (with camera transformations)
+      function render() {
+        if (!mapData) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+
+        // Apply camera transformations
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.scale(camera.zoom, camera.zoom);
+        ctx.translate(
+          -canvas.width / 2 + camera.x,
+          -canvas.height / 2 + camera.y
+        );
+
+        // Draw buildings from JSON
+        mapData.elements.forEach((element) => {
+          if (element.type === "building") {
+            drawBuilding(element);
+          }
+        });
+
+        ctx.restore();
+      }
+
+      function drawBuildingSingleImage(building, img, scale) {
+        // 1. Compute bounding box for the building's polygon
+        const points = building.points;
+        const xs = points.map((pt) => pt.x);
+        const ys = points.map((pt) => pt.y);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+
+        const buildingWidth = maxX - minX;
+        const buildingHeight = maxY - minY;
+
+        // 2. Calculate building's center
+        const centerX = minX + buildingWidth / 2;
+        const centerY = minY + buildingHeight / 2;
+
+        // 3. Scale the image
+        const scaledWidth = img.width * scale;
+        const scaledHeight = img.height * scale;
+
+        // 4. Begin path for building polygon
+        ctx.save(); // save state so we can clip
+        ctx.beginPath();
+        points.forEach((point, index) => {
+          if (index === 0) {
+            ctx.moveTo(point.x, point.y);
+          } else {
+            ctx.lineTo(point.x, point.y);
+          }
+        });
+        ctx.closePath();
+
+        // 5. Clip to building shape, so drawing is limited to that polygon
+        ctx.clip();
+
+        // 6. Draw the single image centered in that polygon’s bounding box
+        //    You could also try to "fit" the image exactly to the bounding box
+        //    but here we just place it centered, at its scaled size
+        const drawX = centerX - scaledWidth / 2;
+        const drawY = centerY - scaledHeight / 2;
+        ctx.drawImage(img, drawX, drawY, scaledWidth, scaledHeight);
+
+        // 7. Restore to remove the clip
+        ctx.restore();
+
+        // 8. Optionally draw the polygon’s stroke after restoring
+        ctx.strokeStyle = building.borderColor || "#000";
+        ctx.lineWidth = 2 / camera.zoom;
+        ctx.beginPath();
+        points.forEach((point, index) => {
+          if (index === 0) {
+            ctx.moveTo(point.x, point.y);
+          } else {
+            ctx.lineTo(point.x, point.y);
+          }
+        });
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      function drawBuildingPattern(building, img, scale) {
+        // Create an offscreen canvas for the pattern
+        const patternCanvas = document.createElement("canvas");
+        const patternCtx = patternCanvas.getContext("2d");
+
+        const scaledWidth = img.width * scale;
+        const scaledHeight = img.height * scale;
+
+        patternCanvas.width = scaledWidth;
+        patternCanvas.height = scaledHeight;
+        patternCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
+
+        // Create a repeating pattern
+        const pattern = ctx.createPattern(patternCanvas, "repeat");
+
+        // Fill building polygon
+        ctx.fillStyle = pattern;
+        ctx.strokeStyle = building.borderColor;
+        ctx.lineWidth = 2 / camera.zoom;
+
+        ctx.beginPath();
+        building.points.forEach((point, index) => {
+          if (index === 0) ctx.moveTo(point.x, point.y);
+          else ctx.lineTo(point.x, point.y);
+        });
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // Function to draw a building
+      function drawBuilding(building) {
+        // First, ensure we have the loaded image if the fillType is SVG
+        if (building.fillType === "svg" && patterns[building.fillSource]) {
+          const { img, scale } = patterns[building.fillSource];
+
+          // Check if 'noRepeat' is set (or any other condition for not repeating)
+          if (building.noRepeat) {
+            drawBuildingSingleImage(building, img, scale);
+          } else {
+            drawBuildingPattern(building, img, scale);
+          }
+        } else {
+          // ...any other handling for different fill types (solid color, etc.)...
+        }
+      }
+
+      // Handle Zoom (Mouse Wheel & Mac Trackpad Pinch)
+      canvas.addEventListener("wheel", (event) => {
+        event.preventDefault();
+
+        let zoomIntensity = event.ctrlKey ? 0.002 : 0.05;
+        let zoomFactor = Math.exp(event.deltaY * -zoomIntensity);
+        let mouseX = event.offsetX;
+        let mouseY = event.offsetY;
+
+        // Convert mouse position to world coordinates
+        let worldX = (mouseX - canvas.width / 2) / camera.zoom + camera.x;
+        let worldY = (mouseY - canvas.height / 2) / camera.zoom + camera.y;
+
+        // Apply zoom change
+        camera.zoom *= zoomFactor;
+
+        // Clamp Zoom Levels
+        camera.zoom = Math.max(0.2, Math.min(5, camera.zoom));
+
+        // Adjust camera position to zoom into the mouse cursor
+        camera.x = worldX - (mouseX - canvas.width / 2) / camera.zoom;
+        camera.y = worldY - (mouseY - canvas.height / 2) / camera.zoom;
+
+        render();
+      });
+
+      // Handle Panning (Mouse Drag)
+      canvas.addEventListener("mousedown", (event) => {
+        camera.isDragging = true;
+        camera.lastX = event.offsetX;
+        camera.lastY = event.offsetY;
+      });
+
+      canvas.addEventListener("mousemove", (event) => {
+        if (camera.isDragging) {
+          let dx = (event.offsetX - camera.lastX) / camera.zoom;
+          let dy = (event.offsetY - camera.lastY) / camera.zoom;
+
+          camera.x += dx;
+          camera.y += dy;
+
+          camera.lastX = event.offsetX;
+          camera.lastY = event.offsetY;
+
+          render();
+        }
+      });
+
+      canvas.addEventListener("mouseup", () => {
+        camera.isDragging = false;
+      });
+
+      canvas.addEventListener("mouseleave", () => {
+        camera.isDragging = false;
+      });
+
+      // Handle touch gestures for mobile
+      let lastTouchDistance = null;
+      canvas.addEventListener("touchstart", (event) => {
+        if (event.touches.length === 2) {
+          const dx = event.touches[0].clientX - event.touches[1].clientX;
+          const dy = event.touches[0].clientY - event.touches[1].clientY;
+          lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+        }
+      });
+
+      canvas.addEventListener("touchmove", (event) => {
+        if (event.touches.length === 2) {
+          const dx = event.touches[0].clientX - event.touches[1].clientX;
+          const dy = event.touches[0].clientY - event.touches[1].clientY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (lastTouchDistance) {
+            const zoomFactor = distance / lastTouchDistance;
+            camera.zoom *= zoomFactor;
+          }
+
+          lastTouchDistance = distance;
+          render();
+        }
+      });
+
+      canvas.addEventListener("touchend", () => {
+        lastTouchDistance = null;
+      });
+
+      // Initial render
+      render();
+    </script>
+  </body>
+</html>

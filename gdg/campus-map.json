@@ -1,0 +1,37 @@
+{
+  "canvasSize": { "width": 1000, "height": 800 },
+  "elements": [
+    {
+      "type": "building",
+      "id": "library",
+      "name": "Library",
+      "fillType": "svg",
+      "fillSource": "pattern1.svg",
+      "patternScale": 0.25,
+      "borderColor": "#000000",
+      "noRepeat": true,
+      "points": [
+        { "x": 200, "y": 200 },
+        { "x": 400, "y": 200 },
+        { "x": 400, "y": 400 },
+        { "x": 200, "y": 400 }
+      ]
+    },
+    {
+      "type": "building",
+      "id": "science-hall",
+      "name": "Science Hall",
+      "fillType": "svg",
+      "fillSource": "pattern2.svg",
+      "patternScale": 0.25,
+      "borderColor": "#000000",
+      "noRepeat": true,
+      "points": [
+        { "x": 500, "y": 300 },
+        { "x": 700, "y": 300 },
+        { "x": 700, "y": 500 },
+        { "x": 500, "y": 500 }
+      ]
+    }
+  ]
+}
