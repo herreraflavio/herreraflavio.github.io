@@ -4,7 +4,8 @@
     "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
     "properties": {
       "name": "Parking Pay Station",
-      "content_url": "/popups/parking_pay_station.html",
+      "content_url": "/popups/parking_pay_station_down.html",
+      "category": "/Parking and Transportation/Under Repair",
       "imgURL": "https://thumbs.dreamstime.com/b/parking-card-pay-station-concept-icon-vector-illustration-214497240.jpg"
     },
     "features": [
@@ -16,7 +17,19 @@
           "coordinates": [-13405962.21535241, 4489563.1433956549]
         },
         "properties": { "FID": 0, "Id": 0 }
-      },
+      }
+    ]
+  },
+  {
+    "type": "FeatureCollection",
+    "crs": { "type": "name", "properties": { "name": "EPSG:3857" } },
+    "properties": {
+      "name": "Parking Pay Station",
+      "content_url": "/popups/parking_pay_station.html",
+      "category": "/Parking and Transportation/Parking Permit Dispensers",
+      "imgURL": "https://thumbs.dreamstime.com/b/parking-card-pay-station-concept-icon-vector-illustration-214497240.jpg"
+    },
+    "features": [
       {
         "type": "Feature",
         "id": 1,
@@ -79,6 +92,7 @@
     "properties": {
       "name": "EV Charging Station",
       "content_url": "/popups/ev_charging_station.html",
+      "category": "/Parking and Transportation/Electric Vehicle Charging",
       "imgURL": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Symbol_electric_vehicle_charging_stations.jpg"
     },
     "features": [

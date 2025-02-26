@@ -5,6 +5,7 @@
     "properties": {
       "color": "#ffa50085",
       "name": "Bellevue Lot-Gold Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/bellevue_lot_gold_zone.html"
     },
     "features": [
@@ -36,6 +37,7 @@
     "properties": {
       "color": "#00440091",
       "name": "Bellevue Lot-Green Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/bellevue_lot_green_zone.html"
     },
     "features": [
@@ -74,6 +76,7 @@
     "properties": {
       "color": "#80808063",
       "name": "Bellevue Lot-H Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/bellevue_lot_h_zone.html"
     },
     "features": [
@@ -105,6 +108,7 @@
     "properties": {
       "color": "#80808063",
       "name": "Bus Staging Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/bus_staging_zone.html"
     },
     "features": [
@@ -133,6 +137,7 @@
     "properties": {
       "color": "#00004e78",
       "name": "ECEC Lot-Blue Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/ecec_lot_blue_zone.html"
     },
     "features": [
@@ -162,6 +167,7 @@
     "properties": {
       "color": "#ffa50085",
       "name": "Le Grand Lot-Gold Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/le_grand_lot_gold_zone.html"
     },
     "features": [
@@ -205,6 +211,7 @@
     "properties": {
       "color": "#ffa50085",
       "name": "Library Lot 1-Gold Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/library_lot_1_gold_zone.html"
     },
     "features": [
@@ -240,6 +247,7 @@
     "properties": {
       "color": "#ffa50085",
       "name": "Library Lot 2-Gold Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/library_lot_2_gold_zone.html"
     },
     "features": [
@@ -270,6 +278,7 @@
     "properties": {
       "color": "#80808063",
       "name": "North Bowl Lot 1-Slate Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/north_bowl_lot_1_slate_zone.html"
     },
     "features": [
@@ -307,6 +316,7 @@
     "properties": {
       "color": "#80808063",
       "name": "North Bowl Lot 2-Slate Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/north_bowl_lot_2_slate_zone.html"
     },
     "features": [
@@ -335,6 +345,7 @@
     "properties": {
       "color": "#00004e78",
       "name": "P3 Lot-Blue Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/p3_lot_blue_zone.html"
     },
     "features": [
@@ -363,6 +374,7 @@
     "properties": {
       "color": "#8b0000a3",
       "name": "restricted Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/restricted_zone.html"
     },
 
@@ -432,6 +444,7 @@
     "properties": {
       "color": "#00004e78",
       "name": "Scholars Lot-Blue Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/scholars_lot_blue_zone.html"
     },
     "features": [
@@ -466,6 +479,7 @@
     "properties": {
       "color": "#80808063",
       "name": "Scholars Lot-H Zone",
+      "category": "/Parking and Transportation/Parking",
       "content_url": "/popups/scholars_lot_h_zone.html"
     },
     "features": [
@@ -504,6 +518,7 @@
     "properties": {
       "color": "#ff325685",
       "name": "Kolligian Library Building",
+      "category": "/buildings",
       "content_url": "/popups/kolligian_library_building.html"
     },
     "features": [

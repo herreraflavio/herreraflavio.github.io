@@ -1,0 +1,1194 @@
+<!-- current working one, use this code -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Polygons, Points, and Text Labels</title>
+
+    <!-- ArcGIS JS API stylesheet and script -->
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.31/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.31/"></script>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      /* Sidebar (nav bar) styling */
+      #sidebar {
+        width: 340px;
+        height: 100%;
+        background-color: #f8f8f8;
+        overflow-y: auto;
+      }
+
+      /* Container for the map view */
+      #viewDiv {
+        height: 100%;
+        flex-grow: 1;
+      }
+
+      /* Basic styling for list items */
+      .list-item {
+        cursor: pointer;
+        padding: 5px;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+      }
+      .list-item:hover {
+        background-color: #eee;
+      }
+      .popup-content {
+        max-width: 300px;
+        font-family: Arial, sans-serif;
+        line-height: 1.5;
+      }
+
+      .popup-content img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .popup-content h1 {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+
+      .popup-content p {
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+      .sub-items {
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar / Nav Bar -->
+    <div style="display: flex; height: 100vh; width: 100vw" id="container">
+      <div id="sidebar">
+        <div style="padding: 25px">
+          <h3>Geometries from GeoJSON</h3>
+          <p>Click a feature name to zoom and see its popup.</p>
+          <h4>Polygons</h4>
+          <div id="polygonList"></div>
+          <h4>Points</h4>
+          <div id="pointList"></div>
+          <h4>Labels</h4>
+          <div id="labelList"></div>
+        </div>
+      </div>
+      <!-- Map container -->
+      <div id="viewDiv"></div>
+    </div>
+
+    <script>
+      let centerCordinates;
+      let zoomLevel;
+      let fontSize;
+
+      let baseURL = "https://flavioherrera.com/ucmercedmap";
+      function detectDeviceType() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const aspectRatio = width / height;
+        const pixelRatio = window.devicePixelRatio; // Helps differentiate high-DPI screens
+
+        // Smartphones typically have a taller aspect ratio (~0.5 to 0.75 in portrait)
+        // Laptops usually have a wider aspect ratio (~1.3 to 1.7)
+        if (aspectRatio < 0.8 || (width < 800 && pixelRatio > 1)) {
+          document.getElementById("container").style.flexDirection =
+            "column-reverse";
+          document.getElementById("sidebar").style.width = "100%";
+          document.getElementById("sidebar").style.height = "60%";
+          centerCordinates = [-120.428845, 37.363169];
+          zoomLevel = 16;
+          fontSize = 10;
+          return "smartphone";
+        } else {
+          centerCordinates = [-120.424445, 37.363569];
+          zoomLevel = 17;
+          fontSize = 14;
+
+          return "laptop";
+        }
+      }
+
+      // Example Usage:
+      window.onload = function () {
+        const currentUrl = window.location.href;
+        console.log(currentUrl);
+
+        if (currentUrl.includes("http://127.0.0.1:5502/")) {
+          baseURL = "http://127.0.0.1:5502/ucmercedmap";
+        }
+        const deviceType = detectDeviceType();
+        console.log(`Detected device: ${deviceType}`);
+
+        if (deviceType === "smartphone") {
+          // Apply settings for smartphones
+          document.body.style.fontSize = "14px";
+        } else {
+          // Apply settings for laptops
+          document.body.style.fontSize = "18px";
+        }
+
+        require([
+          "esri/Map",
+          "esri/views/MapView",
+          "esri/Graphic",
+          "esri/layers/GraphicsLayer",
+          "esri/widgets/Popup",
+        ], function (Map, MapView, Graphic, GraphicsLayer, Popup) {
+          // ----------------------------------------------------------------------
+          // 1. Create the Map and View
+          // ----------------------------------------------------------------------
+          const map = new Map({
+            basemap: "osm", // Uses Web Mercator
+          });
+
+          // const baseURL = "https://flavioherrera.com/ucmercedmap";
+
+          const view = new MapView({
+            container: "viewDiv",
+            map: map,
+            // Center near Merced (ArcGIS will project internally to Web Mercator)
+            center: centerCordinates,
+            zoom: zoomLevel,
+            popup: {
+              dockEnabled: false, // Ensures popups are available
+              defaultPopupTemplateEnabled: true, // Allows popups from sidebar
+            },
+          });
+
+          view.popup = new Popup({
+            view: view,
+          });
+
+          const polygonsLayer = new GraphicsLayer();
+          const pointsLayer = new GraphicsLayer();
+          const labelsLayer = new GraphicsLayer();
+
+          map.addMany([polygonsLayer, pointsLayer, labelsLayer]);
+
+          fetch("./shapefile/shapes.json")
+            .then((response) => response.json())
+            .then((geojsonPolygonsArray) => {
+              const polygonGraphics = [];
+
+              // shapes.json is an array of FeatureCollections
+              geojsonPolygonsArray.forEach((featureCollection, fcIndex) => {
+                let polygonCoords = [];
+                let labelGraphic;
+
+                const color = featureCollection.properties?.color || "gray";
+                const uniqueId = "polygon-" + fcIndex;
+                const uniqueParentPath = `${featureCollection.properties?.category}/${featureCollection.properties?.name}`;
+                featureCollection.features.forEach((feature, fIndex) => {
+                  polygonCoords.push(feature.geometry.coordinates[0]);
+                  parentId = uniqueId;
+                  parentPath = uniqueParentPath;
+
+                  console.log("parentPath:", parentPath);
+
+                  labelGraphic = createNameGraphic(
+                    feature.geometry.coordinates[0],
+                    featureCollection.properties?.name || "default label",
+                    parentId,
+                    parentPath
+                  );
+                });
+
+                const properties = {
+                  name: featureCollection.properties?.name || "default label",
+                  description: "temp description",
+                  content_url: `${baseURL}${
+                    featureCollection.properties?.content_url ||
+                    "/popups/default_popup.html"
+                  }`,
+                  category: featureCollection.properties?.category,
+                };
+
+                const polygonGraphic = createPolygonGraphic(
+                  polygonCoords,
+                  properties,
+                  color,
+                  fcIndex,
+                  0,
+                  uniqueId,
+                  view
+                );
+
+                polygonsLayer.add(polygonGraphic);
+                polygonGraphics.push(polygonGraphic);
+
+                labelsLayer.add(labelGraphic);
+              });
+
+              buildNestedSidebarFromJson(
+                polygonGraphics,
+                document.getElementById("polygonList"),
+                document.getElementById("sidebar")
+              );
+            })
+            .catch((err) => {
+              console.error("Error loading polygons (shapes.json):", err);
+            });
+
+          // ----------------------------------------------------------------------
+          // 4. Fetch points (points.json) - also an array of FeatureCollections
+          // ----------------------------------------------------------------------
+          fetch("./shapefile/points.json")
+            .then((response) => response.json())
+            .then((geojsonPointsArray) => {
+              const pointGraphics = [];
+
+              geojsonPointsArray.forEach((featureCollection, fcIndex) => {
+                const properties = {
+                  name: featureCollection.properties?.name || "default label",
+                  description: "temp description",
+                  imgURL:
+                    featureCollection.properties?.imgURL ||
+                    `${baseURL}/placeholder.png`,
+                  content_url: `${baseURL}${
+                    featureCollection.properties?.content_url ||
+                    "/popups/default_popup.html"
+                  }`,
+                  category: featureCollection.properties?.category,
+                };
+
+                featureCollection.features.forEach((feature, fIndex) => {
+                  if (feature.geometry.type === "Point") {
+                    const coords = feature.geometry.coordinates;
+                    const pointGraphic = createPointGraphic(
+                      coords,
+                      properties,
+                      fcIndex,
+                      fIndex
+                    );
+                    pointsLayer.add(pointGraphic);
+                    pointGraphics.push(pointGraphic);
+                  }
+                });
+              });
+
+              buildNestedSidebarFromJson(
+                pointGraphics,
+                document.getElementById("pointList"),
+                document.getElementById("sidebar")
+              );
+            })
+            .catch((err) => {
+              console.error("Error loading points (points.json):", err);
+            });
+
+          fetch("./shapefile/labels.json")
+            .then((response) => response.json())
+            .then((labelsArray) => {
+              const labelGraphics = [];
+
+              labelsArray.forEach((featureCollection, fcIndex) => {
+                featureCollection.features.forEach((feature, fIndex) => {
+                  if (feature.geometry.type === "Point") {
+                    const coords = feature.geometry.coordinates;
+                    const labelGraphic = createLabelGraphic(
+                      coords,
+                      feature,
+                      fcIndex,
+                      fIndex
+                    );
+                    labelsLayer.add(labelGraphic);
+                    if (feature.properties.display === true) {
+                      labelGraphics.push(labelGraphic);
+                    }
+                  }
+                });
+              });
+
+              buildNestedSidebarFromJson(
+                labelGraphics,
+                document.getElementById("labelList"),
+                document.getElementById("sidebar")
+              );
+            })
+            .catch((err) => {
+              console.error("Error loading labels (labels.json):", err);
+            });
+
+          function hideGraphicById(graphicsLayer, graphicId) {
+            const graphic = graphicsLayer.graphics.items.find(
+              (g) => g.attributes.id === graphicId
+            );
+            if (graphic) {
+              graphic.visible = false; // Hide it
+            }
+          }
+
+          hideGraphicById(polygonsLayer, "polygon-9");
+
+          function getPolygonCentroid(ring) {
+            let signedArea = 0;
+            let cx = 0;
+            let cy = 0;
+
+            if (
+              ring.length > 0 &&
+              (ring[0][0] !== ring[ring.length - 1][0] ||
+                ring[0][1] !== ring[ring.length - 1][1])
+            ) {
+              ring.push([...ring[0]]);
+            }
+
+            for (let i = 0; i < ring.length - 1; i++) {
+              const [x0, y0] = ring[i];
+              const [x1, y1] = ring[i + 1];
+              const cross = x0 * y1 - x1 * y0; // cross product
+              signedArea += cross;
+              cx += (x0 + x1) * cross;
+              cy += (y0 + y1) * cross;
+            }
+
+            signedArea = signedArea / 2;
+            cx = cx / (6 * signedArea);
+            cy = cy / (6 * signedArea);
+
+            return [cx, cy];
+          }
+
+          function createNameGraphic(ring, labelText, parentId, parentPath) {
+            const [cx, cy] = getPolygonCentroid(ring);
+            return new Graphic({
+              geometry: {
+                type: "point",
+                x: cx,
+                y: cy,
+                spatialReference: { wkid: 3857 },
+              },
+              attributes: {
+                name: labelText || "labelText", // shown in sidebar
+                description: "description",
+                id: `label-${parentId}`, // Tie label to polygon
+                parentId: parentId,
+                parentPath: parentPath,
+              },
+              symbol: {
+                type: "text", // Use a TextSymbol
+                color: "black",
+                haloColor: "white",
+                haloSize: "2px",
+                text: labelText || "labelText", // the actual text to display
+                font: {
+                  size: fontSize,
+                  family: "sans-serif",
+                  weight: "bold",
+                },
+              },
+            });
+          }
+
+          function createPolygonGraphic(
+            rings,
+            properties,
+            color,
+            fcIndex,
+            fIndex,
+            uniqueId
+          ) {
+            console.log("unique id:", uniqueId);
+            return new Graphic({
+              geometry: {
+                type: "polygon",
+                rings: rings,
+                spatialReference: { wkid: 3857 },
+              },
+              attributes: {
+                id: uniqueId,
+                name: properties.name || `Polygon ${fcIndex}-${fIndex}`,
+                description:
+                  properties.description || `FID: ${properties.FID || 0}`,
+                content_url: properties.content_url || null, // Add content URL if available
+                category: `${properties.category}` || null, // Add content URL if available
+              },
+              symbol: {
+                type: "simple-fill",
+                color: color,
+                outline: {
+                  color: "black",
+                  width: 1,
+                },
+              },
+
+              popupTemplate: {
+                title: "{name}",
+                content: (event) => {
+                  const g = event.graphic;
+                  let baseContent = `<div>This popup has no content</div>`;
+
+                  if (g.attributes.content_url) {
+                    // Fetch external HTML content
+                    return fetch(`${g.attributes.content_url}`)
+                      .then((res) => res.text())
+                      .then((html) => {
+                        return `<div class="popup-content">${html}</div>`;
+                      })
+                      .catch((err) => {
+                        console.error("Error loading popup content:", err);
+                        return (
+                          baseContent +
+                          `<p style="color:red;">Error loading additional details.</p>`
+                        );
+                      });
+                  } else {
+                    // No external content, return base content
+                    return baseContent;
+                  }
+                },
+              },
+            });
+          }
+
+          function createPointGraphic(coords, properties, fcIndex, fIndex) {
+            return new Graphic({
+              geometry: {
+                type: "point",
+                x: coords[0],
+                y: coords[1],
+                spatialReference: { wkid: 3857 },
+              },
+              attributes: {
+                name:
+                  properties.Name || `${properties.name} ${fcIndex}-${fIndex}`,
+                description:
+                  properties.Description || `FID: ${properties.FID || 0}`,
+
+                content_url: properties.content_url || null, // Store content URL if available
+                category: properties.category || null, // Add content URL if available
+              },
+              symbol: {
+                type: "picture-marker",
+                url: properties.imgURL,
+                width: "24px",
+                height: "24px",
+              },
+              popupTemplate: {
+                title: "{name}",
+                content: (event) => {
+                  const g = event.graphic;
+                  let baseContent = `
+          <p><b>Description:</b> ${g.attributes.description}</p>
+          <p><i>Coordinates (Web Mercator):</i>
+            [${g.geometry.x.toFixed(2)}, ${g.geometry.y.toFixed(2)}]
+          </p>
+        `;
+
+                  if (g.attributes.content_url) {
+                    // Fetch external HTML content
+                    return fetch(g.attributes.content_url)
+                      .then((res) => res.text())
+                      .then((html) => {
+                        return `<div class="popup-content">${html}</div>`;
+                      })
+                      .catch((err) => {
+                        console.error("Error loading popup content:", err);
+                        return (
+                          baseContent +
+                          `<p style="color:red;">Error loading additional details.</p>`
+                        );
+                      });
+                  } else {
+                    // No external content, return base content
+                    return baseContent;
+                  }
+                },
+              },
+            });
+          }
+
+          function createLabelGraphic(coords, feature, fcIndex, fIndex) {
+            const properties = feature.properties || {};
+            const labelText = properties.Label || `Label ${fcIndex}-${fIndex}`;
+
+            if (properties.display) {
+              return new Graphic({
+                geometry: {
+                  type: "point",
+                  x: coords[0],
+                  y: coords[1],
+                  spatialReference: { wkid: 3857 },
+                },
+                attributes: {
+                  name: labelText, // shown in sidebar
+                  description: properties.Description || "",
+                  id: `label1`, // Tie label to polygon
+                  parentId: "none",
+                },
+                symbol: {
+                  type: "text", // Use a TextSymbol
+                  color: "black",
+                  haloColor: "white",
+                  haloSize: "2px",
+                  text: labelText, // the actual text to display
+                  font: {
+                    size: 14,
+                    family: "sans-serif",
+                    weight: "bold",
+                  },
+                },
+
+                popupTemplate: {
+                  title: "{name}",
+                  content: (event) => {
+                    const g = event.graphic;
+                    return `
+                  <p><b>Description:</b> ${g.attributes.description}</p>
+                  <p><i>Label Coordinates (Web Mercator):</i>
+                    [${g.geometry.x.toFixed(2)}, ${g.geometry.y.toFixed(2)}]
+                  </p>
+                `;
+                  },
+                },
+              });
+            }
+          }
+
+          //working simple side bar
+          // ----------------------------------------------------------------------
+          // buildSidebarList: generic for polygons, points, or labels
+          // ----------------------------------------------------------------------
+
+          // function buildNestedSidebarFromJson(features, container) {
+          //   const categoryTree = {};
+
+          //   // Process each feature into the nested structure
+          //   features.forEach((feature) => {
+          //     const categoryPath =
+          //       feature.attributes?.category || "/Uncategorized/testing";
+          //     const pathParts = categoryPath.split("/").filter(Boolean);
+          //     const uniqueKey = `${categoryPath}/${feature.attributes?.name}`;
+
+          //     let currentLevel = categoryTree;
+
+          //     pathParts.forEach((part, index) => {
+          //       if (!currentLevel[part]) {
+          //         currentLevel[part] = {};
+          //       }
+          //       if (index === pathParts.length - 1) {
+          //         if (!currentLevel[part].items) {
+          //           currentLevel[part].items = [];
+          //         }
+          //         feature.uniqueKey = uniqueKey;
+          //         currentLevel[part].items.push(feature);
+          //       }
+          //       currentLevel = currentLevel[part];
+          //     });
+          //   });
+
+          //   function createCategoryList(tree, parentElement) {
+          //     for (const key in tree) {
+          //       const section = document.createElement("div");
+          //       section.className = "category";
+
+          //       const title = document.createElement("div");
+          //       title.className = "category-title";
+          //       title.textContent = key;
+          //       title.onclick = () => subItems.classList.toggle("hidden");
+
+          //       const subItems = document.createElement("div");
+          //       subItems.className = "sub-items hidden";
+
+          //       if (tree[key].items) {
+          //         tree[key].items.forEach((feature) => {
+          //           const listItem = document.createElement("div");
+          //           listItem.className = "list-item";
+
+          //           const nameDiv = document.createElement("div");
+          //           nameDiv.textContent = feature.attributes?.name || "Unnamed";
+          //           nameDiv.style.flexGrow = "1";
+
+          //           const toggleButton = document.createElement("button");
+          //           toggleButton.textContent = "Hide";
+          //           toggleButton.id = `toggle-${feature.uniqueKey}`;
+          //           toggleButton.style.marginLeft = "10px";
+          //           toggleButton.style.cursor = "pointer";
+
+          //           function toggleVisibility() {
+          //             console.log("clicked");
+          //             console.log(feature.attributes.category);
+          //             const isVisible = feature.visible;
+          //             feature.visible = !isVisible; // Toggle visibility
+
+          //             const graphic = labelsLayer.graphics.find(
+          //               (g) =>
+          //                 g.attributes.parentPath ===
+          //                 `${feature.attributes.category}/${feature.attributes.name}`
+          //             );
+          //             console.log(graphic);
+          //             if (graphic) {
+          //               graphic.visible = !graphic.visible;
+          //               toggleButton.textContent = graphic.visible
+          //                 ? "Hide"
+          //                 : "Show";
+          //               listItem.style.opacity = graphic.visible ? "1" : "0.5";
+          //             } else {
+          //               // Update button text and style
+          //               toggleButton.textContent = isVisible ? "Show" : "Hide";
+          //               listItem.style.opacity = isVisible ? "0.5" : "1"; // Dim when hidden
+          //             }
+          //           }
+          //           // toggleVisibility();
+
+          //           toggleButton.addEventListener("click", (event) => {
+          //             event.stopPropagation();
+          //             toggleVisibility();
+          //           });
+
+          //           listItem.addEventListener("click", () => {
+          //             const isPoint = feature.geometry.type === "point";
+          //             const isPolygon = feature.geometry.type === "polygon";
+          //             const isLabel = feature.symbol.type === "text";
+
+          //             document
+          //               .querySelectorAll(".list-item")
+          //               .forEach((node) => {
+          //                 node.style.backgroundColor = "white";
+          //               });
+          //             listItem.style.backgroundColor = "gray";
+
+          //             let popupLocation = isLabel
+          //               ? {
+          //                   x: feature.geometry.x,
+          //                   y: feature.geometry.y + 8,
+          //                   spatialReference: { wkid: 3857 },
+          //                 }
+          //               : isPoint
+          //               ? {
+          //                   x: feature.geometry.x,
+          //                   y: feature.geometry.y + 5,
+          //                   spatialReference: { wkid: 3857 },
+          //                 }
+          //               : feature.geometry.extent.center;
+
+          //             view
+          //               .goTo({
+          //                 target: feature.geometry,
+          //                 zoom: isLabel
+          //                   ? 16
+          //                   : isPoint
+          //                   ? 19
+          //                   : isPolygon
+          //                   ? 17
+          //                   : undefined,
+          //               })
+          //               .then(() => {
+          //                 view.popup.location = popupLocation;
+          //                 view.popup.open({
+          //                   features: [feature],
+          //                   location: popupLocation,
+          //                 });
+          //               });
+          //           });
+
+          //           listItem.appendChild(nameDiv);
+          //           listItem.appendChild(toggleButton);
+          //           subItems.appendChild(listItem);
+          //         });
+          //       } else {
+          //         createCategoryList(tree[key], subItems);
+          //       }
+
+          //       section.appendChild(title);
+          //       section.appendChild(subItems);
+          //       parentElement.appendChild(section);
+          //     }
+          //   }
+
+          //   createCategoryList(categoryTree, container);
+          // }
+
+          function buildNestedSidebarFromJson(features, container, sidebar) {
+            // =============== 1) Build a nested tree from your features ===============
+
+            const categoryTree = {};
+
+            features.forEach((feature) => {
+              // Use the category or fallback
+              const categoryPath =
+                feature.attributes?.category || "/Uncategorized/testing";
+              const pathParts = categoryPath.split("/").filter(Boolean);
+
+              // Build a unique key so we can reference the feature
+              const uniqueKey = `${categoryPath}/${feature.attributes?.name}`;
+              feature.uniqueKey = uniqueKey;
+
+              // Walk through the categoryTree structure
+              let currentNode = categoryTree;
+              pathParts.forEach((part, index) => {
+                if (!currentNode[part]) {
+                  currentNode[part] = {};
+                }
+                if (index === pathParts.length - 1) {
+                  // If this is the last part, place the feature in an "items" array
+                  if (!currentNode[part].items) {
+                    currentNode[part].items = [];
+                  }
+                  currentNode[part].items.push(feature);
+                }
+                currentNode = currentNode[part];
+              });
+            });
+
+            // =============== 2) Keep a stack of where we are in the tree ===============
+
+            // Start at the top-level node (Root)
+            const pathStack = [{ nodeName: "Root", node: categoryTree }];
+
+            // =============== 3) Render function: shows only the current node ===============
+
+            function renderCurrentNode() {
+              // Clear out the sidebar so we only show the current node's contents
+              sidebar.innerHTML = "";
+
+              // The current node is the top of the stack
+              const currentEntry = pathStack[pathStack.length - 1];
+              const currentNode = currentEntry.node;
+              const currentName = currentEntry.nodeName;
+
+              // --- Show a heading for the current node (optional) ---
+              const headerDiv = document.createElement("div");
+              headerDiv.style.fontWeight = "bold";
+              headerDiv.style.marginBottom = "8px";
+              headerDiv.textContent = `Current Category: ${currentName}`;
+              sidebar.appendChild(headerDiv);
+
+              // --- If not at the root, show a BACK button to go up one level ---
+              if (pathStack.length > 1) {
+                const backButton = document.createElement("button");
+                backButton.textContent = "Back";
+                backButton.style.marginBottom = "8px";
+                backButton.addEventListener("click", () => {
+                  // Go one level up
+                  pathStack.pop();
+                  renderCurrentNode();
+                });
+                sidebar.appendChild(backButton);
+              }
+
+              // --- 3A) Show subcategories (keys that are not 'items') ---
+              Object.keys(currentNode).forEach((key) => {
+                if (key === "items") return; // skip items
+
+                // This is a subcategory, show a clickable row
+                const catDiv = document.createElement("div");
+                catDiv.className = "subcategory";
+                catDiv.style.cursor = "pointer";
+                catDiv.style.padding = "4px 0";
+                catDiv.style.fontWeight = "500";
+                catDiv.textContent = key;
+
+                // Clicking on it drills down into that subcategory
+                catDiv.addEventListener("click", () => {
+                  pathStack.push({ nodeName: key, node: currentNode[key] });
+                  renderCurrentNode();
+                });
+
+                sidebar.appendChild(catDiv);
+              });
+
+              // --- 3B) If there are items in this node, list them (features) ---
+              if (currentNode.items && currentNode.items.length) {
+                currentNode.items.forEach((feature) => {
+                  const listItem = document.createElement("div");
+                  listItem.className = "list-item";
+                  listItem.style.display = "flex";
+                  listItem.style.alignItems = "center";
+                  listItem.style.cursor = "pointer";
+                  listItem.style.marginLeft = "10px";
+                  listItem.style.marginBottom = "4px";
+
+                  // The feature's name
+                  const nameDiv = document.createElement("div");
+                  nameDiv.textContent = feature.attributes?.name || "Unnamed";
+                  nameDiv.style.flexGrow = "1";
+
+                  // The Hide/Show button
+                  const toggleButton = document.createElement("button");
+                  toggleButton.id = `toggle-${feature.uniqueKey}`;
+                  toggleButton.style.marginLeft = "10px";
+                  toggleButton.style.cursor = "pointer";
+                  toggleButton.textContent =
+                    feature.visible === false ? "Show" : "Hide";
+
+                  // Toggle function
+                  function toggleVisibility() {
+                    const isVisible = feature.visible;
+                    feature.visible = !isVisible;
+
+                    // If there's a separate label graphic, toggle that too
+                    const graphic = labelsLayer.graphics.find(
+                      (g) =>
+                        g.attributes.parentPath ===
+                        `${feature.attributes.category}/${feature.attributes.name}`
+                    );
+                    if (graphic) {
+                      graphic.visible = !graphic.visible;
+                      toggleButton.textContent = graphic.visible
+                        ? "Hide"
+                        : "Show";
+                      listItem.style.opacity = graphic.visible ? "1" : "0.5";
+                    } else {
+                      // If no separate label, just toggle the text & style
+                      toggleButton.textContent = isVisible ? "Show" : "Hide";
+                      listItem.style.opacity = isVisible ? "0.5" : "1";
+                    }
+                  }
+
+                  // Click on the Hide/Show button => just toggle (prevent zoom)
+                  toggleButton.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    toggleVisibility();
+                  });
+
+                  // Click on the list item => zoom to feature, highlight, open popup
+                  listItem.addEventListener("click", () => {
+                    // Clear highlight from any previously clicked item
+                    document.querySelectorAll(".list-item").forEach((elem) => {
+                      elem.style.backgroundColor = "white";
+                    });
+                    listItem.style.backgroundColor = "gray";
+
+                    const isPoint = feature.geometry.type === "point";
+                    const isPolygon = feature.geometry.type === "polygon";
+                    const isLabel = feature.symbol?.type === "text";
+
+                    // Adjust popup location slightly above the geometry
+                    let popupLocation = isLabel
+                      ? {
+                          x: feature.geometry.x,
+                          y: feature.geometry.y + 8,
+                          spatialReference: { wkid: 3857 },
+                        }
+                      : isPoint
+                      ? {
+                          x: feature.geometry.x,
+                          y: feature.geometry.y + 5,
+                          spatialReference: { wkid: 3857 },
+                        }
+                      : feature.geometry.extent.center;
+
+                    // Zoom and open popup
+                    view
+                      .goTo({
+                        target: feature.geometry,
+                        zoom: isLabel
+                          ? 16
+                          : isPoint
+                          ? 19
+                          : isPolygon
+                          ? 17
+                          : undefined,
+                      })
+                      .then(() => {
+                        view.popup.location = popupLocation;
+                        view.popup.open({
+                          features: [feature],
+                          location: popupLocation,
+                        });
+                      });
+                  });
+
+                  listItem.appendChild(nameDiv);
+                  listItem.appendChild(toggleButton);
+                  sidebar.appendChild(listItem);
+                });
+              }
+            }
+
+            // =============== 4) Render the ROOT level on initial load ===============
+            renderCurrentNode();
+          }
+
+          // function buildNestedSidebarFromJson(features, container) {
+          //   // --- 1) Build the nested category tree from features ---
+          //   const categoryTree = {};
+
+          //   features.forEach((feature) => {
+          //     const categoryPath =
+          //       feature.attributes?.category || "/Uncategorized/testing";
+          //     const pathParts = categoryPath.split("/").filter(Boolean);
+          //     const uniqueKey = `${categoryPath}/${feature.attributes?.name}`;
+
+          //     let currentLevel = categoryTree;
+
+          //     pathParts.forEach((part, index) => {
+          //       if (!currentLevel[part]) {
+          //         currentLevel[part] = {};
+          //       }
+          //       // If we are at the last part of this path, push the feature into `items`.
+          //       if (index === pathParts.length - 1) {
+          //         if (!currentLevel[part].items) {
+          //           currentLevel[part].items = [];
+          //         }
+          //         feature.uniqueKey = uniqueKey;
+          //         currentLevel[part].items.push(feature);
+          //       }
+          //       currentLevel = currentLevel[part];
+          //     });
+          //   });
+
+          //   // --- 2) Maintain a stack for the current path in the folder structure ---
+          //   //     - At first, we're at the "root" of our categoryTree.
+          //   let pathStack = [
+          //     {
+          //       nodeName: "Root", // Not strictly necessary; for reference only
+          //       node: categoryTree,
+          //     },
+          //   ];
+
+          //   // --- 3) Function to (re)render the current level based on pathStack ---
+          //   function renderCurrentLevel() {
+          //     // Clear the container each time we render a new level
+          //     container.innerHTML = "";
+
+          //     // Current node is always the top of the pathStack
+          //     const currentEntry = pathStack[pathStack.length - 1];
+          //     const currentNode = currentEntry.node;
+
+          //     // -- (Optional) Show current path as a title (or breadcrumb) --
+          //     const currentPathDiv = document.createElement("div");
+          //     currentPathDiv.textContent =
+          //       "Current Category: " + currentEntry.nodeName;
+          //     currentPathDiv.style.fontWeight = "bold";
+          //     currentPathDiv.style.marginBottom = "8px";
+          //     container.appendChild(currentPathDiv);
+
+          //     // -- If not at root, show a 'Back' button to navigate up --
+          //     if (pathStack.length > 1) {
+          //       const backButton = document.createElement("button");
+          //       backButton.textContent = "Back";
+          //       backButton.style.marginBottom = "8px";
+          //       backButton.addEventListener("click", () => {
+          //         // Pop from stack, then re-render
+          //         pathStack.pop();
+          //         renderCurrentLevel();
+          //       });
+          //       container.appendChild(backButton);
+          //     }
+
+          //     // -- 3a) Render subcategories (keys that are not 'items') --
+          //     for (const subCategory in currentNode) {
+          //       // If the key is "items", skip; we'll handle items afterward
+          //       if (subCategory === "items") continue;
+
+          //       const categoryDiv = document.createElement("div");
+          //       categoryDiv.className = "category-title";
+          //       categoryDiv.textContent = subCategory;
+          //       categoryDiv.style.cursor = "pointer";
+          //       categoryDiv.style.padding = "4px 0";
+          //       categoryDiv.style.fontWeight = "500";
+
+          //       // When clicked, navigate deeper: push a new node onto the stack
+          //       categoryDiv.addEventListener("click", () => {
+          //         pathStack.push({
+          //           nodeName: subCategory,
+          //           node: currentNode[subCategory],
+          //         });
+          //         renderCurrentLevel();
+          //       });
+
+          //       container.appendChild(categoryDiv);
+          //     }
+
+          //     // -- 3b) If there are actual items in this node, render them --
+          //     if (currentNode.items) {
+          //       currentNode.items.forEach((feature) => {
+          //         const listItem = document.createElement("div");
+          //         listItem.className = "list-item";
+          //         listItem.style.display = "flex";
+          //         listItem.style.alignItems = "center";
+          //         listItem.style.cursor = "pointer";
+          //         listItem.style.marginLeft = "10px";
+          //         listItem.style.marginBottom = "4px";
+
+          //         const nameDiv = document.createElement("div");
+          //         nameDiv.textContent = feature.attributes?.name || "Unnamed";
+          //         nameDiv.style.flexGrow = "1";
+
+          //         // The Hide/Show button
+          //         const toggleButton = document.createElement("button");
+          //         toggleButton.id = `toggle-${feature.uniqueKey}`;
+          //         toggleButton.style.marginLeft = "10px";
+          //         toggleButton.style.cursor = "pointer";
+          //         // Decide initial text based on current feature visibility
+          //         toggleButton.textContent =
+          //           feature.visible === false ? "Show" : "Hide";
+
+          //         function toggleVisibility() {
+          //           // Toggle feature’s visibility in your layer
+          //           const isVisible = feature.visible;
+          //           feature.visible = !isVisible;
+
+          //           // Also toggle the corresponding label if it exists
+          //           const graphic = labelsLayer.graphics.find(
+          //             (g) =>
+          //               g.attributes.parentPath ===
+          //               `${feature.attributes.category}/${feature.attributes.name}`
+          //           );
+
+          //           if (graphic) {
+          //             graphic.visible = !graphic.visible;
+          //             toggleButton.textContent = graphic.visible
+          //               ? "Hide"
+          //               : "Show";
+          //             listItem.style.opacity = graphic.visible ? "1" : "0.5";
+          //           } else {
+          //             // If no separate label graphic found, just adjust button & style
+          //             toggleButton.textContent = isVisible ? "Show" : "Hide";
+          //             listItem.style.opacity = isVisible ? "0.5" : "1";
+          //           }
+          //         }
+
+          //         // Button click only toggles visibility, doesn’t trigger popup
+          //         toggleButton.addEventListener("click", (event) => {
+          //           event.stopPropagation(); // Prevent listItem's click from firing
+          //           toggleVisibility();
+          //         });
+
+          //         // Clicking on the listItem (but not the toggle button) zooms to feature
+          //         listItem.addEventListener("click", () => {
+          //           // Basic styling to highlight selection
+          //           document.querySelectorAll(".list-item").forEach((node) => {
+          //             node.style.backgroundColor = "white";
+          //           });
+          //           listItem.style.backgroundColor = "gray";
+
+          //           // Zoom & popup logic
+          //           const isPoint = feature.geometry.type === "point";
+          //           const isPolygon = feature.geometry.type === "polygon";
+          //           const isLabel = feature.symbol?.type === "text";
+
+          //           let popupLocation = isLabel
+          //             ? {
+          //                 x: feature.geometry.x,
+          //                 y: feature.geometry.y + 8,
+          //                 spatialReference: { wkid: 3857 },
+          //               }
+          //             : isPoint
+          //             ? {
+          //                 x: feature.geometry.x,
+          //                 y: feature.geometry.y + 5,
+          //                 spatialReference: { wkid: 3857 },
+          //               }
+          //             : feature.geometry.extent.center;
+
+          //           view
+          //             .goTo({
+          //               target: feature.geometry,
+          //               zoom: isLabel
+          //                 ? 16
+          //                 : isPoint
+          //                 ? 19
+          //                 : isPolygon
+          //                 ? 17
+          //                 : undefined,
+          //             })
+          //             .then(() => {
+          //               view.popup.location = popupLocation;
+          //               view.popup.open({
+          //                 features: [feature],
+          //                 location: popupLocation,
+          //               });
+          //             });
+          //         });
+
+          //         listItem.appendChild(nameDiv);
+          //         listItem.appendChild(toggleButton);
+          //         container.appendChild(listItem);
+          //       });
+          //     }
+          //   }
+
+          //   // --- 4) Finally, render the root level on first load ---
+          //   renderCurrentLevel();
+          // }
+
+          //Function to toggle visibility (separate from buildSidebarList)
+          function togglePolygonVisibility(id) {
+            const graphic = polygonsLayer.graphics.find(
+              (g) => g.attributes.id === id
+            );
+            if (!graphic) return;
+
+            const isCurrentlyVisible = graphic.visible;
+            graphic.visible = !isCurrentlyVisible; // Toggle visibility
+
+            // Find and toggle label visibility
+            const labelGraphic = labelsLayer.graphics.find(
+              (g) => g.attributes.parentId === id
+            );
+            if (labelGraphic) {
+              labelGraphic.visible = !isCurrentlyVisible;
+            }
+
+            // Update button text
+            const button = document.getElementById(`toggle-btn-${id}`);
+            if (button) {
+              button.textContent = isCurrentlyVisible ? "Show" : "Hide";
+            }
+
+            // Update list item opacity for visual feedback
+            const listItem = document.getElementById(`list-item-${id}`);
+            if (listItem) {
+              listItem.style.opacity = isCurrentlyVisible ? "0.5" : "1";
+            }
+          }
+
+          // Function to build the sidebar (adds buttons with onclick events)
+          function buildSidebarList(graphics, container) {
+            graphics.forEach((graphic) => {
+              const id = graphic.attributes.id;
+              graphic.visible = true; // Start hidden
+
+              // Create list item container
+              const listItem = document.createElement("div");
+              listItem.className = "list-item";
+              listItem.id = `list-item-${id}`;
+
+              // Feature name
+              const nameDiv = document.createElement("div");
+              nameDiv.textContent = graphic.attributes.name;
+              nameDiv.style.flexGrow = "1";
+
+              // Show/Hide button
+              const toggleButton = document.createElement("button");
+              toggleButton.id = `toggle-btn-${id}`;
+              toggleButton.textContent = "Show"; // Starts as "Show"
+              toggleButton.style.marginLeft = "10px";
+              toggleButton.style.cursor = "pointer";
+
+              // Correct way to assign onclick event
+              toggleButton.onclick = () => togglePolygonVisibility(id);
+
+              // Append elements
+              listItem.appendChild(nameDiv);
+              listItem.appendChild(toggleButton);
+              container.appendChild(listItem);
+            });
+          }
+        });
+      };
+    </script>
+  </body>
+</html>
