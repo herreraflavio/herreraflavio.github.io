@@ -314,17 +314,6 @@
             );
           });
 
-          // ---------- Example hideGraphicById (optional) ----------
-          function hideGraphicById(graphicsLayer, graphicId) {
-            const graphic = graphicsLayer.graphics.items.find(
-              (g) => g.attributes.id === graphicId
-            );
-            if (graphic) {
-              graphic.visible = false;
-            }
-          }
-          hideGraphicById(polygonsLayer, "polygon-9");
-
           // =============== Helper Functions ===============
           function getPolygonCentroid(ring) {
             let signedArea = 0;
@@ -527,10 +516,14 @@
                   content: (event) => {
                     const g = event.graphic;
                     return `
-                        <p><b>Description:</b> ${g.attributes.description}</p>
-                        <p><i>Label Coordinates:</i> [${g.geometry.x.toFixed(
-                          2
-                        )}, ${g.geometry.y.toFixed(2)}]</p>
+                       A research university is a community bound by learning, 
+                       discovery and engagement. As the first American student-centered
+                        research university built in the 21st century, UC Merced's strong 
+                        graduate and research programs mesh with high-quality undergraduate
+                         programs. New knowledge increasingly depends on links among th
+                          disciplines, working together on questions that transcend the
+                           traditional disciplines. UC Merced fosters and encourage
+                           s cross-disciplinary inquiry and discovery.
                       `;
                   },
                 },
@@ -590,7 +583,6 @@
               // Back button (except at root)
               if (pathStack.length > 1) {
                 const backButton = document.createElement("div");
-                // backButton.textContent = "Back";
 
                 backButton.innerHTML = `
                 <div class="back">
