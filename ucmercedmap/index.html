@@ -64,8 +64,22 @@
       .category:hover {
         background-color: #bcdaff;
       }
+      .back {
+        cursor: pointer;
+
+        font-weight: 500;
+
+        display: flex;
+      }
+      .back-title {
+        color: #4ea4ff;
+        font-size: 26px;
+        margin-left: 5px;
+      }
       .category-title {
         flex-grow: 1;
+        display: flex;
+        align-items: center;
       }
       .arrowContainer {
         display: flex;
@@ -575,9 +589,16 @@
 
               // Back button (except at root)
               if (pathStack.length > 1) {
-                const backButton = document.createElement("button");
-                backButton.textContent = "Back";
-                backButton.style.marginBottom = "8px";
+                const backButton = document.createElement("div");
+                // backButton.textContent = "Back";
+
+                backButton.innerHTML = `
+                <div class="back">
+                   <div class="arrowContainer"><img src="https://www.svgrepo.com/show/27797/right-arrow.svg/" class="arrow" style=" transform: scaleX(-1);"></div>
+                <div class="back-title">Back</div> 
+               
+                </div>
+                `;
                 backButton.addEventListener("click", () => {
                   pathStack.pop();
                   renderCurrentNode();
