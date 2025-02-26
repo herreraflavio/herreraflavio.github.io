@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div>
+        <div
+          style="display: flex; height: 75px; align-items: center; margin: 10px"
+        >
+          <div class="output">
+            <div id="output">0</div>
+          </div>
+          <div class="rightside-row">
+            <div
+              class="btn operator"
+              onclick="runOperation('±', 'plm')"
+              id="plm"
+              style="margin: 0px"
+            >
+              ±
+            </div>
+          </div>
+        </div>
+        <div class="leftside-row">
+          <div class="btn num highlight">7</div>
+          <div class="btn num highlight">8</div>
+          <div class="btn num highlight">9</div>
+        </div>
+        <div class="leftside-row">
+          <div class="btn num highlight">4</div>
+          <div class="btn num highlight">5</div>
+          <div class="btn num highlight">6</div>
+        </div>
+        <div class="leftside-row">
+          <div class="btn num highlight">1</div>
+          <div class="btn num highlight">2</div>
+          <div class="btn num highlight">3</div>
+        </div>
+        <div class="leftside-row">
+          <div class="btn num highlight">0</div>
+          <div class="btn num highlight">.</div>
+          <div
+            class="btn operator highlight"
+            onclick="runOperation('=', 'eq')"
+            id="eq"
+          >
+            =
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column">
+        <div class="rightside-row">
+          <div class="btn clear">C</div>
+        </div>
+        <div class="rightside-row">
+          <div
+            class="btn operator"
+            onclick="runOperation('\\', 'div')"
+            id="div"
+          >
+            \
+          </div>
+        </div>
+        <div class="rightside-row">
+          <div class="btn operator" onclick="runOperation('X', 'mul')" id="mul">
+            X
+          </div>
+        </div>
+        <div class="rightside-row">
+          <div class="btn operator" onclick="runOperation('-','sub')" id="sub">
+            -
+          </div>
+        </div>
+        <div class="rightside-row">
+          <div class="btn operator" onclick="runOperation('+', 'add')" id="add">
+            +
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const nums = document.querySelectorAll(".num");
+      const output = document.getElementById("output");
+      const operators = document.querySelectorAll(".operator");
+      const clearBtn = document.querySelector(".clear");
+
+      let currHighlighted;
+      let currenOperation = "";
+      let lastNum = null;
+      const currStack = [null, null, null];
+
+      function insertNumber(number) {
+        if (number == ".") {
+          if (
+            !output.innerText.includes(".") &&
+            number == "." &&
+            output.innerText != ""
+          ) {
+            output.innerText += number;
+          } else {
+            x = 1;
+          }
+        } else {
+          if (output.innerText == "0") {
+            output.innerText = number;
+          } else if (currStack[0] == "-0") {
+            console.log(currStack[0]);
+            output.innerText = `-${number}`;
+          } else if (currStack[2] == "-0") {
+            console.log(currStack[2]);
+            output.innerText = `-${number}`;
+          } else {
+            output.innerText += number;
+          }
+        }
+
+        if (
+          currenOperation == "" &&
+          currStack[2] == null &&
+          currStack[0] != null
+        ) {
+          currStack[0] = output.innerText;
+        } else if (currStack[1] == null) {
+          currStack[0] = output.innerText;
+        } else {
+          currStack[2] = output.innerText;
+          lastNum = output.innerText;
+        }
+
+        console.log(currStack);
+
+        currHighlighted
+          ? (currHighlighted.style.backgroundColor = "#70ad47")
+          : null;
+      }
+
+      function clearOutput(content) {
+        output.innerText = content;
+      }
+
+      function performCalculation(firstNum, operator, secondNum) {
+        console.log(firstNum, operator, secondNum);
+        if (operator == "+") {
+          let num = firstNum + secondNum;
+          currStack.push(num.toFixed(5));
+        } else if (operator == "-") {
+          let num = firstNum - secondNum;
+          currStack.push(num.toFixed(5));
+        } else if (operator == "X") {
+          let num = firstNum * secondNum;
+          currStack.push(num.toFixed(5));
+        } else if (operator == "\\") {
+          let num = firstNum / secondNum;
+          currStack.push(num.toFixed(5));
+        }
+
+        output.innerHTML = currStack[0];
+        currStack.push(operator);
+        currStack.push(null);
+        console.log(currStack);
+      }
+
+      function checkStack() {
+        console.log("checking stack...", currStack.length);
+        if (currStack.length == 3 && currStack[2] != null) {
+          firstNum = parseFloat(currStack.shift());
+          operator = currStack.shift();
+          secondNum = parseFloat(currStack.shift());
+          performCalculation(firstNum, operator, secondNum);
+        }
+      }
+
+      nums.forEach((num) => {
+        num.addEventListener("click", function (event) {
+          console.log("num clicked:", num);
+          number = num.innerText;
+          if (currenOperation == "") {
+            // alert("this option first:");
+            console.log(number);
+            insertNumber(number);
+          } else {
+            if (currStack[2] == null && number != ".") {
+              clearOutput("");
+              insertNumber(number);
+              currenOperation = "";
+            } else if (
+              currStack[2] != null &&
+              !output.innerText.includes(".")
+            ) {
+              // clearOutput("");
+              // alert("this second option");
+              insertNumber(number);
+              currenOperation = "";
+            }
+          }
+        });
+      });
+
+      function runOperation(op, element) {
+        if (op != "±") {
+          currenOperation = "";
+          currenOperation = op;
+          console.log(currenOperation);
+
+          if (currenOperation != "=") {
+            if (currStack[0] != null) {
+              checkStack();
+              currStack[1] = currenOperation;
+              if (currHighlighted) {
+                currHighlighted.style.backgroundColor = "#70ad47";
+              }
+              currHighlighted = document.getElementById(element);
+              currHighlighted.style.backgroundColor = "yellow";
+            }
+          } else {
+            if (
+              currStack[0] != null &&
+              currStack[1] != null &&
+              currStack[2] == null &&
+              lastNum != null
+            ) {
+              firstNum = parseFloat(currStack.shift());
+              operator = currStack.shift();
+              dummyRemove = currStack.shift();
+
+              performCalculation(firstNum, operator, parseFloat(lastNum));
+            } else {
+              checkStack();
+            }
+            currenOperation = "";
+          }
+
+          console.log(currStack);
+        }
+        // alert("this case");
+
+        if (output.innerText)
+          if (
+            currenOperation == "" &&
+            currStack[0] != null &&
+            op == "±" &&
+            currStack[2] == null
+          ) {
+            if (currStack[0].toString().includes("-")) {
+              output.innerText = output.innerText.replace("-", "");
+              currStack[0] = output.innerText;
+            } else {
+              newText = `-${currStack[0]}`;
+              output.innerText = newText;
+
+              currStack[0] = newText;
+            }
+          } else if (currStack[0] == null && op == "±") {
+            insertNumber("-0");
+          } else if (
+            currStack[0] != null &&
+            op == "±" &&
+            currStack[1] == null
+          ) {
+            if (currStack[0].toString().includes("-")) {
+              output.innerText = output.innerText.replace("-", "");
+              currStack[0] = output.innerText;
+            } else {
+              newText = `-${currStack[0]}`;
+              output.innerText = newText;
+
+              currStack[0] = newText;
+            }
+          } else if (
+            currStack[2] == null &&
+            currStack[1] != null &&
+            op == "±"
+          ) {
+            alert("this option", currenOperation);
+            // clearOutput("0");
+            // insertNumber("-0");
+
+            if ((currenOperation = "")) {
+              if (currStack[0].toString().includes("-")) {
+                // alert("this case");
+                output.innerText = output.innerText.replace("-", "");
+                currStack[0] = output.innerText;
+              } else {
+                output.innerText = `-${output.innerText}`;
+                currStack[0] = output.innerText;
+              }
+            } else {
+              currenOperation = currStack[1];
+              clearOutput("0");
+              insertNumber("-0");
+            }
+          } else if (
+            currStack[2] != null &&
+            op == "±" &&
+            currStack[1] != null
+          ) {
+            // clearOutput("0");
+            // insertNumber("-0");
+            if (currStack[2].toString().includes("-")) {
+              // alert("this case");
+              output.innerText = output.innerText.replace("-", "");
+              currStack[2] = output.innerText;
+            } else {
+              output.innerText = `-${output.innerText}`;
+              currStack[2] = output.innerText;
+            }
+          }
+      }
+
+      clearBtn.addEventListener("click", function (event) {
+        console.log("operator clicked:", clearBtn);
+        clearOutput("0");
+      });
+    </script>
+  </body>
+</html>

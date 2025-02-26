@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div>
+        <div class="output">
+          <div id="output">0</div>
+        </div>
+        <div class="leftside-row">
+          <div class="btn num highlight">7</div>
+          <div class="btn num highlight">8</div>
+          <div class="btn num highlight">9</div>
+        </div>
+        <div class="leftside-row">
+          <div class="btn num highlight">4</div>
+          <div class="btn num highlight">5</div>
+          <div class="btn num highlight">6</div>
+        </div>
+        <div class="leftside-row">
+          <div class="btn num highlight">1</div>
+          <div class="btn num highlight">2</div>
+          <div class="btn num highlight">3</div>
+        </div>
+        <div class="leftside-row">
+          <div class="btn num highlight">0</div>
+          <div class="btn num highlight">.</div>
+          <div class="btn operator highlight">=</div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column">
+        <div class="rightside-row">
+          <div class="btn clear">C</div>
+        </div>
+        <div class="rightside-row">
+          <div class="btn operator">\</div>
+        </div>
+        <div class="rightside-row">
+          <div class="btn operator">X</div>
+        </div>
+        <div class="rightside-row">
+          <div class="btn operator">-</div>
+        </div>
+        <div class="rightside-row">
+          <div class="btn operator">+</div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const nums = document.querySelectorAll(".num");
+      const output = document.getElementById("output");
+      const operators = document.querySelectorAll(".operator");
+      const clearBtn = document.querySelector(".clear");
+
+      let currHighlighted;
+      let currenOperation = "";
+      const currStack = [];
+
+      function insertNumber(number) {
+        if (number == ".") {
+          if (
+            !output.innerText.includes(".") &&
+            number == "." &&
+            output.innerText != ""
+          ) {
+            output.innerText += number;
+          }
+        } else {
+          if (output.innerText == "0") {
+            output.innerText = number;
+          } else {
+            output.innerText += number;
+          }
+        }
+        currHighlighted
+          ? (currHighlighted.style.backgroundColor = "#70ad47")
+          : null;
+      }
+
+      function clearOutput(content) {
+        output.innerText = content;
+      }
+
+      function performCalculation(firstNum, operator, secondNum) {
+        console.log(firstNum, operator, secondNum);
+        if (operator == "+") {
+          currStack.push(firstNum + secondNum);
+        } else if (operator == "-") {
+          currStack.push(firstNum - secondNum);
+        } else if (operator == "X") {
+          currStack.push(firstNum * secondNum);
+        } else if (operator == "\\") {
+          currStack.push(firstNum / secondNum);
+        }
+
+        console.log(currStack);
+        output.innerHTML = currStack[0];
+        currStack.push(operator);
+      }
+
+      function checkStack() {
+        console.log("checking stack...", currStack.length);
+        if (currStack.length == 3) {
+          alert("stack is full");
+          firstNum = parseFloat(currStack.shift());
+          operator = currStack.shift();
+          secondNum = parseFloat(currStack.shift());
+          performCalculation(firstNum, operator, secondNum);
+        }
+      }
+
+      nums.forEach((num) => {
+        num.addEventListener("click", function (event) {
+          // Code to execute when the num is clicked
+          console.log("num clicked:", num);
+          // alert("num clicked: " + num.textContent);
+          number = num.innerText;
+          if (currenOperation == "") {
+            insertNumber(number);
+          } else {
+            clearOutput("");
+            insertNumber(number);
+            currenOperation = "";
+          }
+        });
+      });
+
+      operators.forEach((operator) => {
+        operator.addEventListener("click", function (event) {
+          // Code to execute when the operator is clicked
+          console.log("operator clicked:", operator);
+          // alert("operator clicked: " + operator.textContent);
+          currenOperation = operator.textContent;
+          console.log(currenOperation);
+          currStack.push(output.innerText);
+          checkStack();
+          if (currenOperation != "=") {
+            if (currStack[1] && currStack[1] == "")
+              currStack.push(currenOperation);
+            currHighlighted = this;
+            currHighlighted.style.backgroundColor = "yellow";
+          }
+
+          console.log(currStack);
+        });
+      });
+
+      clearBtn.addEventListener("click", function (event) {
+        // Code to execute when the operator is clicked
+        console.log("operator clicked:", clearBtn);
+        clearOutput("0");
+      });
+    </script>
+  </body>
+</html>
