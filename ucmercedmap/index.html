@@ -23,7 +23,8 @@
         width: 100%;
         overflow: hidden;
       }
-      /* Override for small screens (mobile) */
+
+      /* Edit1 Override for small screens (mobile) */
       @media (max-width: 800px) {
         .esri-popup__main-container {
           max-height: 250px !important; /* Limit height on mobile */
@@ -105,6 +106,7 @@
       <div id="viewDiv"></div>
     </div>
     <script>
+      //Edit1, Edit2, Edit3, Edit4
       let centerCordinates;
       let zoomLevel;
       let fontSize;
@@ -124,13 +126,14 @@
           document.getElementById("container").style.flexDirection =
             "column-reverse";
           document.getElementById("sidebar").style.width = "95%";
-          document.getElementById("sidebar").style.height = "20%";
+          document.getElementById("sidebar").style.height = "27%";
           centerCordinates = [-120.428845, 37.363169];
           zoomLevel = 16;
           fontSize = 10;
           return "smartphone";
         } else {
           // centerCordinates = [-120.424445, 37.363569];
+          //Edit2
           centerCordinates = [-120.429287, 37.361962];
           zoomLevel = 17;
           fontSize = 14;
@@ -177,6 +180,7 @@
               dockEnabled: false,
               defaultPopupTemplateEnabled: true,
             },
+            //edit3
             constraints: {
               minZoom: 16, // Optional: Set a minimum zoom level
             },
@@ -733,6 +737,7 @@
             }
           }
 
+          //Edit5
           view.watch("zoom", (newZoom) => {
             const updatedGraphics = labelsLayer.graphics.map((g) => {
               if (g.symbol && g.symbol.type === "text") {
