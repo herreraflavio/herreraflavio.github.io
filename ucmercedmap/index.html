@@ -587,6 +587,7 @@
                 parentId: parentId,
                 parentPath: parentPath,
                 originalFontSize: nameFontSize,
+                visible: true,
               },
               symbol: {
                 type: "text",
@@ -766,10 +767,88 @@
             }
           }
 
+          let currentZoom = zoomLevel;
+
+          // function updateFont(g) {
+          //   console.log("updating font");
+          //   const updatedSymbol = g.symbol.clone();
+
+          //   // Base font size at zoom level 17
+          //   console.log(g.attributes.originalFontSize);
+          //   let tempFontSize = g.attributes.originalFontSize
+          //     ? g.attributes.originalFontSize
+          //     : 15;
+          //   let fontSize =
+          //     tempFontSize * Math.pow(1.5, currentZoom - zoomLevel);
+
+          //   // Ensure font size does not drop below a minimum (e.g., 1px)
+          //   fontSize = Math.max(1, fontSize);
+
+          //   updatedSymbol.font.size = fontSize;
+
+          //   return new Graphic({
+          //     geometry: g.geometry,
+          //     attributes: g.attributes,
+          //     symbol: updatedSymbol,
+          //   });
+          //   return g;
+          // }
+
           //Edit5
+
+          function updateFont(g) {
+            if (!g || !g.symbol || g.symbol.type !== "text") {
+              console.warn("updateFont: Invalid graphic.");
+              return;
+            }
+
+            console.log("Updating font");
+
+            const updatedSymbol = g.symbol.clone();
+
+            // Ensure currentZoom and zoomLevel are defined
+            if (
+              typeof currentZoom === "undefined" ||
+              typeof zoomLevel === "undefined"
+            ) {
+              console.log(currentZoom);
+              console.log(zoomLevel);
+              console.error(
+                "updateFont: currentZoom or zoomLevel is undefined."
+              );
+              return;
+            }
+
+            console.log("Original Font Size:", g.attributes.originalFontSize);
+
+            let tempFontSize = g.attributes.originalFontSize || 15;
+            let fontSize =
+              tempFontSize * Math.pow(1.5, currentZoom - zoomLevel);
+
+            // Ensure font size does not drop below 1px
+            fontSize = Math.max(1, fontSize);
+            updatedSymbol.font.size = fontSize;
+
+            // Create updated Graphic
+            const updatedGraphic = new Graphic({
+              geometry: g.geometry,
+              attributes: g.attributes,
+              symbol: updatedSymbol,
+            });
+
+            // Remove old graphic and add the updated one
+            labelsLayer.graphics.remove(g);
+            labelsLayer.graphics.add(updatedGraphic);
+          }
+
           view.watch("zoom", (newZoom) => {
+            currentZoom = newZoom;
             const updatedGraphics = labelsLayer.graphics.map((g) => {
-              if (g.symbol && g.symbol.type === "text") {
+              if (
+                g.symbol &&
+                g.symbol.type === "text" &&
+                g.attributes.visible == true
+              ) {
                 const updatedSymbol = g.symbol.clone();
 
                 // Base font size at zoom level 17
@@ -902,6 +981,7 @@
 
                   function toggleVisibility() {
                     const isVisible = feature.visible;
+
                     feature.visible = !isVisible;
 
                     const graphic = labelsLayer.graphics.find(
@@ -909,7 +989,19 @@
                         g.attributes.parentPath ===
                         `${feature.attributes.category}/${feature.attributes.name}`
                     );
+                    // if (!isVisible) {
+                    //   // updateFont(graphic);
+                    // }
+
+                    console.log(graphic);
+                    if (graphic?.attributes) {
+                      graphic.attributes.visible = !isVisible;
+                    }
+
                     if (graphic) {
+                      if (!isVisible) {
+                        updateFont(graphic);
+                      }
                       graphic.visible = !graphic.visible;
                       toggleButton.textContent = graphic.visible
                         ? "Hide"
