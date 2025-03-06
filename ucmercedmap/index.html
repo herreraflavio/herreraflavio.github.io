@@ -124,7 +124,8 @@
           fontSize = 10;
           return "smartphone";
         } else {
-          centerCordinates = [-120.424445, 37.363569];
+          // centerCordinates = [-120.424445, 37.363569];
+          centerCordinates = [-120.429287, 37.361962];
           zoomLevel = 17;
           fontSize = 14;
           return "laptop";
@@ -169,6 +170,9 @@
             popup: {
               dockEnabled: false,
               defaultPopupTemplateEnabled: true,
+            },
+            constraints: {
+              minZoom: 16, // Optional: Set a minimum zoom level
             },
           });
 
@@ -261,42 +265,197 @@
 
           // load up points, very similar logic as the previous function.
 
-          const p2 = fetch("./shapefile/points.json")
-            .then((response) => response.json())
-            .then((geojsonPointsArray) => {
-              geojsonPointsArray.forEach((featureCollection, fcIndex) => {
-                const properties = {
-                  name:
-                    `${featureCollection.properties?.name}` || "default label",
-                  description: "temp description",
-                  imgURL:
-                    featureCollection.properties?.imgURL ||
-                    `${baseURL}/placeholder.png`,
-                  content_url: `${baseURL}${
-                    featureCollection.properties?.content_url ||
-                    "/popups/default_popup.html"
-                  }`,
-                  category: featureCollection.properties?.category,
-                };
+          // const p2 = fetch("./shapefile/points.json")
+          //   .then((response) => response.json())
+          //   .then((geojsonPointsArray) => {
+          //     geojsonPointsArray.forEach((featureCollection, fcIndex) => {
+          //       const properties = {
+          //         name:
+          //           `${featureCollection.properties?.name}` || "default label",
+          //         description: "temp description",
+          //         imgURL:
+          //           featureCollection.properties?.imgURL ||
+          //           `${baseURL}/placeholder.png`,
+          //         content_url: `${baseURL}${
+          //           featureCollection.properties?.content_url ||
+          //           "/popups/default_popup.html"
+          //         }`,
+          //         category: featureCollection.properties?.category,
+          //       };
 
-                featureCollection.features.forEach((feature, fIndex) => {
-                  if (feature.geometry.type === "Point") {
-                    const coords = feature.geometry.coordinates;
-                    const pointGraphic = createPointGraphic(
-                      coords,
-                      properties,
-                      fcIndex,
-                      fIndex
-                    );
-                    pointsLayer.add(pointGraphic);
-                    pointGraphics.push(pointGraphic);
-                  }
-                });
-              });
-            })
-            .catch((err) => {
-              console.error("Error loading points (points.json):", err);
+          //       featureCollection.features.forEach((feature, fIndex) => {
+          //         if (feature.geometry.type === "Point") {
+          //           const coords = feature.geometry.coordinates;
+          //           const pointGraphic = createPointGraphic(
+          //             coords,
+          //             properties,
+          //             fcIndex,
+          //             fIndex
+          //           );
+          //           pointsLayer.add(pointGraphic);
+          //           pointGraphics.push(pointGraphic);
+          //         }
+          //       });
+          //     });
+          //   })
+          //   .catch((err) => {
+          //     console.error("Error loading points (points.json):", err);
+          //   });
+
+          // // load up labels, very similar logic as the previous function.
+          const geojsonPointsArray = [
+            {
+              type: "FeatureCollection",
+              crs: { type: "name", properties: { name: "EPSG:3857" } },
+              properties: {
+                name: "Parking Pay Station",
+                content_url: "/popups/parking_pay_station_down.html",
+                category: "/Parking and Transportation/Under Repair",
+                imgURL:
+                  "https://thumbs.dreamstime.com/b/parking-card-pay-station-concept-icon-vector-illustration-214497240.jpg",
+              },
+              features: [
+                {
+                  type: "Feature",
+                  id: 0,
+                  geometry: {
+                    type: "Point",
+                    coordinates: [-13405962.21535241, 4489563.1433956549],
+                  },
+                  properties: { FID: 0, Id: 0 },
+                },
+              ],
+            },
+            {
+              type: "FeatureCollection",
+              crs: { type: "name", properties: { name: "EPSG:3857" } },
+              properties: {
+                name: "Parking Pay Station",
+                content_url: "/popups/parking_pay_station.html",
+                category:
+                  "/Parking and Transportation/Parking Permit Dispensers",
+                imgURL:
+                  "https://thumbs.dreamstime.com/b/parking-card-pay-station-concept-icon-vector-illustration-214497240.jpg",
+              },
+              features: [
+                {
+                  type: "Feature",
+                  id: 1,
+                  geometry: {
+                    type: "Point",
+                    coordinates: [-13405964.439560067, 4489474.543735493],
+                  },
+                  properties: { FID: 1, Id: 0 },
+                },
+                {
+                  type: "Feature",
+                  id: 2,
+                  geometry: {
+                    type: "Point",
+                    coordinates: [-13406148.767511182, 4489474.543735493],
+                  },
+                  properties: { FID: 2, Id: 0 },
+                },
+                {
+                  type: "Feature",
+                  id: 3,
+                  geometry: {
+                    type: "Point",
+                    coordinates: [-13406149.984197328, 4489559.7117657112],
+                  },
+                  properties: { FID: 3, Id: 0 },
+                },
+                {
+                  type: "Feature",
+                  id: 4,
+                  geometry: {
+                    type: "Point",
+                    coordinates: [-13406326.305813713, 4489840.563314789],
+                  },
+                  properties: { FID: 4, Id: 0 },
+                },
+                {
+                  type: "Feature",
+                  id: 5,
+                  geometry: {
+                    type: "Point",
+                    coordinates: [-13406334.061452512, 4489682.8606921434],
+                  },
+                  properties: { FID: 5, Id: 0 },
+                },
+                {
+                  type: "Feature",
+                  id: 6,
+                  geometry: {
+                    type: "Point",
+                    coordinates: [-13406304.729588903, 4489539.3139661429],
+                  },
+                  properties: { FID: 6, Id: 0 },
+                },
+              ],
+            },
+            {
+              type: "FeatureCollection",
+              crs: { type: "name", properties: { name: "EPSG:3857" } },
+              properties: {
+                name: "EV Charging Station",
+                content_url: "/popups/ev_charging_station.html",
+                category:
+                  "/Parking and Transportation/Electric Vehicle Charging",
+                imgURL:
+                  "https://upload.wikimedia.org/wikipedia/commons/7/7d/Symbol_electric_vehicle_charging_stations.jpg",
+              },
+              features: [
+                {
+                  type: "Feature",
+                  id: 0,
+                  geometry: {
+                    type: "Point",
+                    coordinates: [-13405708.83751199, 4490276.4595919941],
+                  },
+                  properties: { FID: 0, Id: 0 },
+                },
+                {
+                  type: "Feature",
+                  id: 1,
+                  geometry: {
+                    type: "Point",
+                    coordinates: [-13405716.343783945, 4490281.0602102876],
+                  },
+                  properties: { FID: 1, Id: 0 },
+                },
+              ],
+            },
+          ];
+
+          geojsonPointsArray.forEach((featureCollection, fcIndex) => {
+            const properties = {
+              name: `${featureCollection.properties?.name}` || "default label",
+              description: "temp description",
+              imgURL:
+                featureCollection.properties?.imgURL ||
+                `${baseURL}/placeholder.png`,
+              content_url: `${baseURL}${
+                featureCollection.properties?.content_url ||
+                "/popups/default_popup.html"
+              }`,
+              category: featureCollection.properties?.category,
+            };
+
+            featureCollection.features.forEach((feature, fIndex) => {
+              if (feature.geometry.type === "Point") {
+                const coords = feature.geometry.coordinates;
+                const pointGraphic = createPointGraphic(
+                  coords,
+                  properties,
+                  fcIndex,
+                  fIndex
+                );
+                pointsLayer.add(pointGraphic);
+                pointGraphics.push(pointGraphic);
+              }
             });
+          });
 
           // load up labels, very similar logic as the previous function.
 
@@ -328,7 +487,7 @@
 
           // once all of the data has been added to the graphic layers we can build side bar.
 
-          Promise.all([p1, p2, p3]).then(() => {
+          Promise.all([p1, geojsonPointsArray, p3]).then(() => {
             const allFeatures = [
               ...polygonGraphics,
               ...pointGraphics,
@@ -553,9 +712,9 @@
                   content: (event) => {
                     const g = event.graphic;
                     return `
-                       A research university is a community bound by learning, 
+                       A research university is a community bound by learning,
                        discovery and engagement. As the first American student-centered
-                        research university built in the 21st century, UC Merced's strong 
+                        research university built in the 21st century, UC Merced's strong
                         graduate and research programs mesh with high-quality undergraduate
                          programs. New knowledge increasingly depends on links among th
                           disciplines, working together on questions that transcend the
@@ -567,6 +726,32 @@
               });
             }
           }
+
+          view.watch("zoom", (newZoom) => {
+            const updatedGraphics = labelsLayer.graphics.map((g) => {
+              if (g.symbol && g.symbol.type === "text") {
+                const updatedSymbol = g.symbol.clone();
+
+                // Base font size at zoom level 17
+                let fontSize = 10 * Math.pow(1.5, newZoom - 17);
+
+                // Ensure font size does not drop below a minimum (e.g., 1px)
+                fontSize = Math.max(1, fontSize);
+
+                updatedSymbol.font.size = fontSize;
+
+                return new Graphic({
+                  geometry: g.geometry,
+                  attributes: g.attributes,
+                  symbol: updatedSymbol,
+                });
+              }
+              return g;
+            });
+
+            labelsLayer.graphics.removeAll();
+            labelsLayer.graphics.addMany(updatedGraphics);
+          });
 
           // handles building the sidefar, takes in two arguments, the features / graphic laters, and sidebar
           function buildNestedSidebarFromJson(features, sidebar) {
@@ -620,8 +805,8 @@
                 backButton.innerHTML = `
                 <div class="back">
                    <div class="arrowContainer"><img src="https://www.svgrepo.com/show/27797/right-arrow.svg/" class="arrow" style=" transform: scaleX(-1);"></div>
-                <div class="back-title">Back</div> 
-               
+                <div class="back-title">Back</div>
+
                 </div>
                 `;
                 backButton.addEventListener("click", () => {
@@ -637,7 +822,7 @@
                 const catDiv = document.createElement("div");
                 catDiv.innerHTML = `
                 <div class="category">
-                <div class="category-title">${key}</div> 
+                <div class="category-title">${key}</div>
                 <div class="arrowContainer"><img src="https://www.svgrepo.com/show/27797/right-arrow.svg/" class="arrow"></div>
                 </div>
                 `;
