@@ -23,6 +23,12 @@
         width: 100%;
         overflow: hidden;
       }
+      /* Override for small screens (mobile) */
+      @media (max-width: 800px) {
+        .esri-popup__main-container {
+          max-height: 250px !important; /* Limit height on mobile */
+        }
+      }
 
       #container {
         display: flex;
@@ -118,7 +124,7 @@
           document.getElementById("container").style.flexDirection =
             "column-reverse";
           document.getElementById("sidebar").style.width = "95%";
-          document.getElementById("sidebar").style.height = "60%";
+          document.getElementById("sidebar").style.height = "20%";
           centerCordinates = [-120.428845, 37.363169];
           zoomLevel = 16;
           fontSize = 10;
