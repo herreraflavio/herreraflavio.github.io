@@ -8,6 +8,7 @@
         "properties": {
           "Label": "Main campus",
           "Description": "Auto-generated center of mass",
+
           "category": "/locations",
           "display": true
         },

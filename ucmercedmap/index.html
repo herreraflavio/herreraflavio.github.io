@@ -136,7 +136,7 @@
           //Edit2
           centerCordinates = [-120.429287, 37.361962];
           zoomLevel = 17;
-          fontSize = 14;
+          fontSize = 12;
           return "laptop";
         }
       }
@@ -216,6 +216,15 @@
                 let labelGraphic;
 
                 const color = featureCollection.properties?.color || "gray";
+                const nameFontSize =
+                  featureCollection.properties?.nameFontSize *
+                    Math.pow(1.5, zoomLevel - 17) || fontSize;
+                console.log("nameFontSize", nameFontSize);
+
+                console.log(deviceType);
+                const nameOffset = featureCollection.properties?.nameOffset || [
+                  0, 0,
+                ];
                 const uniqueId = "polygon-" + fcIndex;
                 const uniqueParentPath = `${featureCollection.properties?.category}/${featureCollection.properties?.name}`;
 
@@ -229,6 +238,8 @@
                   labelGraphic = createNameGraphic(
                     feature.geometry.coordinates[0],
                     featureCollection.properties?.name || "default label",
+                    nameFontSize,
+                    nameOffset,
                     uniqueId,
                     uniqueParentPath
                   );
@@ -543,13 +554,30 @@
 
           // handles creating name graphic for the polygons
 
-          function createNameGraphic(ring, labelText, parentId, parentPath) {
+          function createNameGraphic(
+            ring,
+            labelText,
+            nameFontSize,
+            nameOffset,
+            parentId,
+            parentPath
+          ) {
             const [cx, cy] = getPolygonCentroid(ring);
+            console.log(nameOffset);
+            console.log(cx, cy);
+            let offsetX =
+              deviceType == "smartphone"
+                ? nameOffset[0]
+                : nameOffset[0] * 10 - nameOffset[0] * 9;
+            let offsetY =
+              deviceType == "smartphone"
+                ? nameOffset[1]
+                : nameOffset[1] * 10 - nameOffset[1] * 9;
             return new Graphic({
               geometry: {
                 type: "point",
-                x: cx,
-                y: cy,
+                x: cx + offsetX,
+                y: cy + offsetY,
                 spatialReference: { wkid: 3857 },
               },
               attributes: {
@@ -558,6 +586,7 @@
                 id: `label-${parentId}`,
                 parentId: parentId,
                 parentPath: parentPath,
+                originalFontSize: nameFontSize,
               },
               symbol: {
                 type: "text",
@@ -566,7 +595,7 @@
                 haloSize: "2px",
                 text: labelText || "Label",
                 font: {
-                  size: fontSize,
+                  size: nameFontSize,
                   family: "sans-serif",
                   weight: "bold",
                 },
@@ -744,7 +773,12 @@
                 const updatedSymbol = g.symbol.clone();
 
                 // Base font size at zoom level 17
-                let fontSize = 10 * Math.pow(1.5, newZoom - 17);
+                console.log(g.attributes.originalFontSize);
+                let tempFontSize = g.attributes.originalFontSize
+                  ? g.attributes.originalFontSize
+                  : 15;
+                let fontSize =
+                  tempFontSize * Math.pow(1.5, newZoom - zoomLevel);
 
                 // Ensure font size does not drop below a minimum (e.g., 1px)
                 fontSize = Math.max(1, fontSize);
