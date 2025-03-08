@@ -21,7 +21,6 @@ async function postData(entryName, key, index) {
       "https://amhep.pythonanywhere.com/grades",
       {
         name: entryName,
-        //grade: parseInt(key.toString() + index.toString()),
         grade: 0,
       },
       {
@@ -40,7 +39,6 @@ async function postData(entryName, key, index) {
 
 data.forEach((entry) => {
   Object.entries(entry).forEach(([key, lines]) => {
-    // console.log(`Number: ${key}`);
     let startIndex = 14;
     console.log("new partition");
     lines.forEach((line, index) => {
@@ -57,10 +55,6 @@ data.forEach((entry) => {
       } else {
         newLine = newBeforeString + stackedBeforString + line;
       }
-      //   newLine = newBeforeString + stackedBeforString + line;
-      //   console.log(newLine, ":", key, ":", index);
-      //   let grade = parseInt(key.toString() + index.toString());
-      //   console.log(grade);
       //   console.log(newLine, newLine.length);
       console.log(newLine, key, index, newLine.length);
 
@@ -69,6 +63,6 @@ data.forEach((entry) => {
       startIndex -= 1;
     });
 
-    console.log(""); // Print a blank line for separation
+    console.log("");
   });
 });
