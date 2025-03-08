@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Draw, Edit, and Export Polygons to GeoJSON</title>
+    <!-- ArcGIS JS API CSS -->
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.26/esri/css/main.css"
+    />
+    <!-- ArcGIS JS API -->
+    <script src="https://js.arcgis.com/4.26/"></script>
+
+    <!-- Terraformer for geometry conversion (GeoJSON <-> ArcGIS) -->
+    <script src="https://unpkg.com/terraformer@1.0.8"></script>
+    <script src="https://unpkg.com/terraformer-arcgis-parser@1.0.5"></script>
+    <script src="https://unpkg.com/terraformer-wkt-parser@1.1.2"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      #controls {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 99;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px;
+        font-family: sans-serif;
+      }
+
+      #geojsonOutput {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        width: 350px;
+        height: 250px;
+        background-color: white;
+        overflow: auto;
+        border: 1px solid #ccc;
+        padding: 5px;
+        font-family: monospace;
+        font-size: 0.85rem;
+        z-index: 99;
+      }
+
+      button {
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+
+    <!-- Control panel -->
+    <div id="controls">
+      <button id="newPolygonBtn">New Polygon</button>
+      <button id="editPolygonBtn">Edit Polygon</button>
+      <button id="saveBtn">Save All to GeoJSON</button>
+      <button id="clearBtn">Clear All</button>
+      <button id="loadBtn">Load from GeoJSON</button>
+    </div>
+
+    <!-- Output panel for GeoJSON -->
+    <div id="geojsonOutput"></div>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/GraphicsLayer",
+        "esri/widgets/Sketch",
+        "esri/Graphic",
+      ], function (Map, MapView, GraphicsLayer, Sketch, Graphic) {
+        // A layer to hold drawn graphics
+        const graphicsLayer = new GraphicsLayer();
+
+        // Create the Map
+        const map = new Map({
+          basemap: "osm",
+          layers: [graphicsLayer],
+        });
+
+        // Create the MapView
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          center: [-100, 40], // longitude, latitude
+          zoom: 4,
+        });
+
+        // Create a Sketch widget with no default creation tool:
+        const sketch = new Sketch({
+          view: view,
+          layer: graphicsLayer,
+          creationMode: "single",
+          visibleElements: {
+            createTools: {
+              polygon: false,
+              rectangle: false,
+              circle: false,
+            },
+            selectionTools: {
+              "lasso-selection": true,
+              "rectangle-selection": true,
+            },
+          },
+          // We'll programmatically set the "activeTool" as needed
+        });
+
+        // Add the Sketch widget to the top-right corner of the view
+        view.ui.add(sketch, "top-right");
+
+        // References to DOM elements
+        const geojsonOutput = document.getElementById("geojsonOutput");
+        const newPolygonBtn = document.getElementById("newPolygonBtn");
+        const editPolygonBtn = document.getElementById("editPolygonBtn");
+        const saveBtn = document.getElementById("saveBtn");
+        const clearBtn = document.getElementById("clearBtn");
+        const loadBtn = document.getElementById("loadBtn");
+
+        // We will keep track of "editingMode" to control how clicks behave
+        let editingMode = false;
+        let createMode = false;
+
+        /**
+         * Convert all drawn graphics in the GraphicsLayer to a GeoJSON FeatureCollection.
+         */
+        function getAllGraphicsAsGeoJSON() {
+          const graphics = graphicsLayer.graphics.toArray();
+
+          // Convert each graphic geometry to GeoJSON, then build a Feature object
+          const features = graphics.map((g) => {
+            const geojsonGeom = Terraformer.ArcGIS.convert(g.geometry.toJSON());
+            return {
+              type: "Feature",
+              geometry: geojsonGeom,
+              properties: {}, // Add any custom properties if needed
+            };
+          });
+
+          // Wrap features in a GeoJSON FeatureCollection
+          return {
+            type: "FeatureCollection",
+            features: features,
+          };
+        }
+
+        /**
+         * Write the current polygons as GeoJSON to the #geojsonOutput panel.
+         */
+        function updateGeoJSONPreview() {
+          const fc = getAllGraphicsAsGeoJSON();
+          geojsonOutput.textContent = JSON.stringify(fc, null, 2);
+        }
+
+        /**
+         * Clears the graphics from the layer (no polygons).
+         */
+        function clearAllGraphics() {
+          graphicsLayer.removeAll();
+          updateGeoJSONPreview();
+        }
+
+        /**
+         * Load polygons from the text in the #geojsonOutput panel back onto the map.
+         * 1. Parse the GeoJSON
+         * 2. Convert each feature geometry from GeoJSON to ArcGIS geometry
+         * 3. Add it as a Graphic to the graphics layer
+         */
+        function loadFromGeoJSON() {
+          try {
+            const text = geojsonOutput.textContent.trim();
+            if (!text) return;
+            const fc = JSON.parse(text);
+
+            // Validate we have a FeatureCollection
+            if (fc.type !== "FeatureCollection") {
+              alert("Invalid GeoJSON FeatureCollection!");
+              return;
+            }
+
+            clearAllGraphics();
+
+            // Convert each feature geometry from GeoJSON -> ArcGIS -> graphic
+            fc.features.forEach((feature) => {
+              const arcgisGeom = Terraformer.ArcGIS.parse(feature.geometry);
+              const graphic = new Graphic({
+                geometry: arcgisGeom,
+              });
+              graphicsLayer.add(graphic);
+            });
+          } catch (err) {
+            console.error("Failed to load from GeoJSON:", err);
+            alert("Error loading GeoJSON. Check console for details.");
+          }
+        }
+
+        // ============== EVENT HANDLERS ============== //
+
+        // 1. "New Polygon" button
+        newPolygonBtn.addEventListener("click", () => {
+          // Turn on polygon creation mode
+          createMode = true;
+          editingMode = false;
+          sketch.create("polygon"); // Start drawing a new polygon
+        });
+
+        // 2. "Edit Polygon" button
+        editPolygonBtn.addEventListener("click", () => {
+          // Turn off creation and turn on editing
+          createMode = false;
+          editingMode = true;
+          alert("Click on an existing polygon to edit its shape.");
+        });
+
+        // 3. "Save All to GeoJSON" button
+        saveBtn.addEventListener("click", () => {
+          updateGeoJSONPreview();
+        });
+
+        // 4. "Clear All" button
+        clearBtn.addEventListener("click", () => {
+          clearAllGraphics();
+        });
+
+        // 5. "Load from GeoJSON" button
+        loadBtn.addEventListener("click", () => {
+          loadFromGeoJSON();
+        });
+
+        // ============== SKETCH EVENTS ============== //
+
+        // When a new graphic is created with the Sketch:
+        sketch.on("create", (event) => {
+          if (event.state === "complete") {
+            // A new polygon was created, update output
+            updateGeoJSONPreview();
+            createMode = false; // turn off creation mode
+          }
+        });
+
+        // When an existing graphic is updated with the Sketch:
+        sketch.on("update", (event) => {
+          // "complete" fires after user finishes reshaping
+          if (event.state === "complete") {
+            updateGeoJSONPreview();
+          }
+        });
+
+        // Listen for clicks on the map to select an existing polygon for editing
+        view.on("click", (event) => {
+          if (!editingMode) return;
+
+          // Perform a hitTest to see if a polygon was clicked
+          view.hitTest(event).then((response) => {
+            const result = response.results.find((r) => {
+              return r.graphic && r.graphic.layer === graphicsLayer;
+            });
+
+            if (result) {
+              const clickedGraphic = result.graphic;
+              // Start editing the selected polygon with the reshape tool
+              sketch.update([clickedGraphic], { tool: "reshape" });
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

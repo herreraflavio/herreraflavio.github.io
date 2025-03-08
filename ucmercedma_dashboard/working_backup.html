@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Draw Polygons and Export to GeoJSON</title>
+    <!-- ArcGIS JS API CSS -->
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.26/esri/css/main.css"
+    />
+    <!-- ArcGIS JS API -->
+    <script src="https://js.arcgis.com/4.26/"></script>
+
+    <!-- Terraformer for geometry conversion (GeoJSON <-> ArcGIS) -->
+    <script src="https://unpkg.com/terraformer@1.0.8"></script>
+    <script src="https://unpkg.com/terraformer-arcgis-parser@1.0.5"></script>
+    <script src="https://unpkg.com/terraformer-wkt-parser@1.1.2"></script>
+    <!-- <script src="https://unpkg.com/terraformer@2.0.7/dist/terraformer.min.js"></script>
+    <script src="https://unpkg.com/terraformer-arcgis-parser@2.0.7/dist/terraformer-arcgis-parser.min.js"></script> -->
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      /* A small panel to show the GeoJSON output */
+      #geojsonOutput {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 300px;
+        height: 250px;
+        background-color: white;
+        overflow: auto;
+        border: 1px solid #ccc;
+        padding: 5px;
+        font-family: monospace;
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+    <div id="geojsonOutput"></div>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/GraphicsLayer",
+        "esri/widgets/Sketch",
+      ], function (Map, MapView, GraphicsLayer, Sketch) {
+        // A layer to hold your drawn graphics
+        const graphicsLayer = new GraphicsLayer();
+
+        // Create the Map
+        const map = new Map({
+          basemap: "osm",
+          layers: [graphicsLayer],
+        });
+
+        // Create the MapView
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          center: [-100, 40], // longitude, latitude
+          zoom: 4,
+        });
+
+        // Create a Sketch widget
+        const sketch = new Sketch({
+          view: view,
+          layer: graphicsLayer,
+          creationMode: "update", // allows multiple features + updates
+          availableCreateTools: ["polygon", "rectangle"],
+          // You can include circle, polyline, point, etc. if you want.
+          visibleElements: {
+            createTools: {
+              // Only show polygon and rectangle tools (optional)
+              polygon: true,
+              rectangle: true,
+            },
+            selectionTools: {
+              "lasso-selection": true,
+              "rectangle-selection": true,
+            },
+            settingsMenu: true,
+            undoRedoMenu: true,
+          },
+        });
+
+        // Add the Sketch widget to the top-right corner of the view
+        view.ui.add(sketch, "top-right");
+
+        // Get a reference to the output panel
+        const geojsonOutput = document.getElementById("geojsonOutput");
+
+        /**
+         * Convert all drawn graphics to a GeoJSON FeatureCollection
+         * and display in the #geojsonOutput panel.
+         */
+        function updateGeoJSONPreview() {
+          console.log(graphicsLayer.graphics);
+          const graphics = graphicsLayer.graphics.toArray();
+
+          // Convert each graphic geometry to GeoJSON, then build a Feature object
+          const features = graphics.map((g) => {
+            console.log(g.geometry.rings);
+            console.log(g.geometry.type);
+            // Convert ArcGIS geometry to GeoJSON geometry using Terraformer
+            const geojsonGeom = Terraformer.ArcGIS.convert(g.geometry.toJSON());
+            console.log(geojsonGeom);
+            return {
+              type: "Feature",
+              geometry: geojsonGeom,
+              properties: {}, // You could store attribute data here if needed
+            };
+          });
+
+          // Wrap features in a GeoJSON FeatureCollection
+          const geojsonFC = {
+            type: "FeatureCollection",
+            features: features,
+          };
+
+          // Update text area with the JSON
+          geojsonOutput.textContent = JSON.stringify(geojsonFC, null, 2);
+        }
+
+        // Listen to the create and update events from the Sketch widget
+        sketch.on("create", (event) => {
+          if (event.state === "complete") {
+            updateGeoJSONPreview();
+          }
+        });
+
+        sketch.on("update", (event) => {
+          if (event.state === "complete") {
+            updateGeoJSONPreview();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
