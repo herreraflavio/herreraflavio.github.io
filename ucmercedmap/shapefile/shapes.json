@@ -38,6 +38,7 @@
       "color": "#00440091",
       "name": "Bellevue Lot-Green Zone",
       "category": "/Parking and Transportation/Parking",
+      "nameOffset": [0, -30],
       "content_url": "/popups/bellevue_lot_green_zone.html"
     },
     "features": [
