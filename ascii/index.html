@@ -4,6 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <style>
+      #preview {
+      }
+      .letter {
+        font-family: monospace;
+        height: auto;
+        white-space: pre;
+        font-size: 8px;
+      }
+    </style>
   </head>
   <body>
     <h1>Made by HackerFlavio</h1>
@@ -16,8 +26,11 @@
         flex-direction: column;
       "
     >
-      <div>preview</div>
       <div>
+        <input type="text" id="wordInput" maxlength="12" value="HELLOWORLD" />
+      </div>
+      <div>preview</div>
+      <div id="preview">
         <div class="letter" id="w1"></div>
         <div class="letter" id="w2"></div>
         <div class="letter" id="w3"></div>
@@ -33,7 +46,6 @@
       </div>
     </div>
 
-    <div><input type="text" value="Hello World" /></div>
     <script src="./alphabet.js"></script>
   </body>
 </html>

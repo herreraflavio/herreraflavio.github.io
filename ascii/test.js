@@ -2,7 +2,7 @@ const fs = require("fs");
 const axios = require("axios");
 
 // Load JSON data from file
-const data = JSON.parse(fs.readFileSync("word.json", "utf-8"));
+const data = JSON.parse(fs.readFileSync("word2.json", "utf-8"));
 
 const beforeString = [
   "​    ​  ┣︎",
