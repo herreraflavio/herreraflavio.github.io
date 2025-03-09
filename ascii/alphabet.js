@@ -91,7 +91,7 @@
     });
 
     console.log("Starting 30-second progress bar...");
-    const barPromise = startProgressBar(30);
+    const barPromise = startProgressBar(60);
 
     Promise.all([requestPromise, barPromise])
       .then(([response]) => {
