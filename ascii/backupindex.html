@@ -13,25 +13,31 @@
         white-space: pre;
         font-size: 8px;
       }
-      #progressBar {
-        display: none;
-        width: 100%;
-        height: 20px;
-      }
     </style>
   </head>
   <body>
     <h1>Made by HackerFlavio</h1>
     Enter at most a 13 character string
-    <div style="display: flex; flex-direction: column; align-items: center">
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      "
+    >
       <div>
         <input type="text" id="wordInput" maxlength="13" value="HELLOWORLD" />
       </div>
-      <div>Preview</div>
-      <button id="clearButton">Clear Database</button>
-      <button id="uploadButton">Upload JSON</button>
-      <progress id="progressBar" value="0" max="100"></progress>
-      <a href="https://amhep.pythonanywhere.com/grades">Check Database</a>
+      <div>preview</div>
+      <button id="clearButton">clear datase</button>
+      <button id="uploadButton">upload Json</button>
+      <div>
+        Navigate to: <b>https://amhep.pythonanywhere.com/grades</b> to see
+        database reset progress
+      </div>
+      <a href="https://amhep.pythonanywhere.com/grades">amhep database</a>
+
       <div id="preview">
         <div class="letter" id="w1"></div>
         <div class="letter" id="w2"></div>
@@ -48,7 +54,7 @@
         <div class="letter" id="w13"></div>
       </div>
     </div>
-    </div>
+
     <script src="./alphabet.js"></script>
   </body>
 </html>
