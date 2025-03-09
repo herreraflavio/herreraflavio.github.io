@@ -1,6 +1,8 @@
 async function fetchAlphabetData() {
   try {
-    const response = await fetch("http://localhost:3000/alphabet");
+    const response = await fetch(
+      "https://flavioherrera.com/ascii/alphabet.json"
+    );
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
