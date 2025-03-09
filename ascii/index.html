@@ -17,7 +17,7 @@
   </head>
   <body>
     <h1>Made by HackerFlavio</h1>
-    Enter at most a 12 character string
+    Enter at most a 13 character string
     <div
       style="
         display: flex;
@@ -27,9 +27,17 @@
       "
     >
       <div>
-        <input type="text" id="wordInput" maxlength="12" value="HELLOWORLD" />
+        <input type="text" id="wordInput" maxlength="13" value="HELLOWORLD" />
       </div>
       <div>preview</div>
+      <button id="clearButton">clear datase</button>
+      <button id="uploadButton">upload Json</button>
+      <div>
+        Navigate to: <b>https://amhep.pythonanywhere.com/grades</b> to see
+        database reset progress
+      </div>
+      <a href="https://amhep.pythonanywhere.com/grades">amhep database</a>
+
       <div id="preview">
         <div class="letter" id="w1"></div>
         <div class="letter" id="w2"></div>
@@ -43,6 +51,7 @@
         <div class="letter" id="w10"></div>
         <div class="letter" id="w11"></div>
         <div class="letter" id="w12"></div>
+        <div class="letter" id="w13"></div>
       </div>
     </div>
 
