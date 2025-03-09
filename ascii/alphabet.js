@@ -154,24 +154,105 @@
   }
 
   // --------------------- UPDATE ASCII PREVIEW ---------------------
+  // function updateAsciiPreview(inputText) {
+  //   let cleanText = inputText
+  //     .toUpperCase()
+  //     .replace(/[^A-Z]/g, "")
+  //     .slice(0, 13); // Max 13 letters
+  //   document.getElementById("wordInput").value = cleanText;
+
+  //   // Clear out old letters
+  //   for (let i = 1; i <= 13; i++) {
+  //     document.getElementById(`w${i}`).innerHTML = "";
+  //   }
+
+  //   // Populate new letters
+  //   cleanText.split("").forEach((char, index) => {
+  //     if (letters[char] && index < 13) {
+  //       document.getElementById(`w${index + 1}`).innerHTML = letters[char]
+  //         .map((line) => `<div>${line}</div>`)
+  //         .join("");
+  //     }
+  //   });
+
+  //   // Build partitions
+  //   let partitions = {};
+  //   let partitionIndex = 1;
+  //   let lineCounter = 1;
+  //   const maxPartitions = 5;
+  //   let hasContent = false;
+
+  //   cleanText.split("").forEach((char) => {
+  //     if (!letters[char]) return;
+
+  //     letters[char].forEach((line) => {
+  //       if (lineCounter >= 14) {
+  //         if (hasContent) partitionIndex++;
+  //         lineCounter = 0;
+  //         hasContent = false;
+  //       }
+  //       if (partitionIndex > maxPartitions) return;
+
+  //       if (!partitions[partitionIndex]) {
+  //         partitions[partitionIndex] = new Array(14).fill("");
+  //         // Put '-------' at the start of the first partition
+  //         if (partitionIndex === 1) {
+  //           partitions[partitionIndex][0] = "-------";
+  //           lineCounter = 1;
+  //         }
+  //       }
+
+  //       partitions[partitionIndex][lineCounter] = line;
+  //       lineCounter++;
+  //       hasContent = true;
+  //     });
+  //   });
+
+  //   // Fill the last partition
+  //   if (partitions[partitionIndex]) {
+  //     for (let i = 14; i >= 0; i--) {
+  //       if (partitions[partitionIndex][i] === "") {
+  //         partitions[partitionIndex][i] = "-------";
+  //         break;
+  //       }
+  //     }
+  //   }
+
+  //   // Remove entirely empty partitions
+  //   partitions = Object.fromEntries(
+  //     Object.entries(partitions).filter(([_, lines]) =>
+  //       lines.some((line) => line.trim() !== "")
+  //     )
+  //   );
+
+  //   finalJsonStructure = [partitions];
+  //   console.log("📂 Partitions Output:", finalJsonStructure);
+  // }
   function updateAsciiPreview(inputText) {
     let cleanText = inputText
       .toUpperCase()
-      .replace(/[^A-Z]/g, "")
-      .slice(0, 13); // Max 13 letters
-    document.getElementById("wordInput").value = cleanText;
+      .replace(/[^A-Z0-9 ]/g, "") // ✅ Allows A-Z, numbers 0-9, and spaces
+      .slice(0, 13); // Max 13 characters including spaces
 
-    // Clear out old letters
+    document.getElementById("wordInput").value = cleanText; // Ensure valid characters
+
+    // Clear all 13 preview lines before populating
     for (let i = 1; i <= 13; i++) {
       document.getElementById(`w${i}`).innerHTML = "";
     }
 
-    // Populate new letters
+    // Fill each letter if found in the dictionary
     cleanText.split("").forEach((char, index) => {
-      if (letters[char] && index < 13) {
-        document.getElementById(`w${index + 1}`).innerHTML = letters[char]
-          .map((line) => `<div>${line}</div>`)
-          .join("");
+      if (index < 13) {
+        let asciiChar = char === " " ? "SP" : char; // ✅ Replace space with "SP"
+
+        if (letters[asciiChar]) {
+          document.getElementById(`w${index + 1}`).innerHTML = letters[
+            asciiChar
+          ]
+            .map((line) => `<div>${line}</div>`)
+            .join("");
+        }
       }
     });
 
@@ -183,9 +264,11 @@
     let hasContent = false;
 
     cleanText.split("").forEach((char) => {
-      if (!letters[char]) return;
+      let asciiChar = char === " " ? "SP" : char; // ✅ Replace space with "SP"
 
-      letters[char].forEach((line) => {
+      if (!letters[asciiChar]) return;
+
+      letters[asciiChar].forEach((line) => {
         if (lineCounter >= 14) {
           if (hasContent) partitionIndex++;
           lineCounter = 0;
@@ -195,7 +278,6 @@
 
         if (!partitions[partitionIndex]) {
           partitions[partitionIndex] = new Array(14).fill("");
-          // Put '-------' at the start of the first partition
           if (partitionIndex === 1) {
             partitions[partitionIndex][0] = "-------";
             lineCounter = 1;
@@ -218,7 +300,7 @@
       }
     }
 
-    // Remove entirely empty partitions
+    // Remove empty partitions
     partitions = Object.fromEntries(
       Object.entries(partitions).filter(([_, lines]) =>
         lines.some((line) => line.trim() !== "")
