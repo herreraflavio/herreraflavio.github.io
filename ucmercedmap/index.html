@@ -219,9 +219,9 @@
                 const nameFontSize =
                   featureCollection.properties?.nameFontSize *
                     Math.pow(1.5, zoomLevel - 17) || fontSize;
-                console.log("nameFontSize", nameFontSize);
+                // console.log("nameFontSize", nameFontSize);
 
-                console.log(deviceType);
+                //  console.log(deviceType);
                 const nameOffset = featureCollection.properties?.nameOffset || [
                   0, 0,
                 ];
@@ -563,8 +563,8 @@
             parentPath
           ) {
             const [cx, cy] = getPolygonCentroid(ring);
-            console.log(nameOffset);
-            console.log(cx, cy);
+            // console.log(nameOffset);
+            // console.log(cx, cy);
             let offsetX =
               deviceType == "smartphone"
                 ? nameOffset[0]
@@ -802,7 +802,7 @@
               return;
             }
 
-            console.log("Updating font");
+            //   console.log("Updating font");
 
             const updatedSymbol = g.symbol.clone();
 
@@ -811,11 +811,11 @@
               typeof currentZoom === "undefined" ||
               typeof zoomLevel === "undefined"
             ) {
-              console.log(currentZoom);
-              console.log(zoomLevel);
-              console.error(
-                "updateFont: currentZoom or zoomLevel is undefined."
-              );
+              // console.log(currentZoom);
+              // console.log(zoomLevel);
+              // console.error(
+              //   "updateFont: currentZoom or zoomLevel is undefined."
+              // );
               return;
             }
 
@@ -841,8 +841,26 @@
             labelsLayer.graphics.add(updatedGraphic);
           }
 
+          function hideLabel(name) {
+            const graphic = labelsLayer.graphics.find(
+              (g) => g.attributes.name === name
+            );
+            // if (!isVisible) {
+            //   // updateFont(graphic);
+            // }
+
+            //hiding bus staging zone
+            console.log(graphic.attributes.name);
+          }
+
           view.watch("zoom", (newZoom) => {
             currentZoom = newZoom;
+            if (currentZoom == 17) {
+              // console.log("hiding labels {..., listOfLabels}");
+
+              hideLabel("Bus Staging Zone");
+              // loop through labels graphics layer, if label.attributes.name == "myLabel", hide
+            }
             const updatedGraphics = labelsLayer.graphics.map((g) => {
               if (
                 g.symbol &&
@@ -852,7 +870,7 @@
                 const updatedSymbol = g.symbol.clone();
 
                 // Base font size at zoom level 17
-                console.log(g.attributes.originalFontSize);
+                //console.log(g.attributes.originalFontSize);
                 let tempFontSize = g.attributes.originalFontSize
                   ? g.attributes.originalFontSize
                   : 15;
@@ -993,7 +1011,7 @@
                     //   // updateFont(graphic);
                     // }
 
-                    console.log(graphic);
+                    // console.log(graphic);
                     if (graphic?.attributes) {
                       graphic.attributes.visible = !isVisible;
                     }
