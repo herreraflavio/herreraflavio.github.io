@@ -24,11 +24,6 @@
         overflow: hidden;
       }
 
-      /* possible solution, add a parent
-       visibility so that when you zoom 
-       in if the parent is visible then 
-       it should also show the labe;
-       */
       /* Edit1 Override for small screens (mobile) */
       @media (max-width: 800px) {
         .esri-popup__main-container {
@@ -281,7 +276,7 @@
                 polygonGraphics.push(polygonGraphic);
 
                 if (labelGraphic) {
-                  // labelGraphic.visible = true; // Ensure hidden
+                  //   labelGraphic.visible = false; // Ensure hidden
                   labelsLayer.add(labelGraphic);
                 }
               });
@@ -581,9 +576,9 @@
                 : nameOffset[1] * 10 - nameOffset[1] * 9;
 
             let altVis = true;
-            // if (labelText == "Bus Staging Zone") {
-            //   altVis = false;
-            // }
+            if (labelText == "Bus Staging Zone") {
+              altVis = false;
+            }
             return new Graphic({
               geometry: {
                 type: "point",
@@ -850,22 +845,16 @@
             });
 
             // Remove old graphic and add the updated one
-            if (g.attributes.visible == true) {
-              labelsLayer.graphics.remove(g);
-              labelsLayer.graphics.add(updatedGraphic);
-            }
+            labelsLayer.graphics.remove(g);
+            labelsLayer.graphics.add(updatedGraphic);
           }
 
           function hideLabel(labelName) {
             labelsLayer.graphics.forEach((g) => {
-              if (
-                g.attributes &&
-                (g.attributes.name === labelName) &
-                  (g.attributes.visible == true)
-              ) {
+              if (g.attributes && g.attributes.name === labelName) {
                 if (g.visible == true) {
                   console.log("hiding");
-                  g.visible = false;
+                  g.visible = !g.visible;
 
                   g.attributes.visible = g.visible;
                 }
@@ -881,21 +870,19 @@
           }
 
           function showLabel(labelName) {
-            labelsLayer.graphics.forEach((label) => {
-              if (label.attributes && label.attributes.name === labelName) {
-                const graphic = polygonsLayer.graphics.find(
-                  (parent) => parent.attributes.id === label.attributes.parentId
-                );
-                label.visible = graphic.visible;
+            labelsLayer.graphics.forEach((g) => {
+              if (
+                g.attributes &&
+                g.attributes.name === labelName &&
+                graphic.attributes.visible == true
+              ) {
+                if (g.visible == false) {
+                  console.log("hiding");
+                  g.visible = !g.visible;
 
-                label.attributes.visible = graphic.visible;
-                // if (g.visible == false) {
-                //   console.log("hiding");
-                //   g.visible = !g.visible;
-
-                //   g.attributes.visible = g.visible;
-                // }
-                // console.log(g.visible);
+                  g.attributes.visible = g.visible;
+                }
+                console.log(g.visible);
                 //
               }
             });
@@ -904,7 +891,7 @@
           view.watch("zoom", (newZoom) => {
             currentZoom = newZoom;
 
-            if (currentZoom >= zoomLevel) {
+            if (currentZoom >= 18) {
               console.log(currentZoom);
               // console.log("hiding labels {..., listOfLabels}");
               showLabel("Bus Staging Zone");
@@ -1059,28 +1046,25 @@
                         g.attributes.parentPath ===
                         `${feature.attributes.category}/${feature.attributes.name}`
                     );
-                    // if (!isVisible) {
-                    //   // updateFont(graphic);
-                    // }
-
-                    console.log(graphic);
-                    //if (graphic.attributes.name != "Bus Staging Zone") {
-                    if (graphic?.attributes && currentZoom >= zoomLevel) {
-                      graphic.attributes.visible = !isVisible;
+                    // if (currentZoom >= 18) {
+                    if (!isVisible) {
+                      updateFont(graphic);
                     }
                     // }
 
+                    console.log(graphic);
+                    if (graphic?.attributes) {
+                      graphic.attributes.visible = !isVisible;
+                    }
+
                     if (graphic) {
-                      // if (graphic.attributes.name != "Bus Staging Zone") {
-                      if (!isVisible && currentZoom >= zoomLevel) {
+                      if (!isVisible) {
                         updateFont(graphic);
                       }
-                      // graphic.visible = !graphic.visible;
-                      if (currentZoom >= zoomLevel) {
+                      if (currentZoom >= 18) {
                         graphic.visible = !graphic.visible;
                       }
 
-                      // }
                       toggleButton.textContent = feature.visible
                         ? "Hide"
                         : "Show";
@@ -1141,16 +1125,6 @@
                           : undefined,
                       })
                       .then(() => {
-                        console.log(currentZoom);
-                        // if (currentZoom > zoomLevel) {
-                        //   console.log(currentZoom);
-                        //   // console.log("hiding labels {..., listOfLabels}");
-                        //   showLabel("Bus Staging Zone");
-
-                        //   // loop through labels graphics layer, if label.attributes.name == "myLabel", hide
-                        // } else {
-                        //   hideLabel("Bus Staging Zone");
-                        // }
                         view.popup.location = popupLocation;
                         view.popup.open({
                           features: [feature],
