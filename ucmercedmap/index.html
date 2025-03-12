@@ -581,9 +581,14 @@
                 : nameOffset[1] * 10 - nameOffset[1] * 9;
 
             let altVis = true;
-            // if (labelText == "Bus Staging Zone") {
-            //   altVis = false;
-            // }
+            if (
+              (labelText === "Bus Staging Zone" ||
+                labelText === "Bellevue Lot-Gold Zone" ||
+                labelText === "Kolligian Library") &&
+              zoomLevel == 16
+            ) {
+              altVis = false;
+            }
             return new Graphic({
               geometry: {
                 type: "point",
@@ -911,7 +916,7 @@
           view.watch("zoom", (newZoom) => {
             currentZoom = newZoom;
 
-            if (currentZoom >= zoomLevel) {
+            if (currentZoom >= 17) {
               console.log(currentZoom);
               // console.log("hiding labels {..., listOfLabels}");
               showLabel("Bus Staging Zone");
