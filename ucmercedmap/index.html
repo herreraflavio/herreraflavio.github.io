@@ -1072,18 +1072,18 @@
 
                     console.log(graphic);
                     //if (graphic.attributes.name != "Bus Staging Zone") {
-                    if (graphic?.attributes && currentZoom >= zoomLevel) {
+                    if (graphic?.attributes && currentZoom >= 17) {
                       graphic.attributes.visible = !isVisible;
                     }
                     // }
 
                     if (graphic) {
                       // if (graphic.attributes.name != "Bus Staging Zone") {
-                      if (!isVisible && currentZoom >= zoomLevel) {
+                      if (!isVisible && currentZoom >= 17) {
                         updateFont(graphic);
                       }
                       // graphic.visible = !graphic.visible;
-                      if (currentZoom >= zoomLevel) {
+                      if (currentZoom >= 17) {
                         graphic.visible = !graphic.visible;
                       }
 
