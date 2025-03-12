@@ -1068,8 +1068,18 @@
                   toggleButton.id = `toggle-${feature.uniqueKey}`;
                   toggleButton.style.marginLeft = "10px";
                   toggleButton.style.cursor = "pointer";
-                  toggleButton.textContent =
-                    feature.visible === false ? "Show" : "Hide";
+                  toggleButton.style.height = "30px";
+                  toggleButton.style.width = "30px";
+                  toggleButton.style.display = "flex";
+                  toggleButton.style.alignItems = "center";
+                  toggleButton.style.justifyContent = "center";
+
+                  toggleButton.innerHTML =
+                    feature.visible === false
+                      ? `<div></div>`
+                      : `<div><img style="height: 15px;display: block" src="https://cdn.pixabay.com/photo/2016/03/31/14/37/check-mark-1292787_1280.png"/></div>`;
+                  listItem.style.opacity =
+                    feature.visible === false ? "0.5" : "1";
 
                   function toggleVisibility() {
                     const isVisible = feature.visible;
@@ -1103,12 +1113,14 @@
                       }
 
                       // }
-                      toggleButton.textContent = feature.visible
-                        ? "Hide"
-                        : "Show";
+                      toggleButton.innerHTML = feature.visible
+                        ? `<div><img style="height: 15px;display: block" src="https://cdn.pixabay.com/photo/2016/03/31/14/37/check-mark-1292787_1280.png"/></div>`
+                        : `<div></div>`;
                       listItem.style.opacity = feature.visible ? "1" : "0.5";
                     } else {
-                      toggleButton.textContent = isVisible ? "Show" : "Hide";
+                      toggleButton.innerHTML = isVisible
+                        ? `<div></div>`
+                        : `<div><img style="height: 15px;display: block" src="https://cdn.pixabay.com/photo/2016/03/31/14/37/check-mark-1292787_1280.png"/></div>`;
                       listItem.style.opacity = isVisible ? "0.5" : "1";
                     }
                   }
@@ -1129,7 +1141,7 @@
                     document.querySelectorAll(".list-item").forEach((el) => {
                       el.style.backgroundColor = "white";
                     });
-                    listItem.style.backgroundColor = "gray";
+                    listItem.style.backgroundColor = "#7cffd0";
 
                     // handles popup when clicked on item in sidebar, also zooms to that feature.
 
