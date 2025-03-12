@@ -860,7 +860,9 @@
             labelsLayer.graphics.forEach((g) => {
               if (
                 g.attributes &&
-                (g.attributes.name === labelName) &
+                (g.attributes.name === "Bus Staging Zone" ||
+                  g.attributes.name === "Bellevue Lot-Gold Zone" ||
+                  g.attributes.name === "Kolligian Library") &
                   (g.attributes.visible == true)
               ) {
                 if (g.visible == true) {
@@ -882,7 +884,12 @@
 
           function showLabel(labelName) {
             labelsLayer.graphics.forEach((label) => {
-              if (label.attributes && label.attributes.name === labelName) {
+              if (
+                label.attributes &&
+                (label.attributes.name === "Bus Staging Zone" ||
+                  label.attributes.name === "Bellevue Lot-Gold Zone" ||
+                  label.attributes.name === "Kolligian Library")
+              ) {
                 const graphic = polygonsLayer.graphics.find(
                   (parent) => parent.attributes.id === label.attributes.parentId
                 );
