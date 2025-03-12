@@ -1100,18 +1100,58 @@
 
                     console.log(graphic);
                     //if (graphic.attributes.name != "Bus Staging Zone") {
-                    if (graphic?.attributes && currentZoom >= 17) {
+                    if (
+                      graphic?.attributes &&
+                      currentZoom >= 17 &&
+                      (graphic.attributes.name === "Bus Staging Zone" ||
+                        graphic.attributes.name === "Bellevue Lot-Gold Zone" ||
+                        graphic.attributes.name === "Kolligian Library")
+                    ) {
+                      graphic.attributes.visible = !isVisible;
+                    } else if (
+                      graphic?.attributes &&
+                      (graphic.attributes.name !== "Bus Staging Zone" ||
+                        graphic.attributes.name !== "Bellevue Lot-Gold Zone" ||
+                        graphic.attributes.name !== "Kolligian Library")
+                    ) {
                       graphic.attributes.visible = !isVisible;
                     }
                     // }
 
                     if (graphic) {
                       // if (graphic.attributes.name != "Bus Staging Zone") {
-                      if (!isVisible && currentZoom >= 17) {
+                      if (
+                        !isVisible &&
+                        currentZoom >= 17 &&
+                        (graphic.attributes.name === "Bus Staging Zone" ||
+                          graphic.attributes.name ===
+                            "Bellevue Lot-Gold Zone" ||
+                          graphic.attributes.name === "Kolligian Library")
+                      ) {
+                        updateFont(graphic);
+                      } else if (
+                        !isVisible &&
+                        (graphic.attributes.name !== "Bus Staging Zone" ||
+                          graphic.attributes.name !==
+                            "Bellevue Lot-Gold Zone" ||
+                          graphic.attributes.name !== "Kolligian Library")
+                      ) {
                         updateFont(graphic);
                       }
                       // graphic.visible = !graphic.visible;
-                      if (currentZoom >= 17) {
+                      if (
+                        currentZoom >= 17 &&
+                        (graphic.attributes.name === "Bus Staging Zone" ||
+                          graphic.attributes.name ===
+                            "Bellevue Lot-Gold Zone" ||
+                          graphic.attributes.name === "Kolligian Library")
+                      ) {
+                        graphic.visible = !graphic.visible;
+                      } else if (
+                        graphic.attributes.name !== "Bus Staging Zone" ||
+                        graphic.attributes.name !== "Bellevue Lot-Gold Zone" ||
+                        graphic.attributes.name !== "Kolligian Library"
+                      ) {
                         graphic.visible = !graphic.visible;
                       }
 
