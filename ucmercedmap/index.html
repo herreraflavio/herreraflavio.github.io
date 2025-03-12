@@ -62,8 +62,9 @@
       }
 
       .list-item:hover {
-        background-color: #9f98ff;
+        background-color: #9f98ff !important;
       }
+
       .category {
         border-bottom: solid 2px black;
         cursor: pointer;
@@ -1059,6 +1060,8 @@
                   listItem.style.alignItems = "center";
                   listItem.style.marginLeft = "10px";
                   listItem.style.marginBottom = "4px";
+
+                  listItem.classList.add("hover-effect");
 
                   const nameDiv = document.createElement("div");
                   nameDiv.textContent = feature.attributes?.name || "Unnamed";
