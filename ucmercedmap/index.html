@@ -2101,7 +2101,7 @@
 
                     feature.visible = !isVisible;
 
-                    if ((feature.geometry.type = "point")) {
+                    if (feature.geometry.type == "point") {
                       feature.attributes.visible = !isVisible;
                     }
 
