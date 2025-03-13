@@ -849,12 +849,13 @@
                 },
               ],
             },
+
             {
               type: "FeatureCollection",
               crs: { type: "name", properties: { name: "EPSG:3857" } },
               properties: {
                 color: "#8b0000a3",
-                name: "restricted Zone",
+                name: "restricted Zone 1",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
                 <div>
@@ -892,11 +893,41 @@
                       ],
                     ],
                   },
-                  properties: { FID: 0, Id: 0, Color: "#8b0000a3" },
+                  properties: { FID: 0, Id: 0 },
                 },
+              ],
+            },
+
+            {
+              type: "FeatureCollection",
+              crs: { type: "name", properties: { name: "EPSG:3857" } },
+              properties: {
+                color: "#8b0000a3",
+                name: "restricted Zone 2",
+                category: "/Parking and Transportation/Parking",
+                content_url: `
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/ulotrestricted.png"
+    width="200"
+    height="300"
+  />
+  <h1>University Lot Restricted</h1>
+  <p>
+    Parking Availability is reserved for specially marked spaces enforced 24
+    hours. For more information or reservation questions please contact TAPS at
+    (209) 228-8277 or visit our website
+    <a href="" target="_blank">here</a>.
+  </p>
+</div>
+
+                `,
+              },
+
+              features: [
                 {
                   type: "Feature",
-                  id: 1,
+                  id: 0,
                   geometry: {
                     type: "Polygon",
                     coordinates: [
@@ -931,10 +962,11 @@
                       ],
                     ],
                   },
-                  properties: { FID: 1, Id: 0, Color: "#8b0000a3" },
+                  properties: { FID: 0, Id: 0 },
                 },
               ],
             },
+
             {
               type: "FeatureCollection",
               crs: { type: "name", properties: { name: "EPSG:3857" } },
