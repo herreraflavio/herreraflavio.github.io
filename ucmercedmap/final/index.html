@@ -2025,7 +2025,7 @@
                   listItem.className = "list-item";
                   listItem.style.display = "flex";
                   listItem.style.alignItems = "center";
-                  listItem.style.marginLeft = "10px";
+                  // listItem.style.marginLeft = "10px";
                   listItem.style.marginBottom = "4px";
 
                   listItem.classList.add("hover-effect");
@@ -2056,7 +2056,7 @@
 
                     feature.visible = !isVisible;
 
-                    if ((feature.geometry.type = "point")) {
+                    if (feature.geometry.type === "point") {
                       feature.attributes.visible = !isVisible;
                     }
 
