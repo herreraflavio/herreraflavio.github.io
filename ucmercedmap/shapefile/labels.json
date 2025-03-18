@@ -18,5 +18,24 @@
         }
       }
     ]
+  },
+  {
+    "type": "FeatureCollection",
+    "name": "Merced Labels",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "Label": "Bellevue Lot",
+          "Description": "Auto-generated center of mass",
+          "category": "/locations",
+          "display": true
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-13405810.539623834, 4489890.768271976]
+        }
+      }
+    ]
   }
 ]

@@ -251,6 +251,7 @@
           const polygonsLayer = new GraphicsLayer();
           const pointsLayer = new GraphicsLayer();
           const labelsLayer = new GraphicsLayer();
+
           map.addMany([polygonsLayer, pointsLayer, labelsLayer]);
 
           let polygonGraphics = [];
@@ -1435,12 +1436,17 @@
                     Description: "Auto-generated center of mass",
 
                     category: "/locations",
-                    display: true,
+                    // display: true,
+                  },
+                  attributes: {
+                    name: "Main campus",
+                    visible: false,
                   },
                   geometry: {
                     type: "Point",
                     coordinates: [-13405810.539623834, 4489890.768271976],
                   },
+                  visible: false,
                 },
               ],
             },
@@ -1684,50 +1690,36 @@
             const properties = feature.properties || {};
             const labelText = properties.Label || `Label ${fcIndex}-${fIndex}`;
 
-            if (properties.display) {
-              return new Graphic({
-                geometry: {
-                  type: "point",
-                  x: coords[0],
-                  y: coords[1],
-                  spatialReference: { wkid: 3857 },
-                },
-                attributes: {
-                  name: labelText,
-                  description: properties.Description || "",
-                  category: properties.category || "/Uncategorized/Labels",
-                },
+            // if (properties.display) {
+            return new Graphic({
+              geometry: {
+                type: "point",
+                x: coords[0],
+                y: coords[1],
+                spatialReference: { wkid: 3857 },
+              },
+              attributes: {
+                name: labelText,
+                description: properties.Description || "",
+                category: properties.category || "/Uncategorized/Labels",
+                visible: false,
+              },
 
-                symbol: {
-                  type: "text",
-                  color: "black",
-                  haloColor: "white",
-                  haloSize: "2px",
-                  text: labelText,
-                  font: {
-                    size: 14,
-                    family: "sans-serif",
-                    weight: "bold",
-                  },
+              symbol: {
+                type: "text",
+                color: "black",
+                haloColor: "white",
+                haloSize: "2px",
+                text: labelText,
+                font: {
+                  size: 14,
+                  family: "sans-serif",
+                  weight: "bold",
                 },
-                popupTemplate: {
-                  title: "{name}",
-                  content: (event) => {
-                    const g = event.graphic;
-                    return `
-                       A research university is a community bound by learning,
-                       discovery and engagement. As the first American student-centered
-                        research university built in the 21st century, UC Merced's strong
-                        graduate and research programs mesh with high-quality undergraduate
-                         programs. New knowledge increasingly depends on links among th
-                          disciplines, working together on questions that transcend the
-                           traditional disciplines. UC Merced fosters and encourage
-                           s cross-disciplinary inquiry and discovery.
-                      `;
-                  },
-                },
-              });
-            }
+              },
+              visible: false,
+            });
+            // }
           }
 
           let currentZoom = zoomLevel;
@@ -1790,6 +1782,10 @@
                 }
                 console.log(g.visible);
                 //
+              } else if (g.attributes && g.attributes.name === "Main campus") {
+                console.log("found=====");
+                g.visible = true;
+                g.attributes.visible = true;
               }
             });
             // pointsLayer.graphics.forEach((point) => {
@@ -1826,6 +1822,7 @@
 
           function showLabel(labelName) {
             labelsLayer.graphics.forEach((label) => {
+              console.log(label.attributes.name);
               if (
                 label.attributes &&
                 (label.attributes.name === "Bus Staging Zone" ||
@@ -1838,6 +1835,13 @@
                 label.visible = graphic.visible;
 
                 label.attributes.visible = graphic.visible;
+              } else if (
+                label.attributes &&
+                label.attributes.name === "Main campus"
+              ) {
+                console.log("found=============");
+                label.visible = false;
+                label.attributes.visible = false;
               }
             });
             // pointsLayer.graphics.forEach((point) => {
