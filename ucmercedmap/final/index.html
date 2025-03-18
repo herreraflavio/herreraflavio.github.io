@@ -226,6 +226,14 @@
             //edit3
             constraints: {
               minZoom: zoomLevel - 1, // Optional: Set a minimum zoom level
+              geometry: {
+                type: "extent",
+                xmin: -13406500, // Adjust to fit UC Merced's bounding coordinates
+                ymin: 4489300,
+                xmax: -13405000,
+                ymax: 4490700,
+                spatialReference: { wkid: 3857 },
+              },
             },
           });
 
