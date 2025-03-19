@@ -28,10 +28,10 @@
       }
 
       /* possible solution, add a parent
-            visibility so that when you zoom 
-            in if the parent is visible then 
-            it should also show the labe;
-            */
+       visibility so that when you zoom 
+       in if the parent is visible then 
+       it should also show the labe;
+       */
       /* Edit1 Override for small screens (mobile) */
       @media (max-width: 800px) {
         .esri-popup__main-container {
@@ -41,13 +41,13 @@
 
       #container {
         display: flex;
-        height: 100%;
+        height: calc(100% - 60px);
         width: 100%;
       }
 
       #sidebar {
         width: 25%;
-        height: calc(100% - 60px);
+        height: calc(100% - 30px);
         background-color: #f8f8f8;
         padding: 15px;
         overflow-y: scroll;
@@ -128,15 +128,14 @@
           href="https://taps.ucmerced.edu/"
           target="_blank"
           style="display: flex"
-          ><!--<img
-                 class="header-image"
-                 src="https://ucmerced.maps.arcgis.com/sharing/rest/content/items/0439419af51b4fa7ada0df6f92ae87af/resources/media/instantAppsConfigPanel_1677515242929_TAPS-Logo_December_2022-1.png"/>--></a
-        >
+          ><img
+            class="header-image"
+            src="https://ucmerced.maps.arcgis.com/sharing/rest/content/items/0439419af51b4fa7ada0df6f92ae87af/resources/media/instantAppsConfigPanel_1677515242929_TAPS-Logo_December_2022-1.png"
+        /></a>
       </div>
 
       <div>
-        <span
-          style="color: rgb(255, 191, 60); font-size: 21px; padding-left: 10px"
+        <span style="color: rgb(255, 191, 60); font-size: 21px"
           >UC Merced Parking Map</span
         >
         <span style="color: rgb(255, 255, 255); font-size: 8px"
@@ -252,6 +251,7 @@
           const polygonsLayer = new GraphicsLayer();
           const pointsLayer = new GraphicsLayer();
           const labelsLayer = new GraphicsLayer();
+
           map.addMany([polygonsLayer, pointsLayer, labelsLayer]);
 
           let polygonGraphics = [];
@@ -273,31 +273,31 @@
                 name: "Bellevue Lot-Gold Zone",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-                       <img
-                         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/goldzonebellevuelot.png"
-                         width="200"
-                         height="300"
-                       />
-                       <h1>Bellevue Lot Gold Zone</h1>
-                       <p>Parking availability:</p>
-                       <li>Faculty</li>
-                       <li>Staff</li>
-                       <li>Vendors</li>
-                       <p></p>
-                       <p>Marked spaces include:</p>
-                       <li>ADA Parking</li>
-                       <li>Campus Tour Vehicles</li>
-                       <p></p>
-                       <p>
-                         Specially marked spaces enforced 24 hours. Paid parking requiered on Monday
-                         - Friday from 7am - 8pm. For more information please contact TAPS at (209)
-                         228-8277 or visit our website
-                         <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
-                       </p>
-                     </div>
+                <div>
+                  <img
+                    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/goldzonebellevuelot.png"
+                    width="200"
+                    height="300"
+                  />
+                  <h1>Bellevue Lot Gold Zone</h1>
+                  <p>Parking availability:</p>
+                  <li>Faculty</li>
+                  <li>Staff</li>
+                  <li>Vendors</li>
+                  <p></p>
+                  <p>Marked spaces include:</p>
+                  <li>ADA Parking</li>
+                  <li>Campus Tour Vehicles</li>
+                  <p></p>
+                  <p>
+                    Specially marked spaces enforced 24 hours. Paid parking requiered on Monday
+                    - Friday from 7am - 8pm. For more information please contact TAPS at (209)
+                    228-8277 or visit our website
+                    <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                  </p>
+                </div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -331,40 +331,40 @@
                 category: "/Parking and Transportation/Parking",
                 nameOffset: [0, -30],
                 content_url: `
-                     <div>
-                       <img
-                         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/greenzonesign.png"
-                         width="200"
-                         height="300"
-                       />
-                       <h1>Bellevue Lot Green Zone</h1>
-                       <p>Parking avaibility for:</p>
-                       <li>Student Commuter</li>
-                       <li>Staff</li>
-                       <li>Faculty</li>
-                       <li>Visitor Parking</li>
-                       <li>Vendors</li>
-                       <p></p>
-                       <strong
-                         ><p>Marked spaces include:</p>
-                         <li>ADA Parking</li>
-                         <li>Compact Vehicles</li>
-                         <p></p>
-                         <p>
-                           Dont have a permit? Download the WayToPark Mobile App for hourly parking.
-                           Click
-                           <a href="https://taps.ucmerced.edu/permits" target="_blank">here</a> for
-                           more information.
-                         </p></strong
-                       >
-                       <p>
-                         Paid Parking required Monday - Friday from 7am - 6pm. For more information
-                         please visit the TAPS website or click
-                         <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
-                       </p>
-                     </div>
+                <div>
+                  <img
+                    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/greenzonesign.png"
+                    width="200"
+                    height="300"
+                  />
+                  <h1>Bellevue Lot Green Zone</h1>
+                  <p>Parking avaibility for:</p>
+                  <li>Student Commuter</li>
+                  <li>Staff</li>
+                  <li>Faculty</li>
+                  <li>Visitor Parking</li>
+                  <li>Vendors</li>
+                  <p></p>
+                  <strong
+                    ><p>Marked spaces include:</p>
+                    <li>ADA Parking</li>
+                    <li>Compact Vehicles</li>
+                    <p></p>
+                    <p>
+                      Dont have a permit? Download the WayToPark Mobile App for hourly parking.
+                      Click
+                      <a href="https://taps.ucmerced.edu/permits" target="_blank">here</a> for
+                      more information.
+                    </p></strong
+                  >
+                  <p>
+                    Paid Parking required Monday - Friday from 7am - 6pm. For more information
+                    please visit the TAPS website or click
+                    <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                  </p>
+                </div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -404,27 +404,27 @@
                 name: "Bellevue Lot-H Zone",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/hzonesign.png"
-         width="200"
-         height="300"
-       />
-       <h1>Bellevue Lot H Zone</h1>
-       <p>Parkring availability:</p>
-       <li>Student Residents Only</li>
-       <p></p>
-       <p>Marked spaces include:</p>
-       <li>ADA Parking</li>
-       <p></p>
-       <p>
-         Paid Parking required and enforced 24 hours a day. For more information
-         please contact TAPS at (209) 228-8277 or visit our website
-         <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/hzonesign.png"
+    width="200"
+    height="300"
+  />
+  <h1>Bellevue Lot H Zone</h1>
+  <p>Parkring availability:</p>
+  <li>Student Residents Only</li>
+  <p></p>
+  <p>Marked spaces include:</p>
+  <li>ADA Parking</li>
+  <p></p>
+  <p>
+    Paid Parking required and enforced 24 hours a day. For more information
+    please contact TAPS at (209) 228-8277 or visit our website
+    <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -457,25 +457,25 @@
                 name: "Bus Staging Zone",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/busstaging.png"
-         width="200"
-         height="300"
-       />
-       <h1>Bellevue Lot Bus Staging Zone</h1>
-       <p>
-         The Bus Staging zone is located on the south side of Bellevue Lot. For a
-         visual representation please visit
-         <a href="https://taps.ucmerced.edu/bus-staging" target="_blank">here</a>.
-         Bus Staging zone is able to maintain up to 4 bus at a time. If Bus Staging
-         zone is full, the bus must leave campus and return for pickup at a later
-         time. For more informaiton please contact TAPS at (209) 228-8277 or visit
-         <a href="https://taps.ucmerced.edu" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/busstaging.png"
+    width="200"
+    height="300"
+  />
+  <h1>Bellevue Lot Bus Staging Zone</h1>
+  <p>
+    The Bus Staging zone is located on the south side of Bellevue Lot. For a
+    visual representation please visit
+    <a href="https://taps.ucmerced.edu/bus-staging" target="_blank">here</a>.
+    Bus Staging zone is able to maintain up to 4 bus at a time. If Bus Staging
+    zone is full, the bus must leave campus and return for pickup at a later
+    time. For more informaiton please contact TAPS at (209) 228-8277 or visit
+    <a href="https://taps.ucmerced.edu" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -505,27 +505,27 @@
                 name: "ECEC Lot-Blue Zone",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/bluezoneecec.png"
-         width="200"
-         height="300"
-       />
-       <h1>ECEC Lot Blue Zone</h1>
-       <p>Parking availability:</p>
-       <li>Faculty</li>
-       <li>Staff</li>
-       <li>Vendors</li>
-       <p></p>
-       <p>
-         Specially marked spaces are enforced 24 hours. Paid parking required on
-         Monday - Friday from 7am - 6pm. For more information please contact TAPS at
-         (209) 228-8277 or visit our website
-         <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/bluezoneecec.png"
+    width="200"
+    height="300"
+  />
+  <h1>ECEC Lot Blue Zone</h1>
+  <p>Parking availability:</p>
+  <li>Faculty</li>
+  <li>Staff</li>
+  <li>Vendors</li>
+  <p></p>
+  <p>
+    Specially marked spaces are enforced 24 hours. Paid parking required on
+    Monday - Friday from 7am - 6pm. For more information please contact TAPS at
+    (209) 228-8277 or visit our website
+    <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -556,31 +556,31 @@
                 name: "Le Grand Lot-Gold Zone",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/goldzonelegrand.png"
-         width="200"
-         height="300"
-       />
-       <h1>Le Grand Lot Gold Zone</h1>
-       <p>Parking Availability:</p>
-       <li>Faculty</li>
-       <li>Staff</li>
-       <li>Vendors</li>
-       <p></p>
-       <p>Marked spaces include:</p>
-       <li>ADA Parking</li>
-       <li>EV Charging</li>
-       <p></p>
-       <p>
-         Specially marked spaces enforced 24 hours. Paid parking required on Monday -
-         Friday from 7am - 8pm. For more information please contact TAPS at (209)
-         228-8277 or visit our website
-         <a href="https://taps.ucmerced.edu" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/goldzonelegrand.png"
+    width="200"
+    height="300"
+  />
+  <h1>Le Grand Lot Gold Zone</h1>
+  <p>Parking Availability:</p>
+  <li>Faculty</li>
+  <li>Staff</li>
+  <li>Vendors</li>
+  <p></p>
+  <p>Marked spaces include:</p>
+  <li>ADA Parking</li>
+  <li>EV Charging</li>
+  <p></p>
+  <p>
+    Specially marked spaces enforced 24 hours. Paid parking required on Monday -
+    Friday from 7am - 8pm. For more information please contact TAPS at (209)
+    228-8277 or visit our website
+    <a href="https://taps.ucmerced.edu" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -626,31 +626,31 @@
                 nameFontSize: 13,
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/goldzonelibrarylot1.png"
-         width="200"
-         height="300"
-       />
-       <h1>Library Lot 1 Gold Zone</h1>
-       <p>Parking availability:</p>
-       <li>Faculty</li>
-       <li>Staff</li>
-       <li>Vendors</li>
-       <p></p>
-       <p>Marked spaces:</p>
-       <li>ADA Parking</li>
-       <li>EV Charging Stations</li>
-       <p></p>
-       <p>
-         Specially marked spaces enforced 24 hours. Paid parking requiered on Monday
-         - Friday from 7am - 8pm. For more information please contact TAPS at (209)
-         228-8277 or visit our website
-         <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/goldzonelibrarylot1.png"
+    width="200"
+    height="300"
+  />
+  <h1>Library Lot 1 Gold Zone</h1>
+  <p>Parking availability:</p>
+  <li>Faculty</li>
+  <li>Staff</li>
+  <li>Vendors</li>
+  <p></p>
+  <p>Marked spaces:</p>
+  <li>ADA Parking</li>
+  <li>EV Charging Stations</li>
+  <p></p>
+  <p>
+    Specially marked spaces enforced 24 hours. Paid parking requiered on Monday
+    - Friday from 7am - 8pm. For more information please contact TAPS at (209)
+    228-8277 or visit our website
+    <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -688,27 +688,27 @@
                 nameFontSize: 13,
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/goldzonelibrarylot2.png"
-         width="200"
-         height="300"
-       />
-       <h1>Library Lot 2 Gold Zone</h1>
-       <p>Parking availability:</p>
-       <li>Faculty</li>
-       <li>Staff</li>
-       <li>Vendors</li>
-       <p></p>
-       <p>
-         Specially marked spaces enforced 24 hours. Paid parking requiered on Monday
-         - Friday from 7am - 8pm. For more information please contact TAPS at (209)
-         228-8277 or visit our website
-         <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/goldzonelibrarylot2.png"
+    width="200"
+    height="300"
+  />
+  <h1>Library Lot 2 Gold Zone</h1>
+  <p>Parking availability:</p>
+  <li>Faculty</li>
+  <li>Staff</li>
+  <li>Vendors</li>
+  <p></p>
+  <p>
+    Specially marked spaces enforced 24 hours. Paid parking requiered on Monday
+    - Friday from 7am - 8pm. For more information please contact TAPS at (209)
+    228-8277 or visit our website
+    <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -740,29 +740,29 @@
                 name: "North Bowl Lot 1-Slate Zone",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/nb1.png"
-         width="200"
-         height="300"
-       />
-       <h1>North Bowl Lot Slate Zone</h1>
-       <p>Parking Availability:</p>
-       <li>Faculty</li>
-       <li>Staff</li>
-       <p></p>
-       <p>Marked spaces include:</p>
-       <li>ADA Parking</li>
-       <p></p>
-       <p>
-         Specially marked spaced enforeced 24 hours. Paid parking required Monday -
-         Friday from 7am - 6pm For more information please contact TAPS at (209)
-         228-8277 or visit our website
-         <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/nb1.png"
+    width="200"
+    height="300"
+  />
+  <h1>North Bowl Lot Slate Zone</h1>
+  <p>Parking Availability:</p>
+  <li>Faculty</li>
+  <li>Staff</li>
+  <p></p>
+  <p>Marked spaces include:</p>
+  <li>ADA Parking</li>
+  <p></p>
+  <p>
+    Specially marked spaced enforeced 24 hours. Paid parking required Monday -
+    Friday from 7am - 6pm For more information please contact TAPS at (209)
+    228-8277 or visit our website
+    <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -801,29 +801,29 @@
                 name: "North Bowl Lot 2-Slate Zone",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/nb2.png"
-         width="200"
-         height="300"
-       />
-       <h1>North Bowl Lot Slate Zone</h1>
-       <p>Parking Availability:</p>
-       <li>Faculty</li>
-       <li>Staff</li>
-       <p></p>
-       <p>Marked spaces include:</p>
-       <li>ADA Parking</li>
-       <p></p>
-       <p>
-         Specially marked spaced enforeced 24 hours. Paid parking required Monday -
-         Friday from 7am - 8pm For more information please contact TAPS at (209)
-         228-8277 or visit our website
-         <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/nb2.png"
+    width="200"
+    height="300"
+  />
+  <h1>North Bowl Lot Slate Zone</h1>
+  <p>Parking Availability:</p>
+  <li>Faculty</li>
+  <li>Staff</li>
+  <p></p>
+  <p>Marked spaces include:</p>
+  <li>ADA Parking</li>
+  <p></p>
+  <p>
+    Specially marked spaced enforeced 24 hours. Paid parking required Monday -
+    Friday from 7am - 8pm For more information please contact TAPS at (209)
+    228-8277 or visit our website
+    <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -853,27 +853,27 @@
                 name: "P3 Lot-Blue Zone",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/p3u.png"
-         width="200"
-         height="300"
-       />
-       <h1>P3 Lot Blue Zone</h1>
-       <p>Parking availability:</p>
-       <li>Faculty</li>
-       <li>Staff</li>
-       <li>Vendors</li>
-       <p></p>
-       <p>
-         Specially marked spaces are enforced 24 hours. Paid parking required on
-         Monday - Friday from 7am - 6pm. For more information please contact TAPS at
-         (209) 228-8277 or visit our website
-         <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/p3u.png"
+    width="200"
+    height="300"
+  />
+  <h1>P3 Lot Blue Zone</h1>
+  <p>Parking availability:</p>
+  <li>Faculty</li>
+  <li>Staff</li>
+  <li>Vendors</li>
+  <p></p>
+  <p>
+    Specially marked spaces are enforced 24 hours. Paid parking required on
+    Monday - Friday from 7am - 6pm. For more information please contact TAPS at
+    (209) 228-8277 or visit our website
+    <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -901,25 +901,25 @@
               crs: { type: "name", properties: { name: "EPSG:3857" } },
               properties: {
                 color: "#8b0000a3",
-                name: "Restricted Zone 1",
+                name: "restricted Zone 1",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/ulotrestricted.png"
-         width="200"
-         height="300"
-       />
-       <h1>University Lot Restricted</h1>
-       <p>
-         Parking Availability is reserved for specially marked spaces enforced 24
-         hours. For more information or reservation questions please contact TAPS at
-         (209) 228-8277 or visit our website
-         <a href="" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/ulotrestricted.png"
+    width="200"
+    height="300"
+  />
+  <h1>University Lot Restricted</h1>
+  <p>
+    Parking Availability is reserved for specially marked spaces enforced 24
+    hours. For more information or reservation questions please contact TAPS at
+    (209) 228-8277 or visit our website
+    <a href="" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
 
               features: [
@@ -949,25 +949,25 @@
               crs: { type: "name", properties: { name: "EPSG:3857" } },
               properties: {
                 color: "#8b0000a3",
-                name: "Restricted Zone 2",
+                name: "restricted Zone 2",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/ulotrestricted.png"
-         width="200"
-         height="300"
-       />
-       <h1>University Lot Restricted</h1>
-       <p>
-         Parking Availability is reserved for specially marked spaces enforced 24
-         hours. For more information or reservation questions please contact TAPS at
-         (209) 228-8277 or visit our website
-         <a href="" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/ulotrestricted.png"
+    width="200"
+    height="300"
+  />
+  <h1>University Lot Restricted</h1>
+  <p>
+    Parking Availability is reserved for specially marked spaces enforced 24
+    hours. For more information or reservation questions please contact TAPS at
+    (209) 228-8277 or visit our website
+    <a href="" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
 
               features: [
@@ -1018,31 +1018,31 @@
               crs: { type: "name", properties: { name: "EPSG:3857" } },
               properties: {
                 color: "#00004e78",
-                name: "Scholar's Lot-Blue Zone",
+                name: "Scholars Lot-Blue Zone",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/bluezonescholarslot.png"
-         width="200"
-         height="300"
-       />
-       <h1>Scholar's Lot Blue Zone</h1>
-       <p>Parking availability:</p>
-       <li>Faculty</li>
-       <li>Staff</li>
-       <li>Vendors</li>
-       <li>Event Parking</li>
-       <p></p>
-       <p>
-         Specially marked spaces are enforced 24 hours. Paid parking required on
-         Monday - Friday from 7am - 6pm. For more information please contact TAPS at
-         (209) 228-8277 or visit our website
-         <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/bluezonescholarslot.png"
+    width="200"
+    height="300"
+  />
+  <h1>Scholars Lot Blue Zone</h1>
+  <p>Parking availability:</p>
+  <li>Faculty</li>
+  <li>Staff</li>
+  <li>Vendors</li>
+  <li>Event Parking</li>
+  <p></p>
+  <p>
+    Specially marked spaces are enforced 24 hours. Paid parking required on
+    Monday - Friday from 7am - 6pm. For more information please contact TAPS at
+    (209) 228-8277 or visit our website
+    <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -1075,27 +1075,27 @@
               crs: { type: "name", properties: { name: "EPSG:3857" } },
               properties: {
                 color: "#80808063",
-                name: "Scholar's Lot-H Zone",
+                name: "Scholars Lot-H Zone",
                 category: "/Parking and Transportation/Parking",
                 content_url: `
-                     <div>
-       <img
-         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/hzonesign.png"
-         width="200"
-         height="300"
-       />
-       <h1>Scholar's Lot H Zone</h1>
-       <p>Parkring availability:</p>
-       <li>Student Residents Only</li>
-       <p></p>
-       <p>
-         Paid Parking required and enforced 24 hours a day. For more information
-         please contact TAPS at (209) 228-8277 or visit our website
-         <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
-       </p>
-     </div>
+                <div>
+  <img
+    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/hzonesign.png"
+    width="200"
+    height="300"
+  />
+  <h1>Scholars Lot H Zone</h1>
+  <p>Parkring availability:</p>
+  <li>Student Residents Only</li>
+  <p></p>
+  <p>
+    Paid Parking required and enforced 24 hours a day. For more information
+    please contact TAPS at (209) 228-8277 or visit our website
+    <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+  </p>
+</div>
 
-                     `,
+                `,
               },
               features: [
                 {
@@ -1209,26 +1209,26 @@
               properties: {
                 name: "University Transit Center (UTC)",
                 content_url: `
-                     <div>
-                     <img
-                       alt=""
-                       src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/documents/cattracks_photo_utc_2_2_22.jpg"
-                     />
-                     <h1>University Transit Center</h1>
-                     <p>
-                       Transportation and Parking Services (TAPS) is committed to providing safe
-                       and reliable transit services for all students, faculty, staff and visitors.
-                       The UTC is a transportation hub that served bus transportation that serves
-                       students, faculty, staff and visiters of the university. The UTC typically
-                       offers bus shelters, seating, and real-time information about bus arrivals
-                       <a href="https://cattracks.ridesystems.net/routes" target="_blank">here</a>.
-                       For updated transit shcedules or information please contact TAPS at (209)
-                       228-8277 visit
-                       <a href="https://taps.ucmerced.edu/transportation" target="_blank">here</a>.
-                     </p>
-                   </div>
+                <div>
+                <img
+                  alt=""
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/documents/cattracks_photo_utc_2_2_22.jpg"
+                />
+                <h1>University Transit Center</h1>
+                <p>
+                  Transportation and Parking Services (TAPS) is committed to providing safe
+                  and reliable transit services for all students, faculty, staff and visitors.
+                  The UTC is a transportation hub that served bus transportation that serves
+                  students, faculty, staff and visiters of the university. The UTC typically
+                  offers bus shelters, seating, and real-time information about bus arrivals
+                  <a href="https://cattracks.ridesystems.net/routes" target="_blank">here</a>.
+                  For updated transit shcedules or information please contact TAPS at (209)
+                  228-8277 visit
+                  <a href="https://taps.ucmerced.edu/transportation" target="_blank">here</a>.
+                </p>
+              </div>
 
-                     `,
+                `,
                 category: "/Parking and Transportation/UC Merced Transit",
                 imgURL:
                   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7Utj8RWnlmSHb7X6eCSc0Tk9DnJ6u7Ty40Q&s",
@@ -1251,24 +1251,24 @@
               properties: {
                 name: "Parking Pay Station",
                 content_url: `
-                     <div>
-                       <img
-                         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/parkingpaystation.png"
-                         width="200"
-                         height="300"
-                       />
-                       <h1>Parking Pay Stations Updated</h1>
-                       <p>
-                         The campus parking pay stations are electronic machines used to manage the
-                         payment of parking fees in designated parking areas. They typically offer
-                         two types of permits: hourly and daily. These permits allow drivers to park
-                         their vehicles in designated areas. Payments can be made with card and
-                         mobile app. For more information please contact TAPS at (209) 822-8277 or
-                         visit
-                         <a href="https://taps.ucmerced.edu/transportation" target="_blank">here</a>.
-                       </p>
-                     </div>
-                     `,
+                <div>
+                  <img
+                    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/parkingpaystation.png"
+                    width="200"
+                    height="300"
+                  />
+                  <h1>Parking Pay Stations Updated</h1>
+                  <p>
+                    The campus parking pay stations are electronic machines used to manage the
+                    payment of parking fees in designated parking areas. They typically offer
+                    two types of permits: hourly and daily. These permits allow drivers to park
+                    their vehicles in designated areas. Payments can be made with card and
+                    mobile app. For more information please contact TAPS at (209) 822-8277 or
+                    visit
+                    <a href="https://taps.ucmerced.edu/transportation" target="_blank">here</a>.
+                  </p>
+                </div>
+                `,
                 category:
                   "/Parking and Transportation/Parking Permit Dispensers",
                 imgURL:
@@ -1277,10 +1277,20 @@
               features: [
                 {
                   type: "Feature",
+                  id: 0,
+                  geometry: {
+                    type: "Point",
+                    coordinates: [-13405962.21535241, 4489563.1433956549],
+                  },
+                  properties: { FID: 0, Id: 0 },
+                },
+
+                {
+                  type: "Feature",
                   id: 1,
                   geometry: {
                     type: "Point",
-                    coordinates: [-13406340.729589, 4489520.3139661429],
+                    coordinates: [-13405964.439560067, 4489474.543735493],
                   },
                   properties: { FID: 1, Id: 0 },
                 },
@@ -1289,7 +1299,7 @@
                   id: 2,
                   geometry: {
                     type: "Point",
-                    coordinates: [-13406260.729589, 4489520.3139661429],
+                    coordinates: [-13406148.767511182, 4489474.543735493],
                   },
                   properties: { FID: 2, Id: 0 },
                 },
@@ -1307,7 +1317,7 @@
                   id: 4,
                   geometry: {
                     type: "Point",
-                    coordinates: [-13406148.767511182, 4489474.543735493],
+                    coordinates: [-13406326.305813713, 4489840.563314789],
                   },
                   properties: { FID: 4, Id: 0 },
                 },
@@ -1316,7 +1326,7 @@
                   id: 5,
                   geometry: {
                     type: "Point",
-                    coordinates: [-13405962.21535241, 4489563.1433956549],
+                    coordinates: [-13406334.061452512, 4489682.8606921434],
                   },
                   properties: { FID: 5, Id: 0 },
                 },
@@ -1325,27 +1335,9 @@
                   id: 6,
                   geometry: {
                     type: "Point",
-                    coordinates: [-13405964.439560067, 4489474.543735493],
+                    coordinates: [-13406304.729588903, 4489539.3139661429],
                   },
                   properties: { FID: 6, Id: 0 },
-                },
-                {
-                  type: "Feature",
-                  id: 7,
-                  geometry: {
-                    type: "Point",
-                    coordinates: [-13406326.305813713, 4489840.563314789],
-                  },
-                  properties: { FID: 7, Id: 0 },
-                },
-                {
-                  type: "Feature",
-                  id: 8,
-                  geometry: {
-                    type: "Point",
-                    coordinates: [-13406334.061452512, 4489682.8606921434],
-                  },
-                  properties: { FID: 8, Id: 0 },
                 },
               ],
             },
@@ -1353,30 +1345,30 @@
               type: "FeatureCollection",
               crs: { type: "name", properties: { name: "EPSG:3857" } },
               properties: {
-                name: "EV Charging Station",
+                name: "EV Charging Station Updated",
                 content_url: `
-                     <div>
-                       <img
-                         src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/documents/Fall/2015/thumbnail_image.png"
-                         width="400"
-                         height="300"
-                       />
-                       <h1>Electric Vehicle Charging Station</h1>
-                       <p>
-                         These spaces provide access for charging purposes only.&nbsp; When charging
-                         is complete, the vehicle must be moved to an alternate location as soon as
-                         possible. Please<strong> do not</strong> unplug other vehicles without
-                         permission from the vehicle owner and be sure to return the cord to the
-                         charging station when you are finished.
-                       </p>
-                       <br />
-                       <p>
-                         For more information about the EV Charging Stations please contact TAPS at
-                         (209) 228 - 8277 or visit our website
-                         <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
-                       </p>
-                     </div>
-                     `,
+                <div>
+                  <img
+                    src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/documents/Fall/2015/thumbnail_image.png"
+                    width="400"
+                    height="300"
+                  />
+                  <h1>Electric Vehicle Charging Station</h1>
+                  <p>
+                    These spaces provide access for charging purposes only.&nbsp; When charging
+                    is complete, the vehicle must be moved to an alternate location as soon as
+                    possible. Please<strong> do not</strong> unplug other vehicles without
+                    permission from the vehicle owner and be sure to return the cord to the
+                    charging station when you are finished.
+                  </p>
+                  <br />
+                  <p>
+                    For more information about the EV Charging Stations please contact TAPS at
+                    (209) 228 - 8277 or visit our website
+                    <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                  </p>
+                </div>
+                `,
                 category:
                   "/Parking and Transportation/Electric Vehicle Charging",
                 imgURL:
@@ -1424,7 +1416,7 @@
                   coords,
                   properties,
                   fcIndex,
-                  fIndex + 1
+                  fIndex
                 );
                 pointsLayer.add(pointGraphic);
                 pointGraphics.push(pointGraphic);
@@ -1440,92 +1432,21 @@
                 {
                   type: "Feature",
                   properties: {
-                    Label: "Main Campus",
+                    Label: "Main campus",
                     Description: "Auto-generated center of mass",
-                    popup: false,
+
                     category: "/locations",
-                    display: true,
+                    // display: true,
                   },
                   attributes: {
-                    name: "Main Campus",
+                    name: "Main campus",
                     visible: false,
                   },
                   geometry: {
                     type: "Point",
-                    coordinates: [-13405800.439560067, 4489884.543735493],
+                    coordinates: [-13405810.539623834, 4489890.768271976],
                   },
-                },
-                {
-                  type: "Feature",
-                  properties: {
-                    Label: "Bellevue Lot",
-                    Description: "Auto-generated center of mass",
-                    popup: false,
-                    category: "/locations",
-                    display: true,
-                  },
-                  attributes: {
-                    name: "Bellevue Lot",
-                    visible: false,
-                  },
-                  geometry: {
-                    type: "Point",
-                    coordinates: [-13406000.439560067, 4489474.543735493],
-                  },
-                },
-                {
-                  type: "Feature",
-                  properties: {
-                    Label: "Scholar's Lot",
-                    Description: "Auto-generated center of mass",
-                    popup: false,
-                    category: "/locations",
-                    display: true,
-                  },
-                  attributes: {
-                    name: "Scholar's Lot",
-                    visible: false,
-                  },
-                  geometry: {
-                    type: "Point",
-                    coordinates: [-13406379.061452512, 4489682.8606921434],
-                  },
-                },
-                {
-                  type: "Feature",
-                  properties: {
-                    Label: "Library Lot",
-                    Description: "Auto-generated center of mass",
-                    popup: false,
-                    category: "/locations",
-                    display: true,
-                  },
-                  attributes: {
-                    name: "Library Lot",
-                    visible: false,
-                  },
-                  geometry: {
-                    type: "Point",
-                    coordinates: [-13405716.343783945, 4490281.0602102876],
-                  },
-                },
-                {
-                  type: "Feature",
-                  properties: {
-                    Label: "North Bowl Lot",
-                    Description: "Auto-generated center of mass",
-                    popup: false,
-                    category: "/locations",
-                    display: true,
-                  },
-                  attributes: {
-                    name: "North Bowl Lot",
-                    visible: false,
-                  },
-                  geometry: {
-                    type: "Point",
-                    coordinates: [-13404875.668397716, 4490515.348983869],
-                  },
+                  visible: false,
                 },
               ],
             },
@@ -1621,18 +1542,10 @@
                 : nameOffset[1] * 10 - nameOffset[1] * 9;
 
             let altVis = true;
-
             if (
               (labelText === "Bus Staging Zone" ||
                 labelText === "Bellevue Lot-Gold Zone" ||
-                labelText === "Kolligian Library" ||
-                labelText === "Bellevue Lot-H Zone" ||
-                labelText === "Bellevue Lot-Green Zone" ||
-                labelText === "Scholar's Lot-Blue Zone" ||
-                labelText === "Scholar's Lot-H Zone" ||
-                labelText === "North Bowl Lot 1-Slate Zone" ||
-                labelText === "North Bowl Lot 2-Slate Zone" ||
-                labelText === "P3 Lot-Blue Zone") &&
+                labelText === "Kolligian Library") &&
               zoomLevel == 16
             ) {
               altVis = false;
@@ -1756,13 +1669,11 @@
                 content: (event) => {
                   const g = event.graphic;
                   let baseContent = `
-                           <p><b>Description:</b> ${
-                             g.attributes.description
-                           }</p>
-                           <p><i>Coordinates:</i> [${g.geometry.x.toFixed(
-                             2
-                           )}, ${g.geometry.y.toFixed(2)}]</p>
-                         `;
+                      <p><b>Description:</b> ${g.attributes.description}</p>
+                      <p><i>Coordinates:</i> [${g.geometry.x.toFixed(
+                        2
+                      )}, ${g.geometry.y.toFixed(2)}]</p>
+                    `;
                   if (g.attributes.content_url) {
                     return g.attributes.content_url;
                   } else {
@@ -1779,6 +1690,7 @@
             const properties = feature.properties || {};
             const labelText = properties.Label || `Label ${fcIndex}-${fIndex}`;
 
+            // if (properties.display) {
             return new Graphic({
               geometry: {
                 type: "point",
@@ -1807,6 +1719,7 @@
               },
               visible: false,
             });
+            // }
           }
 
           let currentZoom = zoomLevel;
@@ -1853,41 +1766,26 @@
             }
           }
 
-          function hideLotLabels() {
-            labelsLayer.graphics.forEach((label) => {
+          function hideLabel(labelName) {
+            labelsLayer.graphics.forEach((g) => {
               if (
-                label.attributes &&
-                (label.attributes.name === "Bus Staging Zone" ||
-                  label.attributes.name === "Bellevue Lot-Gold Zone" ||
-                  label.attributes.name === "Kolligian Library" ||
-                  label.attributes.name === "Bellevue Lot-H Zone" ||
-                  label.attributes.name === "Bellevue Lot-Green Zone" ||
-                  label.attributes.name === "Scholar's Lot-Blue Zone" ||
-                  label.attributes.name === "Scholar's Lot-H Zone" ||
-                  label.attributes.name === "Library Lot 2-Gold Zone" ||
-                  label.attributes.name === "Library Lot 1-Gold Zone" ||
-                  label.attributes.name === "North Bowl Lot 1-Slate Zone" ||
-                  label.attributes.name === "North Bowl Lot 2-Slate Zone" ||
-                  label.attributes.name === "P3 Lot-Blue Zone")
+                g.attributes &&
+                (g.attributes.name === "Bus Staging Zone" ||
+                  g.attributes.name === "Bellevue Lot-Gold Zone" ||
+                  g.attributes.name === "Kolligian Library")
               ) {
-                if (label.visible == true) {
+                if (g.visible == true) {
                   console.log("hiding");
-                  label.visible = false;
+                  g.visible = false;
 
-                  label.attributes.visible = false;
+                  g.attributes.visible = false;
                 }
-                //console.log(g.visible);
+                console.log(g.visible);
                 //
-              } else if (
-                label.attributes &&
-                (label.attributes.name === "Bellevue Lot" ||
-                  label.attributes.name === "Scholar's Lot" ||
-                  label.attributes.name === "Main Campus" ||
-                  label.attributes.name === "Library Lot" ||
-                  label.attributes.name === "North Bowl Lot")
-              ) {
-                label.visible = true;
-                label.attributes.visible = true;
+              } else if (g.attributes && g.attributes.name === "Main campus") {
+                console.log("found=====");
+                g.visible = true;
+                g.attributes.visible = true;
               }
             });
             // pointsLayer.graphics.forEach((point) => {
@@ -1922,22 +1820,14 @@
             });
           }
 
-          function showLotLabels() {
+          function showLabel(labelName) {
             labelsLayer.graphics.forEach((label) => {
+              console.log(label.attributes.name);
               if (
                 label.attributes &&
                 (label.attributes.name === "Bus Staging Zone" ||
                   label.attributes.name === "Bellevue Lot-Gold Zone" ||
-                  label.attributes.name === "Kolligian Library" ||
-                  label.attributes.name === "Bellevue Lot-H Zone" ||
-                  label.attributes.name === "Bellevue Lot-Green Zone" ||
-                  label.attributes.name === "Scholar's Lot-Blue Zone" ||
-                  label.attributes.name === "Scholar's Lot-H Zone" ||
-                  label.attributes.name === "Library Lot 2-Gold Zone" ||
-                  label.attributes.name === "Library Lot 1-Gold Zone" ||
-                  label.attributes.name === "North Bowl Lot 1-Slate Zone" ||
-                  label.attributes.name === "North Bowl Lot 2-Slate Zone" ||
-                  label.attributes.name === "P3 Lot-Blue Zone")
+                  label.attributes.name === "Kolligian Library")
               ) {
                 const graphic = polygonsLayer.graphics.find(
                   (parent) => parent.attributes.id === label.attributes.parentId
@@ -1947,19 +1837,13 @@
                 label.attributes.visible = graphic.visible;
               } else if (
                 label.attributes &&
-                (label.attributes.name === "Bellevue Lot" ||
-                  label.attributes.name === "Scholar's Lot" ||
-                  label.attributes.name === "Main Campus" ||
-                  label.attributes.name === "Library Lot" ||
-                  label.attributes.name === "North Bowl Lot")
+                label.attributes.name === "Main campus"
               ) {
-                //here5
+                console.log("found=============");
                 label.visible = false;
-
                 label.attributes.visible = false;
               }
             });
-
             // pointsLayer.graphics.forEach((point) => {
             //   console.log("hiding point layer");
             //   console.log(point.attributes.name);
@@ -2025,11 +1909,11 @@
             if (currentZoom >= 17) {
               console.log(currentZoom);
               // console.log("hiding labels {..., listOfLabels}");
-              showLotLabels();
+              showLabel("Bus Staging Zone");
 
               // loop through labels graphics layer, if label.attributes.name == "myLabel", hide
             } else {
-              hideLotLabels();
+              hideLabel("Bus Staging Zone");
             }
             const updatedGraphics = labelsLayer.graphics.map((g) => {
               if (
@@ -2115,12 +1999,12 @@
                 const backButton = document.createElement("div");
 
                 backButton.innerHTML = `
-                     <div class="back">
-                        <div class="arrowContainer"><img src="https://www.svgrepo.com/show/27797/right-arrow.svg/" class="arrow" style=" transform: scaleX(-1);"></div>
-                     <div class="back-title">Back</div>
+                <div class="back">
+                   <div class="arrowContainer"><img src="https://www.svgrepo.com/show/27797/right-arrow.svg/" class="arrow" style=" transform: scaleX(-1);"></div>
+                <div class="back-title">Back</div>
 
-                     </div>
-                     `;
+                </div>
+                `;
                 backButton.addEventListener("click", () => {
                   pathStack.pop();
                   renderCurrentNode();
@@ -2133,11 +2017,11 @@
 
                 const catDiv = document.createElement("div");
                 catDiv.innerHTML = `
-                     <div class="category">
-                     <div class="category-title">${key}</div>
-                     <div class="arrowContainer"><img src="https://www.svgrepo.com/show/27797/right-arrow.svg/" class="arrow"></div>
-                     </div>
-                     `;
+                <div class="category">
+                <div class="category-title">${key}</div>
+                <div class="arrowContainer"><img src="https://www.svgrepo.com/show/27797/right-arrow.svg/" class="arrow"></div>
+                </div>
+                `;
 
                 catDiv.addEventListener("click", () => {
                   pathStack.push({ nodeName: key, node: currentNode[key] });
@@ -2204,36 +2088,14 @@
                       currentZoom >= 17 &&
                       (graphic.attributes.name === "Bus Staging Zone" ||
                         graphic.attributes.name === "Bellevue Lot-Gold Zone" ||
-                        graphic.attributes.name === "Kolligian Library" ||
-                        graphic.attributes.name === "Bellevue Lot-H Zone" ||
-                        graphic.attributes.name === "Bellevue Lot-Green Zone" ||
-                        graphic.attributes.name === "Scholar's Lot-Blue Zone" ||
-                        graphic.attributes.name === "Scholar's Lot-H Zone" ||
-                        graphic.attributes.name === "Library Lot 2-Gold Zone" ||
-                        graphic.attributes.name === "Library Lot 1-Gold Zone" ||
-                        graphic.attributes.name ===
-                          "North Bowl Lot 1-Slate Zone" ||
-                        graphic.attributes.name ===
-                          "North Bowl Lot 2-Slate Zone" ||
-                        graphic.attributes.name === "P3 Lot-Blue Zone")
+                        graphic.attributes.name === "Kolligian Library")
                     ) {
                       graphic.attributes.visible = !isVisible;
                     } else if (
                       graphic?.attributes &&
                       graphic.attributes.name != "Bus Staging Zone" &&
                       graphic.attributes.name != "Bellevue Lot-Gold Zone" &&
-                      graphic.attributes.name != "Kolligian Library" &&
-                      graphic.attributes.name != "Bellevue Lot-H Zone" &&
-                      graphic.attributes.name != "Bellevue Lot-Green Zone" &&
-                      graphic.attributes.name != "Scholar's Lot-Blue Zone" &&
-                      graphic.attributes.name != "Scholar's Lot-H Zone" &&
-                      graphic.attributes.name != "Library Lot 2-Gold Zone" &&
-                      graphic.attributes.name != "Library Lot 1-Gold Zone" &&
-                      graphic.attributes.name !=
-                        "North Bowl Lot 1-Slate Zone" &&
-                      graphic.attributes.name !=
-                        "North Bowl Lot 2-Slate Zone" &&
-                      graphic.attributes.name != "P3 Lot-Blue Zone"
+                      graphic.attributes.name != "Kolligian Library"
                     ) {
                       graphic.attributes.visible = !isVisible;
                     }
@@ -2247,44 +2109,14 @@
                         (graphic.attributes.name === "Bus Staging Zone" ||
                           graphic.attributes.name ===
                             "Bellevue Lot-Gold Zone" ||
-                          graphic.attributes.name === "Kolligian Library" ||
-                          graphic.attributes.name === "Bellevue Lot-H Zone" ||
-                          graphic.attributes.name ===
-                            "Bellevue Lot-Green Zone" ||
-                          graphic.attributes.name ===
-                            "Scholar's Lot-Blue Zone" ||
-                          graphic.attributes.name === "Scholar's Lot-H Zone" ||
-                          graphic.attributes.name ===
-                            "Library Lot 2-Gold Zone" ||
-                          graphic.attributes.name ===
-                            "Library Lot 1-Gold Zone" ||
-                          graphic.attributes.name ===
-                            "North Bowl Lot 1-Slate Zone" ||
-                          graphic.attributes.name ===
-                            "North Bowl Lot 2-Slate Zone" ||
-                          graphic.attributes.name === "P3 Lot-Blue Zone")
+                          graphic.attributes.name === "Kolligian Library")
                       ) {
                         updateFont(graphic);
                       } else if (
-                        (!isVisible &&
-                          graphic.attributes.name != "Bus Staging Zone" &&
-                          graphic.attributes.name != "Bellevue Lot-Gold Zone" &&
-                          graphic.attributes.name != "Kolligian Library" &&
-                          graphic.attributes.name != "Bellevue Lot-H Zone" &&
-                          graphic.attributes.name !=
-                            "Bellevue Lot-Green Zone" &&
-                          graphic.attributes.name !=
-                            "Scholar's Lot-Blue Zone" &&
-                          graphic.attributes.name != "Scholar's Lot-H Zone" &&
-                          graphic.attributes.name !=
-                            "Library Lot 2-Gold Zone" &&
-                          graphic.attributes.name !=
-                            "Library Lot 1-Gold Zone") ||
-                        (graphic.attributes.name !=
-                          "North Bowl Lot 1-Slate Zone" &&
-                          graphic.attributes.name !=
-                            "North Bowl Lot 2-Slate Zone" &&
-                          graphic.attributes.name != "P3 Lot-Blue Zone")
+                        !isVisible &&
+                        graphic.attributes.name !== "Bus Staging Zone" &&
+                        graphic.attributes.name !== "Bellevue Lot-Gold Zone" &&
+                        graphic.attributes.name !== "Kolligian Library"
                       ) {
                         updateFont(graphic);
                       }
@@ -2294,39 +2126,13 @@
                         (graphic.attributes.name === "Bus Staging Zone" ||
                           graphic.attributes.name ===
                             "Bellevue Lot-Gold Zone" ||
-                          graphic.attributes.name === "Kolligian Library" ||
-                          graphic.attributes.name === "Bellevue Lot-H Zone" ||
-                          graphic.attributes.name ===
-                            "Bellevue Lot-Green Zone" ||
-                          graphic.attributes.name ===
-                            "Scholar's Lot-Blue Zone" ||
-                          graphic.attributes.name === "Scholar's Lot-H Zone" ||
-                          graphic.attributes.name ===
-                            "Library Lot 2-Gold Zone" ||
-                          graphic.attributes.name ===
-                            "Library Lot 1-Gold Zone" ||
-                          graphic.attributes.name ===
-                            "North Bowl Lot 1-Slate Zone" ||
-                          graphic.attributes.name ===
-                            "North Bowl Lot 2-Slate Zone" ||
-                          graphic.attributes.name === "P3 Lot-Blue Zone")
+                          graphic.attributes.name === "Kolligian Library")
                       ) {
                         graphic.visible = !graphic.visible;
                       } else if (
                         graphic.attributes.name != "Bus Staging Zone" &&
                         graphic.attributes.name != "Bellevue Lot-Gold Zone" &&
-                        graphic.attributes.name != "Kolligian Library" &&
-                        graphic.attributes.name != "Bellevue Lot-H Zone" &&
-                        graphic.attributes.name != "Bellevue Lot-Green Zone" &&
-                        graphic.attributes.name != "Scholar's Lot-Blue Zone" &&
-                        graphic.attributes.name != "Scholar's Lot-H Zone" &&
-                        graphic.attributes.name != "Library Lot 2-Gold Zone" &&
-                        graphic.attributes.name != "Library Lot 1-Gold Zone" &&
-                        graphic.attributes.name !=
-                          "North Bowl Lot 1-Slate Zone" &&
-                        graphic.attributes.name !=
-                          "North Bowl Lot 2-Slate Zone" &&
-                        graphic.attributes.name != "P3 Lot-Blue Zone"
+                        graphic.attributes.name != "Kolligian Library"
                       ) {
                         graphic.visible = !graphic.visible;
                       }
@@ -2390,15 +2196,10 @@
                         console.log(currentZoom);
 
                         view.popup.location = popupLocation;
-
-                        console.log(feature.attributes.category);
-
-                        if (feature.attributes.category != "/locations") {
-                          view.popup.open({
-                            features: [feature],
-                            location: popupLocation,
-                          });
-                        }
+                        view.popup.open({
+                          features: [feature],
+                          location: popupLocation,
+                        });
                       });
                   });
 

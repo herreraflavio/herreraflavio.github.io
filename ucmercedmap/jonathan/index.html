@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+     <html lang="en">
+       <head>
+         <meta charset="utf-8" />
+         <meta
+           name="viewport"
+           content="initial-scale=1,maximum-scale=1,user-scalable=no"
+         />
+         <title>UC Merced Map</title>
+<body>
+         <link href="https://js.arcgis.com/4.31/esri/themes/light/main.css" rel="stylesheet" /><script src="https://js.arcgis.com/4.31/"></script>
+         <style type="text/css">html,
+                    body {
+                      margin: 0;
+                      padding: 0;
+                      height: 100%;
+                      width: 100%;
+                      font-size: 18px;
+                      display: flex;
+                      flex-direction: column;
+                      overflow: hidden;
+                    }
+
+                    /* possible solution, add a parent
+                     visibility so that when you zoom 
+                     in if the parent is visible then 
+                     it should also show the labe;
+                     */
+                    /* Edit1 Override for small screens (mobile) */
+                    @media (max-width: 800px) {
+                      .esri-popup__main-container {
+                        max-height: 250px !important; /* Limit height on mobile */
+                      }
+                    }
+
+                    #container {
+                      display: flex;
+                      height: 500px;
+                      width: 100%;
+                    }
+
+                    #sidebar {
+                      width: 25%;
+                      height: auto;
+                      background-color: #f8f8f8;
+                      padding: 15px;
+                      overflow-y: scroll;
+                    }
+
+                    #viewDiv {
+                      flex-grow: 1;
+                    }
+
+                    .list-item {
+                      cursor: pointer;
+                      padding: 5px;
+                      border-bottom: 1px solid #ccc;
+                      display: flex;
+                    }
+
+                    .list-item:hover {
+                      background-color: #9f98ff !important;
+                    }
+
+                    .category {
+                      border-bottom: solid 2px black;
+                      cursor: pointer;
+                      padding: 4px 0;
+                      font-weight: 500;
+                      display: flex;
+                    }
+                    .category:hover {
+                      background-color: #bcdaff;
+                    }
+                    .back {
+                      cursor: pointer;
+
+                      font-weight: 500;
+
+                      display: flex;
+                    }
+                    .back-title {
+                      color: #4ea4ff;
+                      font-size: 26px;
+                      margin-left: 5px;
+                    }
+                    .category-title {
+                      flex-grow: 1;
+                      display: flex;
+                      align-items: center;
+                    }
+                    .arrowContainer {
+                      display: flex;
+                      align-items: center;
+                      justify-self: center;
+                    }
+                    .arrow {
+                      height: 30px;
+                      width: 20px;
+                      display: block;
+                    }
+
+                    /* header styles */
+                    .header-container {
+                      display: flex;
+                      flex-direction: row;
+                      align-items: center;
+                      background-color: #002856;
+                    }
+                    .header-image {
+                      width: 50px;
+                      padding: 5px;
+                      padding-left: 15px;
+                    }
+         </style>
+         <div class="header-container">
+           <div><a href="https://taps.ucmerced.edu/" style="display: flex" target="_blank"><!--<img
+                          class="header-image"
+                          src="https://ucmerced.maps.arcgis.com/sharing/rest/content/items/0439419af51b4fa7ada0df6f92ae87af/resources/media/instantAppsConfigPanel_1677515242929_TAPS-Logo_December_2022-1.png"/>--></a></div>
+
+           <div><span style="color: rgb(255, 191, 60); font-size: 21px; padding-left: 10px;">UC Merced Parking Map</span> <span style="color: rgb(255, 255, 255); font-size: 8px">Made by Flavio Herrera</span></div>
+         </div>
+
+         <div id="container">
+           <div id="sidebar">&nbsp;</div>
+           <!-- map renders here -->
+
+           <div id="viewDiv">&nbsp;</div>
+         </div>
+         <script>
+                    //Edit1, Edit2, Edit3, Edit4
+                    let centerCordinates;
+                    let zoomLevel;
+                    let fontSize;
+
+                    // Update base url to what ever you need it, this will depend on how you are hosting it, alternatively you can use full path instead either here or in the
+                    // json file, points.json and shapes.json. Currently I have it hosted on my website for demonstration purposes only.
+                    let baseURL = "https://flavioherrera.com/ucmercedmap";
+
+                    //very basic way to determin if mobile or laptop, checks aspect ratio. Has different css styling and zoom.
+                    function detectDeviceType() {
+                      const width = window.innerWidth;
+                      const height = window.innerHeight;
+                      const aspectRatio = width / height;
+                      const pixelRatio = window.devicePixelRatio;
+
+                      if (aspectRatio < 0.8 || (width < 800 && pixelRatio > 1)) {
+                        document.getElementById("container").style.flexDirection =
+                          "column-reverse";
+                        document.getElementById("sidebar").style.width = "95%";
+                        document.getElementById("sidebar").style.height = "27%";
+                        centerCordinates = [-120.428845, 37.363169];
+                        zoomLevel = 17;
+                        fontSize = 10;
+                        return "smartphone";
+                      } else {
+                        // centerCordinates = [-120.424445, 37.363569];
+                        //Edit2
+                        centerCordinates = [-120.422045, 37.365169];
+                        zoomLevel = 15;
+                        fontSize = 12.5;
+                        return "laptop";
+                      }
+                      showLotLabels();
+                      hideLotLabels();
+                    }
+
+                    //loads map on window load
+                    window.onload = function () {
+                      //checks url, in development you probably wont need this anymore
+                      const currentUrl = window.location.href;
+                      if (currentUrl.includes("http://127.0.0.1:5502/")) {
+                        baseURL = "http://127.0.0.1:5502/ucmercedmap";
+                      }
+                      const deviceType = detectDeviceType();
+                      if (deviceType === "smartphone") {
+                        document.body.style.fontSize = "14px";
+                      } else {
+                        document.body.style.fontSize = "18px";
+                      }
+
+                      //setting up map
+
+                      require([
+                        "esri/Map",
+                        "esri/views/MapView",
+                        "esri/Graphic",
+                        "esri/layers/GraphicsLayer",
+                        "esri/widgets/Popup",
+                      ], function (Map, MapView, Graphic, GraphicsLayer, Popup) {
+                        // Create the Map currently using open street map
+                        const map = new Map({
+                          basemap: "osm",
+                        });
+
+                        // Create View
+
+                        const view = new MapView({
+                          container: "viewDiv",
+                          map: map,
+                          center: centerCordinates,
+                          zoom: zoomLevel,
+                          popup: {
+                            dockEnabled: false,
+                            defaultPopupTemplateEnabled: true,
+                          },
+                          //edit3
+                          constraints: {
+                            minZoom: zoomLevel, // Optional: Set a minimum zoom level
+                            geometry: {
+                              type: "extent",
+                              xmin: -13406500, // Adjust to fit UC Merced's bounding coordinates
+                              ymin: 4489300,
+                              xmax: -13404750,
+                              ymax: 4490700,
+                              spatialReference: { wkid: 3857 },
+                            },
+                          },
+                        });
+
+                        // create popup instance
+
+                        view.popup = new Popup({ view: view });
+
+                        // create different graphics layers
+
+                        // one note, there are two types of lables, not the best naming convertion, there are the lables associated with the polygons and those that are
+                        // stand alone labels which have their own json file.
+
+                        // the goal was that the standalone lables dont require any assocciation to any polygons, you can think of them as more of like bookmarks.
+
+                        const polygonsLayer = new GraphicsLayer();
+                        const pointsLayer = new GraphicsLayer();
+                        const labelsLayer = new GraphicsLayer();
+                        map.addMany([polygonsLayer, pointsLayer, labelsLayer]);
+
+                        let polygonGraphics = [];
+                        let pointGraphics = [];
+                        let labelGraphics = [];
+
+                        // fetch json file and create polygon graphics, and add them to layer
+
+                        // const p1 = fetch("./shapefile/shapes.json")
+                        //   .then((response) => response.json())
+                        //   .then((geojsonPolygonsArray) => {
+
+                        const geojsonPolygonsArray = [
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#ffa50085",
+                              name: "Bellevue Lot-Gold Zone",
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                                <img
+                                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/goldzonebellevuelot.png"
+                                  width="200"
+                                  height="300"
+                                />
+                                <h1>Bellevue Lot Gold Zone</h1>
+                                <p>Parking availability:</p>
+                                <li>Faculty</li>
+                                <li>Staff</li>
+                                <li>Vendors</li>
+                                <p></p>
+                                <p>Marked spaces include:</p>
+                                <li>ADA Parking</li>
+                                <li>Campus Tour Vehicles</li>
+                                <p></p>
+                                <p>
+                                  Specially marked spaces enforced 24 hours. Paid parking requiered on Monday
+                                  - Friday from 7am - 8pm. For more information please contact TAPS at (209)
+                                  228-8277 or visit our website
+                                  <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                                </p>
+                              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13406051.698986635, 4489552.5263904259],
+                                      [-13406051.390150174, 4489528.6868036762],
+                                      [-13405712.009933606, 4489528.6254802123],
+                                      [-13405711.779138448, 4489551.3724146262],
+                                      [-13406051.698986635, 4489552.5263904259],
+                                    ],
+                                  ],
+                                },
+                                properties: {
+                                  FID: 0,
+                                  Id: 0,
+                                },
+                              },
+                            ],
+                          },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#00440091",
+                              name: "Bellevue Lot-Green Zone",
+                              category: "/Parking and Transportation/Parking",
+                              nameOffset: [0, -20],
+                              content_url: `
+                              <div>
+                                <img
+                                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/greenzonesign.png"
+                                  width="200"
+                                  height="300"
+                                />
+                                <h1>Bellevue Lot Green Zone</h1>
+                                <p>Parking avaibility for:</p>
+                                <li>Student Commuter</li>
+                                <li>Staff</li>
+                                <li>Faculty</li>
+                                <li>Visitor Parking</li>
+                                <li>Vendors</li>
+                                <p></p>
+                                <strong
+                                  ><p>Marked spaces include:</p>
+                                  <li>ADA Parking</li>
+                                  <li>Compact Vehicles</li>
+                                  <p></p>
+                                  <p>
+                                    Dont have a permit? Download the WayToPark Mobile App for hourly parking.
+                                    Click
+                                    <a href="https://taps.ucmerced.edu/permits" target="_blank">here</a> for
+                                    more information.
+                                  </p></strong
+                                >
+                                <p>
+                                  Paid Parking required Monday - Friday from 7am - 6pm. For more information
+                                  please visit the TAPS website or click
+                                  <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                                </p>
+                              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13406340.67845241, 4489553.0741014928],
+                                      [-13406342.607443703, 4489379.4648851156],
+                                      [-13406258.282967182, 4489379.4648851156],
+                                      [-13406258.558537368, 4489390.4876925126],
+                                      [-13406153.841867179, 4489389.6609819531],
+                                      [-13406153.290726805, 4489379.4648851156],
+                                      [-13405667.460491154, 4489377.8114640117],
+                                      [-13405668.287201706, 4489543.7047152147],
+                                      [-13405675.176456323, 4489543.7047152147],
+                                      [-13405676.278737063, 4489552.2473909333],
+                                      [-13405711.27615053, 4489551.4206803814],
+                                      [-13405711.827290896, 4489528.2727848664],
+                                      [-13406051.880898841, 4489528.2727848664],
+                                      [-13406052.156469027, 4489552.5229611173],
+                                      [-13406340.67845241, 4489553.0741014928],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#80808063",
+                              name: "Bellevue Lot-H Zone",
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/hzonesign.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>Bellevue Lot H Zone</h1>
+                <p>Parkring availability:</p>
+                <li>Student Residents Only</li>
+                <p></p>
+                <p>Marked spaces include:</p>
+                <li>ADA Parking</li>
+                <p></p>
+                <p>
+                  Paid Parking required and enforced 24 hours a day. For more information
+                  please contact TAPS at (209) 228-8277 or visit our website
+                  <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13406341.51618579, 4489545.8872310668],
+                                      [-13406411.533058319, 4489545.7108661607],
+                                      [-13406411.356693398, 4489521.196142517],
+                                      [-13406419.645844555, 4489520.8434126824],
+                                      [-13406434.107767854, 4489505.4996647984],
+                                      [-13406433.755038021, 4489379.5751131997],
+                                      [-13406342.706941396, 4489379.4581217915],
+                                      [-13406341.51618579, 4489545.8872310668],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#80808063",
+                              name: "Bus Staging Zone",
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/busstaging.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>Bellevue Lot Bus Staging Zone</h1>
+                <p>
+                  The Bus Staging zone is located on the south side of Bellevue Lot. For a
+                  visual representation please visit
+                  <a href="https://taps.ucmerced.edu/bus-staging" target="_blank">here</a>.
+                  Bus Staging zone is able to maintain up to 4 bus at a time. If Bus Staging
+                  zone is full, the bus must leave campus and return for pickup at a later
+                  time. For more informaiton please contact TAPS at (209) 228-8277 or visit
+                  <a href="https://taps.ucmerced.edu" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13406257.907953855, 4489379.5152359083],
+                                      [-13406153.951942615, 4489379.5235682204],
+                                      [-13406154.01254113, 4489389.4132474139],
+                                      [-13406258.267757591, 4489390.2146628946],
+                                      [-13406257.907953855, 4489379.5152359083],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#00004e78",
+                              name: "ECEC Lot-Blue Zone",
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/bluezoneecec.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>ECEC Lot Blue Zone</h1>
+                <p>Parking availability:</p>
+                <li>Faculty</li>
+                <li>Staff</li>
+                <li>Vendors</li>
+                <p></p>
+                <p>
+                  Specially marked spaces are enforced 24 hours. Paid parking required on
+                  Monday - Friday from 7am - 6pm. For more information please contact TAPS at
+                  (209) 228-8277 or visit our website
+                  <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13406425.013951933, 4489947.0292376131],
+                                      [-13406425.253346151, 4489922.1181190163],
+                                      [-13406403.70462124, 4489897.4498877749],
+                                      [-13406375.778028805, 4489897.7570495754],
+                                      [-13406376.678177003, 4489947.0548149943],
+                                      [-13406425.013951933, 4489947.0292376131],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#ffa50085",
+                              name: "Le Grand Lot-Gold Zone",
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/goldzonelegrand.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>Le Grand Lot Gold Zone</h1>
+                <p>Parking Availability:</p>
+                <li>Faculty</li>
+                <li>Staff</li>
+                <li>Vendors</li>
+                <p></p>
+                <p>Marked spaces include:</p>
+                <li>ADA Parking</li>
+                <li>EV Charging</li>
+                <p></p>
+                <p>
+                  Specially marked spaces enforced 24 hours. Paid parking required on Monday -
+                  Friday from 7am - 8pm. For more information please contact TAPS at (209)
+                  228-8277 or visit our website
+                  <a href="https://taps.ucmerced.edu" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13405312.782443188, 4490357.0207049921],
+                                      [-13405270.457268482, 4490309.9264913648],
+                                      [-13405264.173519436, 4490315.4803099781],
+                                      [-13405260.769559976, 4490311.8771903738],
+                                      [-13405133.043516589, 4490426.1619781256],
+                                      [-13405137.137300028, 4490430.869829081],
+                                      [-13405133.657584107, 4490434.0083963946],
+                                      [-13405139.661799822, 4490441.0360579565],
+                                      [-13405144.7107994, 4490436.3964367211],
+                                      [-13405149.964488149, 4490442.9464902282],
+                                      [-13405171.399538253, 4490423.7329999432],
+                                      [-13405181.519370917, 4490435.9160994738],
+                                      [-13405184.368644197, 4490436.9968582988],
+                                      [-13405220.328437943, 4490439.7478807718],
+                                      [-13405220.721441153, 4490431.7895657569],
+                                      [-13405227.500746533, 4490432.37907058],
+                                      [-13405232.708039071, 4490438.2741187289],
+                                      [-13405311.308681153, 4490367.1405376568],
+                                      [-13405306.789144233, 4490361.933245115],
+                                      [-13405312.782443188, 4490357.0207049921],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#ffa50085",
+                              name: "Library Lot 1-Gold Zone",
+                              nameFontSize: 13,
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/goldzonelibrarylot1.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>Library Lot 1 Gold Zone</h1>
+                <p>Parking availability:</p>
+                <li>Faculty</li>
+                <li>Staff</li>
+                <li>Vendors</li>
+                <p></p>
+                <p>Marked spaces:</p>
+                <li>ADA Parking</li>
+                <li>EV Charging Stations</li>
+                <p></p>
+                <p>
+                  Specially marked spaces enforced 24 hours. Paid parking requiered on Monday
+                  - Friday from 7am - 8pm. For more information please contact TAPS at (209)
+                  228-8277 or visit our website
+                  <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13405765.65814613, 4490260.2083365768],
+                                      [-13405699.60798274, 4490224.3403497115],
+                                      [-13405686.957054745, 4490247.5574085861],
+                                      [-13405679.375974294, 4490243.7668683603],
+                                      [-13405671.059599232, 4490260.2664669752],
+                                      [-13405674.030098781, 4490262.8256665841],
+                                      [-13405724.618367417, 4490289.1647706777],
+                                      [-13405728.579839781, 4490283.2225621268],
+                                      [-13405732.541312143, 4490285.7692229375],
+                                      [-13405721.505781991, 4490307.5573209226],
+                                      [-13405735.512416415, 4490315.9047091082],
+                                      [-13405765.65814613, 4490260.2083365768],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#ffa50085",
+                              name: "Library Lot 2-Gold Zone",
+                              nameFontSize: 13,
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/goldzonelibrarylot2.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>Library Lot 2 Gold Zone</h1>
+                <p>Parking availability:</p>
+                <li>Faculty</li>
+                <li>Staff</li>
+                <li>Vendors</li>
+                <p></p>
+                <p>
+                  Specially marked spaces enforced 24 hours. Paid parking requiered on Monday
+                  - Friday from 7am - 8pm. For more information please contact TAPS at (209)
+                  228-8277 or visit our website
+                  <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13405827.773446467, 4490315.2667862549],
+                                      [-13405821.573117316, 4490307.5163748041],
+                                      [-13405762.98000679, 4490268.6093093455],
+                                      [-13405737.71366548, 4490322.2421565577],
+                                      [-13405749.494290877, 4490328.4424857125],
+                                      [-13405808.638068512, 4490322.1964874417],
+                                      [-13405827.773446467, 4490315.2667862549],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#80808063",
+                              name: "North Bowl Lot 1-Slate Zone",
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/nb1.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>North Bowl Lot Slate Zone</h1>
+                <p>Parking Availability:</p>
+                <li>Faculty</li>
+                <li>Staff</li>
+                <p></p>
+                <p>Marked spaces include:</p>
+                <li>ADA Parking</li>
+                <p></p>
+                <p>
+                  Specially marked spaced enforeced 24 hours. Paid parking required Monday -
+                  Friday from 7am - 6pm For more information please contact TAPS at (209)
+                  228-8277 or visit our website
+                  <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13404998.395595035, 4490428.0992656276],
+                                      [-13404990.897093784, 4490432.8700101972],
+                                      [-13404975.005930373, 4490431.2401472926],
+                                      [-13404954.428911086, 4490409.2369979396],
+                                      [-13404945.668397916, 4490415.348983869],
+                                      [-13404930.592165962, 4490399.2540875971],
+                                      [-13404773.514127605, 4490542.4782911837],
+                                      [-13404864.378985073, 4490639.2514017075],
+                                      [-13404935.685487565, 4490576.9091452435],
+                                      [-13404956.058773991, 4490547.7753456458],
+                                      [-13405030.653298546, 4490476.2028585747],
+                                      [-13405026.691826181, 4490472.3828673735],
+                                      [-13405035.746620154, 4490463.611035727],
+                                      [-13404998.395595035, 4490428.0992656276],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#80808063",
+                              name: "North Bowl Lot 2-Slate Zone",
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/nb2.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>North Bowl Lot Slate Zone</h1>
+                <p>Parking Availability:</p>
+                <li>Faculty</li>
+                <li>Staff</li>
+                <p></p>
+                <p>Marked spaces include:</p>
+                <li>ADA Parking</li>
+                <p></p>
+                <p>
+                  Specially marked spaced enforeced 24 hours. Paid parking required Monday -
+                  Friday from 7am - 8pm For more information please contact TAPS at (209)
+                  228-8277 or visit our website
+                  <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13404862.499014899, 4490641.2602769211],
+                                      [-13404773.098607786, 4490543.0050120056],
+                                      [-13404683.17558004, 4490622.0699301586],
+                                      [-13404774.430925494, 4490720.9652580172],
+                                      [-13404862.499014899, 4490641.2602769211],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#00004e78",
+                              name: "P3 Lot-Blue Zone",
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/p3u.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>P3 Lot Blue Zone</h1>
+                <p>Parking availability:</p>
+                <li>Faculty</li>
+                <li>Staff</li>
+                <li>Vendors</li>
+                <p></p>
+                <p>
+                  Specially marked spaces are enforced 24 hours. Paid parking required on
+                  Monday - Friday from 7am - 6pm. For more information please contact TAPS at
+                  (209) 228-8277 or visit our website
+                  <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13404763.984201171, 4490710.4205385447],
+                                      [-13404689.094708554, 4490629.213478893],
+                                      [-13404656.074078649, 4490661.4016914442],
+                                      [-13404726.421653304, 4490741.6725971699],
+                                      [-13404763.984201171, 4490710.4205385447],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#8b0000a3",
+                              name: "Restricted Zone 1",
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/ulotrestricted.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>University Lot Restricted</h1>
+                <p>
+                  Parking Availability is reserved for specially marked spaces enforced 24
+                  hours. For more information or reservation questions please contact TAPS at
+                  (209) 228-8277 or visit our website
+                  <a href="" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13406064.654869005, 4490035.6492228284],
+                                      [-13406000.22890548, 4490094.4879457578],
+                                      [-13406015.466834418, 4490110.8052279949],
+                                      [-13406066.564689435, 4490067.9942666516],
+                                      [-13406077.698536169, 4490063.0774949193],
+                                      [-13406064.654869005, 4490035.6492228284],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#8b0000a3",
+                              name: "Restricted Zone 2",
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/ulotrestricted.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>University Lot Restricted</h1>
+                <p>
+                  Parking Availability is reserved for specially marked spaces enforced 24
+                  hours. For more information or reservation questions please contact TAPS at
+                  (209) 228-8277 or visit our website
+                  <a href="" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13405992.414219387, 4489692.1977044269],
+                                      [-13405981.459840586, 4489692.1464829072],
+                                      [-13405981.511852711, 4489698.8040356487],
+                                      [-13405976.180609308, 4489698.8820538372],
+                                      [-13405976.128597183, 4489707.2820129693],
+                                      [-13405979.24932503, 4489707.2820129693],
+                                      [-13405979.11695835, 4489762.3409301788],
+                                      [-13405986.437377997, 4489762.3490699753],
+                                      [-13405986.433866568, 4489779.6580493227],
+                                      [-13405979.274029706, 4489779.6711385995],
+                                      [-13405979.105771504, 4489838.3536227122],
+                                      [-13405976.742340285, 4489838.3369788229],
+                                      [-13405976.725696404, 4489844.1623374671],
+                                      [-13405981.818724245, 4489844.1456935927],
+                                      [-13405981.785436485, 4489851.8018792421],
+                                      [-13405995.250336895, 4489851.7852353528],
+                                      [-13405995.200405248, 4489844.2788446397],
+                                      [-13406002.573644903, 4489844.3121324107],
+                                      [-13406002.586959999, 4489778.4795879126],
+                                      [-13405996.280926049, 4489778.4689358398],
+                                      [-13405996.280926043, 4489762.5014613494],
+                                      [-13406003.01304337, 4489762.5014613494],
+                                      [-13406003.034347527, 4489709.379516542],
+                                      [-13405996.141750153, 4489709.3511564359],
+                                      [-13405996.163753092, 4489699.0469946936],
+                                      [-13405992.424871475, 4489699.0576467663],
+                                      [-13405992.414219387, 4489692.1977044269],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#00004e78",
+                              name: "Scholar's Lot-Blue Zone",
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/bluezonescholarslot.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>Scholar's Lot Blue Zone</h1>
+                <p>Parking availability:</p>
+                <li>Faculty</li>
+                <li>Staff</li>
+                <li>Vendors</li>
+                <li>Event Parking</li>
+                <p></p>
+                <p>
+                  Specially marked spaces are enforced 24 hours. Paid parking required on
+                  Monday - Friday from 7am - 6pm. For more information please contact TAPS at
+                  (209) 228-8277 or visit our website
+                  <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13406422.700485118, 4489708.9048523381],
+                                      [-13406334.792873099, 4489708.9886609539],
+                                      [-13406334.061452512, 4489682.8606921434],
+                                      [-13406325.812653648, 4489682.9419610947],
+                                      [-13406326.320584612, 4489845.2843163088],
+                                      [-13406396.73251456, 4489844.9033680707],
+                                      [-13406397.938850604, 4489843.0621183366],
+                                      [-13406398.002341971, 4489837.9828086793],
+                                      [-13406420.224321675, 4489814.4910015762],
+                                      [-13406422.700485125, 4489789.1579447314],
+                                      [-13406422.700485118, 4489708.9048523381],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              color: "#80808063",
+                              name: "Scholar's Lot-H Zone",
+                              category: "/Parking and Transportation/Parking",
+                              content_url: `
+                              <div>
+                <img
+                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/hzonesign.png"
+                  width="200"
+                  height="300"
+                />
+                <h1>Scholar's Lot H Zone</h1>
+                <p>Parkring availability:</p>
+                <li>Student Residents Only</li>
+                <p></p>
+                <p>
+                  Paid Parking required and enforced 24 hours a day. For more information
+                  please contact TAPS at (209) 228-8277 or visit our website
+                  <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                </p>
+              </div>
+
+                              `,
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Polygon",
+                                  coordinates: [
+                                    [
+                                      [-13406325.6598775, 4489589.2082420141],
+                                      [-13406325.6598775, 4489682.368187584],
+                                      [-13406334.495346548, 4489682.368187584],
+                                      [-13406335.115379464, 4489708.5645782575],
+                                      [-13406422.695028793, 4489708.2545618042],
+                                      [-13406423.00504525, 4489633.5405954719],
+                                      [-13406419.284847759, 4489628.5803321451],
+                                      [-13406416.95972432, 4489625.9451922625],
+                                      [-13406414.014567971, 4489625.9451922625],
+                                      [-13406414.169576203, 4489613.3895257115],
+                                      [-13406411.224419855, 4489605.4841060415],
+                                      [-13406406.26415653, 4489602.3839414716],
+                                      [-13406341.935741536, 4489601.2988838628],
+                                      [-13406341.470716845, 4489588.5882091001],
+                                      [-13406325.6598775, 4489589.2082420141],
+                                    ],
+                                  ],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+                        ];
+
+                        geojsonPolygonsArray.forEach((featureCollection, fcIndex) => {
+                          let polygonCoords = [];
+                          let labelGraphic;
+
+                          const color = featureCollection.properties?.color || "gray";
+                          const nameFontSize =
+                            featureCollection.properties?.nameFontSize *
+                              Math.pow(1.5, zoomLevel - 17) || fontSize;
+                          // console.log("nameFontSize", nameFontSize);
+
+                          //  console.log(deviceType);
+                          const nameOffset = featureCollection.properties?.nameOffset || [
+                            0, 0,
+                          ];
+                          const uniqueId = "polygon-" + fcIndex;
+                          const uniqueParentPath = `${featureCollection.properties?.category}/${featureCollection.properties?.name}`;
+
+                          // creating graphic label for each polygon, we pass in polygon coordinates to calculate centroid to position lable in the middle of the polygon
+                          // we also create a uniqueParentPath to be able to reference the lable with its parent polygon, this allows us to look for the lable
+                          // and hide it along side the polygon we want to hide
+
+                          // other stuff is passed.
+                          featureCollection.features.forEach((feature) => {
+                            polygonCoords.push(feature.geometry.coordinates[0]);
+                            labelGraphic = createNameGraphic(
+                              feature.geometry.coordinates[0],
+                              featureCollection.properties?.name || "default label",
+                              nameFontSize,
+                              nameOffset,
+                              uniqueId,
+                              uniqueParentPath
+                            );
+                          });
+
+                          // technically we dont need this as the polygon already has properties, we could pass that all together, feel free to remove this and use
+                          // the polygon properties in the json file instead
+                          // featureCollection holds all  the polygons from the json
+
+                          const properties = {
+                            name: featureCollection.properties?.name || "default label",
+                            description: "temp description",
+
+                            content_url: featureCollection.properties.content_url,
+                            category: featureCollection.properties?.category,
+                          };
+
+                          // pass properties and other parameters to create polygon graphic, code needs a bit of cleaning and there are
+                          // some redandent lines of code or ways you can make this cleaner.
+                          const polygonGraphic = createPolygonGraphic(
+                            polygonCoords,
+                            properties,
+                            color,
+                            fcIndex,
+                            0,
+                            uniqueId,
+                            view
+                          );
+
+                          // push all changes to layers
+                          polygonsLayer.add(polygonGraphic);
+                          polygonGraphics.push(polygonGraphic);
+
+                          if (labelGraphic) {
+                            // labelGraphic.visible = true; // Ensure hidden
+                            labelsLayer.add(labelGraphic);
+                          }
+                        });
+                        // })
+                        // .catch((err) => {
+                        //   console.error("Error loading polygons (shapes.json):", err);
+                        // });
+
+                        // load up labels, very similar logic as the previous function.
+                        const geojsonPointsArray = [
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              name: "University Transit Center (UTC)",
+                              content_url: `
+                              <div>
+                              <img
+                                alt=""
+                                src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/documents/cattracks_photo_utc_2_2_22.jpg"
+                              />
+                              <h1>University Transit Center</h1>
+                              <p>
+                                Transportation and Parking Services (TAPS) is committed to providing safe
+                                and reliable transit services for all students, faculty, staff and visitors.
+                                The UTC is a transportation hub that served bus transportation that serves
+                                students, faculty, staff and visiters of the university. The UTC typically
+                                offers bus shelters, seating, and real-time information about bus arrivals
+                                <a href="https://cattracks.ridesystems.net/routes" target="_blank">here</a>.
+                                For updated transit shcedules or information please contact TAPS at (209)
+                                228-8277 visit
+                                <a href="https://taps.ucmerced.edu/transportation" target="_blank">here</a>.
+                              </p>
+                            </div>
+
+                              `,
+                              category: "/Parking and Transportation/UC Merced Transit",
+                              imgURL:
+                                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7Utj8RWnlmSHb7X6eCSc0Tk9DnJ6u7Ty40Q&s",
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Point",
+                                  coordinates: [-13406040.21535241, 4489610.1433956549],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                            ],
+                          },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              name: "Parking Pay Station",
+                              content_url: `
+                              <div>
+                                <img
+                                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/images/tapsMapImages/parkingpaystation.png"
+                                  width="200"
+                                  height="300"
+                                />
+                                <h1>Parking Pay Stations Updated</h1>
+                                <p>
+                                  The campus parking pay stations are electronic machines used to manage the
+                                  payment of parking fees in designated parking areas. They typically offer
+                                  two types of permits: hourly and daily. These permits allow drivers to park
+                                  their vehicles in designated areas. Payments can be made with card and
+                                  mobile app. For more information please contact TAPS at (209) 822-8277 or
+                                  visit
+                                  <a href="https://taps.ucmerced.edu/transportation" target="_blank">here</a>.
+                                </p>
+                              </div>
+                              `,
+                              category:
+                                "/Parking and Transportation/Parking Permit Dispensers",
+                              imgURL:
+                                "https://thumbs.dreamstime.com/b/parking-card-pay-station-concept-icon-vector-illustration-214497240.jpg",
+                            },
+                          "features": [
+                               {
+                                 "type": "Feature",
+                                 "id": 1,
+                                 "geometry": {
+                                   "type": "Point",
+                                   "coordinates": [-13406340.729589, 4489520.3139661429]
+                                 },
+                                 "properties": { "FID": 1, "Id": 0 }
+                               },
+                               {
+                                 "type": "Feature",
+                                 "id": 2,
+                                 "geometry": {
+                                   "type": "Point",
+                                   "coordinates": [-13406260.729589, 4489520.3139661429]
+                                 },
+                                 "properties": { "FID": 2, "Id": 0 }
+                               },
+                               {
+                                 "type": "Feature",
+                                 "id": 3,
+                                 "geometry": {
+                                   "type": "Point",
+                                   "coordinates": [-13406149.984197328, 4489559.7117657112]
+                                 },
+                                 "properties": { "FID": 3, "Id": 0 }
+                               },
+                               {
+                                 "type": "Feature",
+                                 "id": 4,
+                                 "geometry": {
+                                   "type": "Point",
+                                   "coordinates": [-13406148.767511182, 4489474.543735493]
+                                 },
+                                 "properties": { "FID": 4, "Id": 0 }
+                               },
+                               {
+                                 "type": "Feature",
+                                 "id": 5,
+                                 "geometry": {
+                                   "type": "Point",
+                                   "coordinates": [-13405962.21535241, 4489563.1433956549]
+                                 },
+                                 "properties": { "FID": 5, "Id": 0 }
+                               },
+                               {
+                                 "type": "Feature",
+                                 "id": 6,
+                                 "geometry": {
+                                   "type": "Point",
+                                   "coordinates": [-13405964.439560067, 4489474.543735493]
+                                 },
+                                 "properties": { "FID": 6, "Id": 0 }
+                               },
+                               {
+                                 "type": "Feature",
+                                 "id": 7,
+                                 "geometry": {
+                                   "type": "Point",
+                                   "coordinates": [-13406326.305813713, 4489840.563314789]
+                                 },
+                                 "properties": { "FID": 7, "Id": 0 }
+                               },
+                               {
+                                 "type": "Feature",
+                                 "id": 8,
+                                 "geometry": {
+                                   "type": "Point",
+                                   "coordinates": [-13406334.061452512, 4489682.8606921434]
+                                 },
+                                 "properties": { "FID": 8, "Id": 0 }
+                               }
+                             ]
+                           },
+                          {
+                            type: "FeatureCollection",
+                            crs: { type: "name", properties: { name: "EPSG:3857" } },
+                            properties: {
+                              name: "EV Charging Station",
+                              content_url: `
+                              <div>
+                                <img
+                                  src="https://taps.ucmerced.edu/sites/taps.ucmerced.edu/files/documents/Fall/2015/thumbnail_image.png"
+                                  width="400"
+                                  height="300"
+                                />
+                                <h1>Electric Vehicle Charging Station</h1>
+                                <p>
+                                  These spaces provide access for charging purposes only.&nbsp; When charging
+                                  is complete, the vehicle must be moved to an alternate location as soon as
+                                  possible. Please<strong> do not</strong> unplug other vehicles without
+                                  permission from the vehicle owner and be sure to return the cord to the
+                                  charging station when you are finished.
+                                </p>
+                                <br />
+                                <p>
+                                  For more information about the EV Charging Stations please contact TAPS at
+                                  (209) 228 - 8277 or visit our website
+                                  <a href="https://taps.ucmerced.edu/" target="_blank">here</a>.
+                                </p>
+                              </div>
+                              `,
+                              category:
+                                "/Parking and Transportation/Electric Vehicle Charging",
+                              imgURL:
+                                "https://upload.wikimedia.org/wikipedia/commons/7/7d/Symbol_electric_vehicle_charging_stations.jpg",
+                            },
+                            features: [
+                              {
+                                type: "Feature",
+                                id: 0,
+                                geometry: {
+                                  type: "Point",
+                                  coordinates: [-13405708.83751199, 4490276.4595919941],
+                                },
+                                properties: { FID: 0, Id: 0 },
+                              },
+                              {
+                                type: "Feature",
+                                id: 1,
+                                geometry: {
+                                  type: "Point",
+                                  coordinates: [-13405716.343783945, 4490281.0602102876],
+                                },
+                                properties: { FID: 1, Id: 0 },
+                              },
+                            ],
+                          },
+                        ];
+
+                        geojsonPointsArray.forEach((featureCollection, fcIndex) => {
+                          const properties = {
+                            name: `${featureCollection.properties?.name}` || "default label",
+                            description: "temp description",
+                            imgURL:
+                              featureCollection.properties?.imgURL ||
+                              `${baseURL}/placeholder.png`,
+                            content_url: featureCollection.properties.content_url,
+
+                            category: featureCollection.properties?.category,
+                          };
+
+                          featureCollection.features.forEach((feature, fIndex) => {
+                            if (feature.geometry.type === "Point") {
+                              const coords = feature.geometry.coordinates;
+                              const pointGraphic = createPointGraphic(
+                                coords,
+                                properties,
+                                fcIndex,
+                                fIndex + 1
+                              );
+                              pointsLayer.add(pointGraphic);
+                              pointGraphics.push(pointGraphic);
+                            }
+                          });
+                        });
+
+                        const labelsArray = [
+                          {
+                            type: "FeatureCollection",
+                            name: "Merced Labels",
+                            features: [
+                              {
+                                 type: "Feature",
+                                 properties: {
+                                   Label: "Bellevue Lot",
+                                   Description: "Auto-generated center of mass",
+
+                                   category: "/locations",
+                                   display: true,
+                                 },
+                                attributes: {
+                                   name: "Bellevue Lot",
+                                   visible: false,
+                                 },
+                                 geometry: {
+                                   type: "Point",
+                                   coordinates: [-13406050.439560067, 4489460.543735493],
+                                 },
+                               },
+                              {
+                                type: "Feature",
+                                properties: {
+                                  Label: "Scholar's Lot",
+                                  Description: "Auto-generated center of mass",
+
+                                  category: "/locations",
+                                  display: true,
+                                },
+                               attributes: {
+                                  name: "Scholar's Lot",
+                                  visible: false,
+                                },
+                                geometry: {
+                                  type: "Point",
+                                  coordinates: [-13406375.061452512, 4489710.8606921434],
+                                },
+                              },
+                              {
+                                type: "Feature",
+                                properties: {
+                                  Label: "Library Lot",
+                                  Description: "Auto-generated center of mass",
+
+                                  category: "/locations",
+                                  display: true,
+                                },
+                               attributes: {
+                                  name: "Library Lot",
+                                  visible: false,
+                                },
+                                geometry: {
+                                  type: "Point",
+                                  coordinates: [-13405750.343783945, 4490281.0602102876],
+                                },
+                              },
+                              {
+                                type: "Feature",
+                                properties: {
+                                  Label: "North Bowl Lot",
+                                  Description: "Auto-generated center of mass",
+
+                                  category: "/locations",
+                                  display: true,
+                                },
+                               attributes: {
+                                  name: "North Bowl Lot",
+                                  visible: false,
+                                },
+                                geometry: {
+                                  type: "Point",
+                                  coordinates: [-13404850.668397916, 4490550.348983869],
+                                },
+                              },
+                            ],
+                          },
+                        ];
+
+                        labelsArray.forEach((featureCollection, fcIndex) => {
+                          featureCollection.features.forEach((feature, fIndex) => {
+                            if (feature.geometry.type === "Point") {
+                              const coords = feature.geometry.coordinates;
+                              const labelGraphic = createLabelGraphic(
+                                coords,
+                                feature,
+                                fcIndex,
+                                fIndex
+                              );
+                              if (labelGraphic) {
+                                labelsLayer.add(labelGraphic);
+
+                                labelGraphics.push(labelGraphic);
+                              }
+                            }
+                          });
+                        });
+
+                        Promise.all([
+                          geojsonPolygonsArray,
+                          geojsonPointsArray,
+                          labelsArray,
+                        ]).then(() => {
+                          const allFeatures = [
+                            ...polygonGraphics,
+                            ...pointGraphics,
+                            ...labelGraphics,
+                          ];
+
+                          buildNestedSidebarFromJson(
+                            allFeatures,
+                            document.getElementById("sidebar")
+                          );
+                        });
+
+                        //find the center of the polygon
+
+                        function getPolygonCentroid(ring) {
+                          let signedArea = 0;
+                          let cx = 0;
+                          let cy = 0;
+
+                          if (
+                            ring.length > 0 &&
+                            (ring[0][0] !== ring[ring.length - 1][0] ||
+                              ring[0][1] !== ring[ring.length - 1][1])
+                          ) {
+                            ring.push([...ring[0]]);
+                          }
+
+                          for (let i = 0; i < ring.length - 1; i++) {
+                            const [x0, y0] = ring[i];
+                            const [x1, y1] = ring[i + 1];
+                            const cross = x0 * y1 - x1 * y0;
+                            signedArea += cross;
+                            cx += (x0 + x1) * cross;
+                            cy += (y0 + y1) * cross;
+                          }
+
+                          signedArea = signedArea / 2;
+                          cx = cx / (6 * signedArea);
+                          cy = cy / (6 * signedArea);
+
+                          return [cx, cy];
+                        }
+
+                        // handles creating name graphic for the polygons
+
+                        function createNameGraphic(
+                          ring,
+                          labelText,
+                          nameFontSize,
+                          nameOffset,
+                          parentId,
+                          parentPath
+                        ) {
+                          const [cx, cy] = getPolygonCentroid(ring);
+                          // console.log(nameOffset);
+                          // console.log(cx, cy);
+                          let offsetX =
+                            deviceType == "smartphone"
+                              ? nameOffset[0]
+                              : nameOffset[0] * 10 - nameOffset[0] * 9;
+                          let offsetY =
+                            deviceType == "smartphone"
+                              ? nameOffset[1]
+                              : nameOffset[1] * 10 - nameOffset[1] * 9;
+
+                          let altVis = true;
+                          if (
+                            (labelText === "Bus Staging Zone" ||
+                              labelText === "Bellevue Lot-Gold Zone" ||
+                              labelText === "Kolligian Library") &&
+                            zoomLevel == 16
+                          ) {
+                            altVis = false;
+                          }
+                          return new Graphic({
+                            geometry: {
+                              type: "point",
+                              x: cx + offsetX,
+                              y: cy + offsetY,
+                              spatialReference: { wkid: 3857 },
+                            },
+                            attributes: {
+                              name: labelText || "Label",
+                              description: "description",
+                              id: `label-${parentId}`,
+                              parentId: parentId,
+                              parentPath: parentPath,
+                              originalFontSize: nameFontSize,
+                              visible: altVis,
+                            },
+                            symbol: {
+                              type: "text",
+                              color: "black",
+                              haloColor: "white",
+                              haloSize: "2px",
+                              text: labelText || "Label",
+                              font: {
+                                size: nameFontSize,
+                                family: "sans-serif",
+                                weight: "bold",
+                              },
+                            },
+                            visible: altVis,
+                          });
+                        }
+
+                        // creates polygon graphic and has popup template
+
+                        function createPolygonGraphic(
+                          rings,
+                          props,
+                          color,
+                          fcIndex,
+                          fIndex,
+                          uniqueId
+                        ) {
+                          return new Graphic({
+                            geometry: {
+                              type: "polygon",
+                              rings: rings,
+                              spatialReference: { wkid: 3857 },
+                            },
+                            attributes: {
+                              id: uniqueId,
+                              name: props.name || `Polygon ${fcIndex}-${fIndex}`,
+                              description: props.description || "",
+                              content_url: props.content_url || null,
+                              category: props.category || "/Uncategorized",
+                            },
+                            symbol: {
+                              type: "simple-fill",
+                              color: color,
+                              outline: {
+                                color: "black",
+                                width: 1,
+                              },
+                            },
+                            popupTemplate: {
+                              title: "{name}",
+                              content: (event) => {
+                                const g = event.graphic;
+                                let baseContent = `<div>No popup content found</div>`;
+                                if (g.attributes.content_url) {
+                                  // fetches the popup url and injects html into the popup using the content url has some basecontent if the popup fails to load
+                                  // return fetch(g.attributes.content_url)
+                                  //   .then((res) => res.text())
+                                  //   .then(
+                                  //     (html) => `<div class="popup-content">${html}</div>`
+                                  //   )
+                                  //   .catch((err) => {
+                                  //     console.error("Error loading popup content:", err);
+                                  //     return (
+                                  //       baseContent +
+                                  //       `<p style="color:red;">Error loading additional details.</p>`
+                                  //     );
+                                  //   });
+                                  return g.attributes.content_url;
+                                } else {
+                                  return baseContent;
+                                }
+                              },
+                            },
+                          });
+                        }
+
+                        //create point graphic so this is for like the parking pay stations and ev charging stations
+
+                        function createPointGraphic(coords, props, fcIndex, fIndex) {
+                          return new Graphic({
+                            geometry: {
+                              type: "point",
+                              x: coords[0],
+                              y: coords[1],
+                              spatialReference: { wkid: 3857 },
+                            },
+                            attributes: {
+                              name: `${props.name}-${fIndex}` || `Point ${fcIndex}-${fIndex}`,
+                              description: props.description || "",
+                              content_url: props.content_url || null,
+                              category: props.category || "/Uncategorized",
+                              visible: true,
+                            },
+                            symbol: {
+                              type: "picture-marker",
+                              url: props.imgURL,
+                              width: "24px",
+                              height: "24px",
+                            },
+                            popupTemplate: {
+                              title: "{name}",
+                              content: (event) => {
+                                const g = event.graphic;
+                                let baseContent = `
+                                    <p><b>Description:</b> ${g.attributes.description}</p>
+                                    <p><i>Coordinates:</i> [${g.geometry.x.toFixed(
+                                      2
+                                    )}, ${g.geometry.y.toFixed(2)}]</p>
+                                  `;
+                                if (g.attributes.content_url) {
+                                  return g.attributes.content_url;
+                                } else {
+                                  return baseContent;
+                                }
+                              },
+                            },
+                          });
+                        }
+
+                        // currently there is one label so i just returned description of uc merced, however if you want more
+                        // labels you would follow same logic as previous functions and fetch html page or have it in the json object.
+                        function createLabelGraphic(coords, feature, fcIndex, fIndex) {
+                          const properties = feature.properties || {};
+                          const labelText = properties.Label || `Label ${fcIndex}-${fIndex}`;
+
+                            return new Graphic({
+                             geometry: {
+                               type: "point",
+                               x: coords[0],
+                               y: coords[1],
+                               spatialReference: { wkid: 3857 },
+                             },
+                             attributes: {
+                               name: labelText,
+                               description: properties.Description || "",
+                               category: properties.category || "/Uncategorized/Labels",
+                               visible: false,
+                             },
+
+                              symbol: {
+                                type: "text",
+                                color: "black",
+                                haloColor: "white",
+                                haloSize: "2px",
+                                text: labelText,
+                                font: {
+                                  size: 14,
+                                  family: "sans-serif",
+                                  weight: "bold",
+                                },
+                              },
+                              visible: false,
+                            });
+                          }
+
+                        let currentZoom = zoomLevel;
+                        showLotLabels();
+                        hideLotLabels();
+
+                        function updateFont(g) {
+                          if (!g || !g.symbol || g.symbol.type !== "text") {
+                            console.warn("updateFont: Invalid graphic.");
+                            return;
+                          }
+
+                          //   console.log("Updating font");
+
+                          const updatedSymbol = g.symbol.clone();
+
+                          // Ensure currentZoom and zoomLevel are defined
+                          if (
+                            typeof currentZoom === "undefined" ||
+                            typeof zoomLevel === "undefined"
+                          ) {
+                            return;
+                          }
+
+                          console.log("Original Font Size:", g.attributes.originalFontSize);
+
+                          let tempFontSize = g.attributes.originalFontSize || 15;
+                          let fontSize =
+                            tempFontSize * Math.pow(1.5, currentZoom - zoomLevel);
+
+                          // Ensure font size does not drop below 1px
+                          fontSize = Math.max(1, fontSize);
+                          updatedSymbol.font.size = fontSize;
+
+                          // Create updated Graphic
+                          const updatedGraphic = new Graphic({
+                            geometry: g.geometry,
+                            attributes: g.attributes,
+                            symbol: updatedSymbol,
+                          });
+
+                          // Remove old graphic and add the updated one
+                          if (g.attributes.visible == true) {
+                            labelsLayer.graphics.remove(g);
+                            labelsLayer.graphics.add(updatedGraphic);
+                          }
+                        }
+
+                        function hideLotLabels() {
+                          labelsLayer.graphics.forEach((label) => {
+                            if (
+                              label.attributes &&
+                              (label.attributes.name === "Bus Staging Zone" ||
+                                label.attributes.name === "Bellevue Lot-Gold Zone" ||
+                                label.attributes.name === "Kolligian Library" || label.attributes.name === "Bellevue Lot-H Zone" || label.attributes.name === "Bellevue Lot-Green Zone" || label.attributes.name === "Scholar's Lot-Blue Zone" || label.attributes.name === "Scholar's Lot-H Zone" || label.attributes.name === "Library Lot 1-Gold Zone" || label.attributes.name === "Library Lot 2-Gold Zone" || label.attributes.name === "North Bowl Lot 1-Slate Zone" || label.attributes.name === "North Bowl Lot 2-Slate Zone")
+                            ) {
+                              if (label.visible == true) {
+                                console.log("hiding");
+                                label.visible = false;
+
+                                label.attributes.visible = false;
+                              }
+                              //console.log(g.visible);
+                              //
+                            } else if(label.attributes && (label.attributes.name === "Bellevue Lot" || label.attributes.name === "Scholar's Lot" || label.attributes.name === "Library Lot" || label.attributes.name === "North Bowl Lot")){
+                              label.visible = true;
+                              label.attributes.visible = true;
+                            }
+                          });
+                          // pointsLayer.graphics.forEach((point) => {
+                          //   console.log("hiding point layer");
+                          //   point.visible = false;
+                          // });
+                          const listItems = document.querySelectorAll(".list-item");
+
+                          // Iterate over points layer
+                          pointsLayer.graphics.forEach((point) => {
+                            console.log("Checking point:", point.attributes.name);
+
+                            listItems.forEach((item) => {
+                              const itemName = item.querySelector("div").textContent.trim();
+                              const button = item.querySelector("button"); // Select the button inside the item
+                              const imgContainer = button.querySelector("div"); // The div inside the button that contains the image
+
+                              if (itemName === point.attributes.name) {
+                                console.log("Match found:", itemName);
+
+                                // Update background color
+                                item.style.opacity = "0.5"; // Light green
+
+                                const img = imgContainer.querySelector("img");
+                                if (img) {
+                                  img.remove();
+                                }
+                              }
+                            });
+
+                            point.visible = false;
+                          });
+                        }
+
+                        function showLotLabels() {
+                          labelsLayer.graphics.forEach((label) => {
+                            if (
+                              label.attributes &&
+                              (label.attributes.name === "Bus Staging Zone" ||
+                                label.attributes.name === "Bellevue Lot-Gold Zone" ||
+                                label.attributes.name === "Kolligian Library" || label.attributes.name === "Bellevue Lot-H Zone" || label.attributes.name === "Bellevue Lot-Green Zone" || label.attributes.name === "Scholar's Lot-Blue Zone" || label.attributes.name === "Scholar's Lot-H Zone" || label.attributes.name === "Library Lot 1-Gold Zone" || label.attributes.name === "Library Lot 2-Gold Zone" || label.attributes.name === "North Bowl Lot 1-Slate Zone" || label.attributes.name === "North Bowl Lot 2-Slate Zone")
+                            ) {
+                              const graphic = polygonsLayer.graphics.find(
+                                (parent) => parent.attributes.id === label.attributes.parentId
+                              );
+                              label.visible = graphic.visible;
+
+                              label.attributes.visible = graphic.visible;
+                            } else if(label.attributes && (label.attributes.name === "Bellevue Lot" || label.attributes.name === "Scholar's Lot" || label.attributes.name === "Library Lot" || label.attributes.name === "North Bowl Lot")){
+                               label.visible = false;
+
+                               label.attributes.visible = false;
+                            }
+                          });
+
+                          // pointsLayer.graphics.forEach((point) => {
+                          //   console.log("hiding point layer");
+                          //   console.log(point.attributes.name);
+                          //   point.visible = true;
+                          // });
+                          // Get all sidebar items
+
+                          // Get all sidebar items
+                          const listItems = document.querySelectorAll(".list-item");
+
+                          // Iterate over points layer
+                          pointsLayer.graphics.forEach((point) => {
+                            console.log("Checking point:", point.attributes.name);
+                            if (point.attributes.visible == true) {
+                              listItems.forEach((item) => {
+                                const itemName = item.querySelector("div").textContent.trim();
+                                const button = item.querySelector("button"); // Select the button inside the item
+                                const imgContainer = button.querySelector("div"); // The div inside the button that contains the image
+
+                                if (itemName === point.attributes.name) {
+                                  console.log("Match found:", itemName);
+
+                                  // Update background color
+                                  item.style.opacity = "1"; // Light green
+
+                                  if (!imgContainer.querySelector("img")) {
+                                    const img = document.createElement("img");
+                                    img.style.height = "15px";
+                                    img.style.display = "block";
+                                    img.src =
+                                      "https://cdn.pixabay.com/photo/2016/03/31/14/37/check-mark-1292787_1280.png";
+                                    imgContainer.appendChild(img);
+                                  }
+                                }
+                              });
+                              point.visible = true;
+                            }
+                          });
+
+                          // const listItems = document.querySelectorAll(".list-item");
+
+                          // // Iterate over points layer
+                          // pointsLayer.graphics.forEach((point) => {
+                          //   console.log("Checking point:", point.attributes.name);
+
+                          //   listItems.forEach((item) => {
+                          //     const itemName = item.querySelector("div").textContent.trim();
+
+                          //     if (itemName === point.attributes.name) {
+                          //       console.log("Match found:", itemName);
+
+                          //       // Update background color
+                          //       item.style.opacity = "1"; // Light green
+                          //     }
+                          //   });
+                          //   point.visible = true;
+                          // });
+                        }
+
+                        view.watch("zoom", (newZoom) => {
+                          currentZoom = newZoom;
+
+                          if (currentZoom >= 17) {
+                            console.log(currentZoom);
+                            // console.log("hiding labels {..., listOfLabels}");
+                            showLotLabels();
+
+                            // loop through labels graphics layer, if label.attributes.name == "myLabel", hide
+                          } else {
+                            hideLotLabels();
+                          }
+                          const updatedGraphics = labelsLayer.graphics.map((g) => {
+                            if (
+                              g.symbol &&
+                              g.symbol.type === "text" &&
+                              g.attributes.visible == true
+                            ) {
+                              const updatedSymbol = g.symbol.clone();
+
+                              // Base font size at zoom level 17
+                              //console.log(g.attributes.originalFontSize);
+                              let tempFontSize = g.attributes.originalFontSize
+                                ? g.attributes.originalFontSize
+                                : 15;
+                              let fontSize =
+                                tempFontSize * Math.pow(1.5, newZoom - zoomLevel);
+
+                              // Ensure font size does not drop below a minimum (e.g., 1px)
+                              console.log(fontSize);
+                              fontSize = Math.max(1, fontSize);
+                              fontSize = Math.min(20, fontSize);
+
+                              updatedSymbol.font.size = fontSize;
+
+                              return new Graphic({
+                                geometry: g.geometry,
+                                attributes: g.attributes,
+                                symbol: updatedSymbol,
+                              });
+                            }
+                            return g;
+                          });
+
+                          labelsLayer.graphics.removeAll();
+                          labelsLayer.graphics.addMany(updatedGraphics);
+                        });
+
+                        // handles building the sidefar, takes in two arguments, the features / graphic laters, and sidebar
+                        function buildNestedSidebarFromJson(features, sidebar) {
+                          //create tree for nested sidebar
+                          const categoryTree = {};
+
+                          features.forEach((feature) => {
+                            const categoryPath =
+                              feature.attributes?.category || "/Uncategorized";
+                            const pathParts = categoryPath.split("/").filter(Boolean);
+
+                            const uniqueKey = `${categoryPath}/${
+                              feature.attributes?.name || "Unnamed"
+                            }`;
+                            feature.uniqueKey = uniqueKey;
+
+                            let currentNode = categoryTree;
+                            pathParts.forEach((part, index) => {
+                              if (!currentNode[part]) {
+                                currentNode[part] = {};
+                              }
+                              if (index === pathParts.length - 1) {
+                                if (!currentNode[part].items) {
+                                  currentNode[part].items = [];
+                                }
+                                currentNode[part].items.push(feature);
+                              }
+                              currentNode = currentNode[part];
+                            });
+                          });
+
+                          const pathStack = [{ nodeName: "UC Merced", node: categoryTree }];
+
+                          //reder the sidebar
+                          function renderCurrentNode() {
+                            sidebar.innerHTML = "";
+
+                            const currentEntry = pathStack[pathStack.length - 1];
+                            const currentNode = currentEntry.node;
+                            const currentName = currentEntry.nodeName;
+
+                            const headerDiv = document.createElement("div");
+                            headerDiv.style.fontWeight = "bold";
+                            headerDiv.style.marginBottom = "8px";
+                            headerDiv.textContent = `${currentName}`;
+                            sidebar.appendChild(headerDiv);
+
+                            if (pathStack.length > 1) {
+                              const backButton = document.createElement("div");
+
+                              backButton.innerHTML = `
+                              <div class="back">
+                                 <div class="arrowContainer"><img src="https://www.svgrepo.com/show/27797/right-arrow.svg/" class="arrow" style=" transform: scaleX(-1);"></div>
+                              <div class="back-title">Back</div>
+
+                              </div>
+                              `;
+                              backButton.addEventListener("click", () => {
+                                pathStack.pop();
+                                renderCurrentNode();
+                              });
+                              sidebar.appendChild(backButton);
+                            }
+
+                            Object.keys(currentNode).forEach((key) => {
+                              if (key === "items") return;
+
+                              const catDiv = document.createElement("div");
+                              catDiv.innerHTML = `
+                              <div class="category">
+                              <div class="category-title">${key}</div>
+                              <div class="arrowContainer"><img src="https://www.svgrepo.com/show/27797/right-arrow.svg/" class="arrow"></div>
+                              </div>
+                              `;
+
+                              catDiv.addEventListener("click", () => {
+                                pathStack.push({ nodeName: key, node: currentNode[key] });
+                                renderCurrentNode();
+                              });
+
+                              sidebar.appendChild(catDiv);
+                            });
+
+                            if (currentNode.items) {
+                              currentNode.items.forEach((feature) => {
+                                const listItem = document.createElement("div");
+                                listItem.className = "list-item";
+                                listItem.style.display = "flex";
+                                listItem.style.alignItems = "center";
+                                // listItem.style.marginLeft = "10px";
+                                listItem.style.marginBottom = "4px";
+
+                                listItem.classList.add("hover-effect");
+
+                                const nameDiv = document.createElement("div");
+                                nameDiv.textContent = feature.attributes?.name || "Unnamed";
+                                nameDiv.style.flexGrow = "1";
+
+                                const toggleButton = document.createElement("button");
+                                toggleButton.id = `toggle-${feature.uniqueKey}`;
+                                toggleButton.style.marginLeft = "10px";
+                                toggleButton.style.cursor = "pointer";
+                                toggleButton.style.height = "30px";
+                                toggleButton.style.width = "30px";
+                                toggleButton.style.display = "flex";
+                                toggleButton.style.alignItems = "center";
+                                toggleButton.style.justifyContent = "center";
+
+                                toggleButton.innerHTML =
+                                  feature.visible === false
+                                    ? `<div></div>`
+                                    : `<div><img style="height: 15px;display: block" src="https://cdn.pixabay.com/photo/2016/03/31/14/37/check-mark-1292787_1280.png"/></div>`;
+                                listItem.style.opacity =
+                                  feature.visible === false ? "0.5" : "1";
+
+                                function toggleVisibility() {
+                                  const isVisible = feature.visible;
+
+                                  feature.visible = !isVisible;
+
+                                  if (feature.geometry.type === "point") {
+                                    feature.attributes.visible = !isVisible;
+                                  }
+
+                                  const graphic = labelsLayer.graphics.find(
+                                    (g) =>
+                                      g.attributes.parentPath ===
+                                      `${feature.attributes.category}/${feature.attributes.name}`
+                                  );
+                                  // if (!isVisible) {
+                                  //   // updateFont(graphic);
+                                  // }
+
+                                  console.log(graphic);
+                                  //if (graphic.attributes.name != "Bus Staging Zone") {
+                                  if (
+                                    graphic?.attributes &&
+                                    currentZoom >= 17 &&
+                                    (graphic.attributes.name === "Bus Staging Zone" ||
+                                      graphic.attributes.name === "Bellevue Lot-Gold Zone" ||
+                                      graphic.attributes.name === "Kolligian Library")
+                                  ) {
+                                    graphic.attributes.visible = !isVisible;
+                                  } else if (
+                                    graphic?.attributes &&
+                                    graphic.attributes.name != "Bus Staging Zone" &&
+                                    graphic.attributes.name != "Bellevue Lot-Gold Zone" &&
+                                    graphic.attributes.name != "Kolligian Library"
+                                  ) {
+                                    graphic.attributes.visible = !isVisible;
+                                  }
+                                  // }
+
+                                  if (graphic) {
+                                    // if (graphic.attributes.name != "Bus Staging Zone") {
+                                    if (
+                                      !isVisible &&
+                                      currentZoom >= 17 &&
+                                      (graphic.attributes.name === "Bus Staging Zone" ||
+                                        graphic.attributes.name ===
+                                          "Bellevue Lot-Gold Zone" ||
+                                        graphic.attributes.name === "Kolligian Library")
+                                    ) {
+                                      updateFont(graphic);
+                                    } else if (
+                                      !isVisible &&
+                                      graphic.attributes.name !== "Bus Staging Zone" &&
+                                      graphic.attributes.name !== "Bellevue Lot-Gold Zone" &&
+                                      graphic.attributes.name !== "Kolligian Library"
+                                    ) {
+                                      updateFont(graphic);
+                                    }
+                                    // graphic.visible = !graphic.visible;
+                                    if (
+                                      currentZoom >= 17 &&
+                                      (graphic.attributes.name === "Bus Staging Zone" ||
+                                        graphic.attributes.name ===
+                                          "Bellevue Lot-Gold Zone" ||
+                                        graphic.attributes.name === "Kolligian Library")
+                                    ) {
+                                      graphic.visible = !graphic.visible;
+                                    } else if (
+                                      graphic.attributes.name != "Bus Staging Zone" &&
+                                      graphic.attributes.name != "Bellevue Lot-Gold Zone" &&
+                                      graphic.attributes.name != "Kolligian Library"
+                                    ) {
+                                      graphic.visible = !graphic.visible;
+                                    }
+
+                                    // }
+                                    toggleButton.innerHTML = feature.visible
+                                      ? `<div><img style="height: 15px;display: block" src="https://cdn.pixabay.com/photo/2016/03/31/14/37/check-mark-1292787_1280.png"/></div>`
+                                      : `<div></div>`;
+                                    listItem.style.opacity = feature.visible ? "1" : "0.5";
+                                  } else {
+                                    toggleButton.innerHTML = isVisible
+                                      ? `<div></div>`
+                                      : `<div><img style="height: 15px;display: block" src="https://cdn.pixabay.com/photo/2016/03/31/14/37/check-mark-1292787_1280.png"/></div>`;
+                                    listItem.style.opacity = isVisible ? "0.5" : "1";
+                                  }
+                                }
+
+                                toggleButton.addEventListener("click", (e) => {
+                                  e.stopPropagation();
+                                  toggleVisibility();
+                                });
+
+                                listItem.addEventListener("click", () => {
+                                  document.querySelectorAll(".list-item").forEach((el) => {
+                                    el.style.backgroundColor = "white";
+                                  });
+                                  listItem.style.backgroundColor = "#7cffd0";
+
+                                  // handles popup when clicked on item in sidebar, also zooms to that feature.
+
+                                  const isPoint = feature.geometry.type === "point";
+                                  const isPolygon = feature.geometry.type === "polygon";
+                                  const isLabel = feature.symbol?.type === "text";
+
+                                  let popupLocation = isLabel
+                                    ? {
+                                        x: feature.geometry.x,
+                                        y: feature.geometry.y + 8,
+                                        spatialReference: { wkid: 3857 },
+                                      }
+                                    : isPoint
+                                    ? {
+                                        x: feature.geometry.x,
+                                        y: feature.geometry.y + 5,
+                                        spatialReference: { wkid: 3857 },
+                                      }
+                                    : feature.geometry.extent.center;
+
+                                  view
+                                    .goTo({
+                                      target: feature.geometry,
+                                      zoom: isLabel
+                                        ? 16
+                                        : isPoint
+                                        ? 19
+                                        : isPolygon
+                                        ? 17
+                                        : undefined,
+                                    })
+                                    .then(() => {
+                                      console.log(currentZoom);
+
+                                      view.popup.location = popupLocation;
+                                      view.popup.open({
+                                        features: [feature],
+                                        location: popupLocation,
+                                      });
+                                    });
+                                });
+
+                                listItem.appendChild(nameDiv);
+                                listItem.appendChild(toggleButton);
+                                sidebar.appendChild(listItem);
+                              });
+                            }
+                          }
+
+                          renderCurrentNode();
+                        }
+                      });
+                    };
+                  </script>
+       </body>
+     </html>
