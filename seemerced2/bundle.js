@@ -1445,11 +1445,11 @@ Error generating stack: ` +
     se++, (st[se] = t.current), (t.current = e);
   }
   var lt = St(null),
-    pt = St(null),
+    mt = St(null),
     Rt = St(null),
     Gt = St(null);
   function Se(t, e) {
-    switch ((q(Rt, e), q(pt, t), q(lt, null), (t = e.nodeType), t)) {
+    switch ((q(Rt, e), q(mt, t), q(lt, null), (t = e.nodeType), t)) {
       case 9:
       case 11:
         e = (e = e.documentElement) && (e = e.namespaceURI) ? Qd(e) : 0;
@@ -1476,16 +1476,16 @@ Error generating stack: ` +
     Ut(lt), q(lt, e);
   }
   function It() {
-    Ut(lt), Ut(pt), Ut(Rt);
+    Ut(lt), Ut(mt), Ut(Rt);
   }
   function We(t) {
     t.memoizedState !== null && q(Gt, t);
     var e = lt.current,
       n = Zd(e, t.type);
-    e !== n && (q(pt, t), q(lt, n));
+    e !== n && (q(mt, t), q(lt, n));
   }
   function Ce(t) {
-    pt.current === t && (Ut(lt), Ut(pt)),
+    mt.current === t && (Ut(lt), Ut(mt)),
       Gt.current === t && (Ut(Gt), (va._currentValue = ct));
   }
   var Je = Object.prototype.hasOwnProperty,
@@ -8439,7 +8439,7 @@ Error generating stack: ` +
     ty = typeof WeakMap == "function" ? WeakMap : Map,
     Yt = 0,
     Bt = null,
-    mt = null,
+    pt = null,
     vt = 0,
     Lt = 0,
     Ee = null,
@@ -8637,11 +8637,11 @@ Error generating stack: ` +
     return (Yt & 6) === 0 ? (da(0), !1) : !0;
   }
   function pc() {
-    if (mt !== null) {
-      if (Lt === 0) var t = mt.return;
-      else (t = mt), (vi = Tn = null), Su(t), (il = null), (Kl = 0), (t = mt);
+    if (pt !== null) {
+      if (Lt === 0) var t = pt.return;
+      else (t = pt), (vi = Tn = null), Su(t), (il = null), (Kl = 0), (t = pt);
       for (; t !== null; ) xd(t.alternate, t), (t = t.return);
-      mt = null;
+      pt = null;
     }
   }
   function gl(t, e) {
@@ -8652,7 +8652,7 @@ Error generating stack: ` +
       n !== null && ((t.cancelPendingCommit = null), n()),
       pc(),
       (Bt = t),
-      (mt = n = Wi(t.current, null)),
+      (pt = n = Wi(t.current, null)),
       (vt = e),
       (Lt = 0),
       (Ee = null),
@@ -8688,7 +8688,7 @@ Error generating stack: ` +
               ? 6
               : 1),
       (Ee = e),
-      mt === null && ((qt = 1), Rs(t, Le(e, t.current)));
+      pt === null && ((qt = 1), Rs(t, Le(e, t.current)));
   }
   function Dd() {
     var t = Y.H;
@@ -8714,8 +8714,8 @@ Error generating stack: ` +
     var p = qt;
     t: do
       try {
-        if (Lt !== 0 && mt !== null) {
-          var b = mt,
+        if (Lt !== 0 && pt !== null) {
+          var b = pt,
             x = Ee;
           switch (Lt) {
             case 8:
@@ -8747,12 +8747,12 @@ Error generating stack: ` +
       (Yt = o),
       (Y.H = r),
       (Y.A = h),
-      mt === null && ((Bt = null), (vt = 0), fs()),
+      pt === null && ((Bt = null), (vt = 0), fs()),
       p
     );
   }
   function iy() {
-    for (; mt !== null; ) Ed(mt);
+    for (; pt !== null; ) Ed(pt);
   }
   function ny(t, e) {
     var n = Yt;
@@ -8764,8 +8764,8 @@ Error generating stack: ` +
       : (hl = zl(t, e));
     t: do
       try {
-        if (Lt !== 0 && mt !== null) {
-          e = mt;
+        if (Lt !== 0 && pt !== null) {
+          e = pt;
           var h = Ee;
           e: switch (Lt) {
             case 1:
@@ -8794,19 +8794,19 @@ Error generating stack: ` +
               break;
             case 5:
               var p = null;
-              switch (mt.tag) {
+              switch (pt.tag) {
                 case 26:
-                  p = mt.memoizedState;
+                  p = pt.memoizedState;
                 case 5:
                 case 27:
-                  var b = mt;
+                  var b = pt;
                   if (!p || lg(p)) {
                     (Lt = 0), (Ee = null);
                     var x = b.sibling;
-                    if (x !== null) mt = x;
+                    if (x !== null) pt = x;
                     else {
                       var O = b.return;
-                      O !== null ? ((mt = O), qs(O)) : (mt = null);
+                      O !== null ? ((pt = O), qs(O)) : (pt = null);
                     }
                     break e;
                   }
@@ -8834,15 +8834,15 @@ Error generating stack: ` +
       (Y.H = o),
       (Y.A = r),
       (Yt = n),
-      mt !== null ? 0 : ((Bt = null), (vt = 0), fs(), qt)
+      pt !== null ? 0 : ((Bt = null), (vt = 0), fs(), qt)
     );
   }
   function ly() {
-    for (; mt !== null && !Uo(); ) Ed(mt);
+    for (; pt !== null && !Uo(); ) Ed(pt);
   }
   function Ed(t) {
     var e = Jh(t.alternate, t, Di);
-    (t.memoizedProps = t.pendingProps), e === null ? qs(t) : (mt = e);
+    (t.memoizedProps = t.pendingProps), e === null ? qs(t) : (pt = e);
   }
   function zd(t) {
     var e = t,
@@ -8858,21 +8858,21 @@ Error generating stack: ` +
       case 5:
         Su(e);
       default:
-        xd(n, e), (e = mt = bd(e, Di)), (e = Jh(n, e, Di));
+        xd(n, e), (e = pt = bd(e, Di)), (e = Jh(n, e, Di));
     }
-    (t.memoizedProps = t.pendingProps), e === null ? qs(t) : (mt = e);
+    (t.memoizedProps = t.pendingProps), e === null ? qs(t) : (pt = e);
   }
   function ml(t, e, n, o) {
     (vi = Tn = null), Su(e), (il = null), (Kl = 0);
     var r = e.return;
     try {
       if (Zp(t, r, e, n, vt)) {
-        (qt = 1), Rs(t, Le(n, t.current)), (mt = null);
+        (qt = 1), Rs(t, Le(n, t.current)), (pt = null);
         return;
       }
     } catch (h) {
-      if (r !== null) throw ((mt = r), h);
-      (qt = 1), Rs(t, Le(n, t.current)), (mt = null);
+      if (r !== null) throw ((pt = r), h);
+      (qt = 1), Rs(t, Le(n, t.current)), (pt = null);
       return;
     }
     e.flags & 32768
@@ -8897,14 +8897,14 @@ Error generating stack: ` +
       t = e.return;
       var n = $p(e.alternate, e, Di);
       if (n !== null) {
-        mt = n;
+        pt = n;
         return;
       }
       if (((e = e.sibling), e !== null)) {
-        mt = e;
+        pt = e;
         return;
       }
-      mt = e = t;
+      pt = e = t;
     } while (e !== null);
     qt === 0 && (qt = 5);
   }
@@ -8912,7 +8912,7 @@ Error generating stack: ` +
     do {
       var n = Pp(t.alternate, t);
       if (n !== null) {
-        (n.flags &= 32767), (mt = n);
+        (n.flags &= 32767), (pt = n);
         return;
       }
       if (
@@ -8921,12 +8921,12 @@ Error generating stack: ` +
           ((n.flags |= 32768), (n.subtreeFlags = 0), (n.deletions = null)),
         !e && ((t = t.sibling), t !== null))
       ) {
-        mt = t;
+        pt = t;
         return;
       }
-      mt = t = n;
+      pt = t = n;
     } while (t !== null);
-    (qt = 6), (mt = null);
+    (qt = 6), (pt = null);
   }
   function Rd(t, e, n, o, r, h, p, b, x, O) {
     var H = Y.T,
@@ -8952,7 +8952,7 @@ Error generating stack: ` +
     if (
       ((O |= ou),
       k0(t, o, O, h, p, b),
-      t === Bt && ((mt = Bt = null), (vt = 0)),
+      t === Bt && ((pt = Bt = null), (vt = 0)),
       ((x.subtreeFlags & 10256) === 0 && (x.flags & 10256) === 0) ||
         Ys ||
         ((Ys = !0),
@@ -20873,8 +20873,8 @@ const km = [
           .then((q) => q.json())
           .then((q) => {
             const lt = {};
-            q.forEach((pt) => {
-              Object.entries(pt).forEach(([Rt, Gt]) => {
+            q.forEach((mt) => {
+              Object.entries(mt).forEach(([Rt, Gt]) => {
                 lt[Rt.toLowerCase()] = Gt;
               });
             }),
@@ -20888,11 +20888,11 @@ const km = [
       }, []);
     const rt = (q) => {
       const lt = q.toLowerCase();
-      for (const pt in u)
-        if (lt.includes(pt)) {
+      for (const mt in u)
+        if (lt.includes(mt)) {
           const Rt = q.match(/\d+$/),
             Gt = Rt ? Rt[0].padStart(3, "0") : "";
-          return u[pt] + (Gt ? " " + Gt : "");
+          return u[mt] + (Gt ? " " + Gt : "");
         }
       return q;
     };
@@ -20902,7 +20902,7 @@ const km = [
     const j = (q = E) => {
         if (!l) return;
         const lt = [],
-          pt = [];
+          mt = [];
         if (
           (D.forEach((Gt, Se) => {
             if (!Gt.visible) return;
@@ -20929,7 +20929,7 @@ const km = [
                 Re = Qt.length > 0 ? Qt[Qt.length - 1] : null;
               Je = [...Ce, Re];
             }
-            if ((pt.push(Je), Z)) {
+            if ((mt.push(Je), Z)) {
               const Qt = X ? [...Ce, Je[Je.length - 1]] : Ce;
               lt.push({
                 label: Gt.abbreviatedName,
@@ -20962,9 +20962,9 @@ const km = [
               });
             }
           }),
-          W && pt.length > 0)
+          W && mt.length > 0)
         ) {
-          const Gt = hx(pt);
+          const Gt = hx(mt);
           Et(Gt[Gt.length - 1]),
             lt.push({
               label: "Combined Probability (Fail at Least One)",
@@ -20987,30 +20987,30 @@ const km = [
           m([]), S(-1);
           return;
         }
-        const pt = lt.toLowerCase(),
-          Rt = fx(pt),
+        const mt = lt.toLowerCase(),
+          Rt = fx(mt),
           Gt = f.filter((It) => {
             const We = It.toLowerCase(),
               Ce = rt(It).toLowerCase();
             return (
-              We.includes(pt) ||
+              We.includes(mt) ||
               We.includes(Rt) ||
-              Ce.includes(pt) ||
+              Ce.includes(mt) ||
               Ce.includes(Rt)
             );
           });
         m(Gt);
         const Se = Gt.findIndex(
           (It) =>
-            It.toLowerCase() === pt ||
+            It.toLowerCase() === mt ||
             It.toLowerCase() === Rt ||
-            rt(It).toLowerCase() === pt ||
+            rt(It).toLowerCase() === mt ||
             rt(It).toLowerCase() === Rt
         );
         S(Se !== -1 ? Se : -1);
       },
       et = (q) => {
-        if (D.find((pt) => pt.fullName === q)) {
+        if (D.find((mt) => mt.fullName === q)) {
           v(""), m([]), S(-1);
           return;
         }
@@ -21040,24 +21040,26 @@ const km = [
             ? (q.preventDefault(),
               S((lt) => {
                 var Rt;
-                const pt = lt < g.length - 1 ? lt + 1 : g.length - 1;
+                const mt = lt < g.length - 1 ? lt + 1 : g.length - 1;
                 return (
+                  v(g[mt]),
                   Ht.current &&
-                    ((Rt = Ht.current.children[pt]) == null ||
+                    ((Rt = Ht.current.children[mt]) == null ||
                       Rt.scrollIntoView({ block: "nearest" })),
-                  pt
+                  mt
                 );
               }))
             : q.key === "ArrowUp"
             ? (q.preventDefault(),
               S((lt) => {
                 var Rt;
-                const pt = lt > 0 ? lt - 1 : 0;
+                const mt = lt > 0 ? lt - 1 : 0;
                 return (
+                  v(g[mt]),
                   Ht.current &&
-                    ((Rt = Ht.current.children[pt]) == null ||
+                    ((Rt = Ht.current.children[mt]) == null ||
                       Rt.scrollIntoView({ block: "nearest" })),
-                  pt
+                  mt
                 );
               }))
             : q.key === "Enter" &&
@@ -21068,8 +21070,8 @@ const km = [
       I = (q) => {
         const lt = q.target.value;
         Q(lt);
-        const pt = parseInt(lt, 10);
-        lt === "" || isNaN(pt) || B(pt);
+        const mt = parseInt(lt, 10);
+        lt === "" || isNaN(mt) || B(mt);
       },
       $ = (q) => {
         const lt = q.target.value;
@@ -21078,8 +21080,8 @@ const km = [
           B(58), Q("58");
           return;
         }
-        const pt = parseInt(lt, 10);
-        isNaN(pt) || (B(pt), Q(String(pt)));
+        const mt = parseInt(lt, 10);
+        isNaN(mt) || (B(mt), Q(String(mt)));
       },
       G = () => {
         L(!K);
