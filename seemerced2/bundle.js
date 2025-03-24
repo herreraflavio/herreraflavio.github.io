@@ -76,7 +76,7 @@ var yg;
 function Py() {
   return yg || ((yg = 1), (Gc.exports = $y())), Gc.exports;
 }
-var bt = Py(),
+var yt = Py(),
   Qc = { exports: {} },
   ft = {};
 /**
@@ -3142,30 +3142,30 @@ Error generating stack: ` +
       o = t.memoizedProps;
     switch (((e[re] = t), (e[ye] = o), n)) {
       case "dialog":
-        yt("cancel", e), yt("close", e);
+        bt("cancel", e), bt("close", e);
         break;
       case "iframe":
       case "object":
       case "embed":
-        yt("load", e);
+        bt("load", e);
         break;
       case "video":
       case "audio":
-        for (n = 0; n < ga.length; n++) yt(ga[n], e);
+        for (n = 0; n < ga.length; n++) bt(ga[n], e);
         break;
       case "source":
-        yt("error", e);
+        bt("error", e);
         break;
       case "img":
       case "image":
       case "link":
-        yt("error", e), yt("load", e);
+        bt("error", e), bt("load", e);
         break;
       case "details":
-        yt("toggle", e);
+        bt("toggle", e);
         break;
       case "input":
-        yt("invalid", e),
+        bt("invalid", e),
           Wr(
             e,
             o.value,
@@ -3179,19 +3179,19 @@ Error generating stack: ` +
           is(e);
         break;
       case "select":
-        yt("invalid", e);
+        bt("invalid", e);
         break;
       case "textarea":
-        yt("invalid", e), $r(e, o.value, o.defaultValue, o.children), is(e);
+        bt("invalid", e), $r(e, o.value, o.defaultValue, o.children), is(e);
     }
     (n = o.children),
       (typeof n != "string" && typeof n != "number" && typeof n != "bigint") ||
       e.textContent === "" + n ||
       o.suppressHydrationWarning === !0 ||
       Gd(e.textContent, n)
-        ? (o.popover != null && (yt("beforetoggle", e), yt("toggle", e)),
-          o.onScroll != null && yt("scroll", e),
-          o.onScrollEnd != null && yt("scrollend", e),
+        ? (o.popover != null && (bt("beforetoggle", e), bt("toggle", e)),
+          o.onScroll != null && bt("scroll", e),
+          o.onScrollEnd != null && bt("scrollend", e),
           o.onClick != null && (e.onclick = Ks),
           (e = !0))
         : (e = !1),
@@ -9427,7 +9427,7 @@ Error generating stack: ` +
       }
     }
   }
-  function yt(t, e) {
+  function bt(t, e) {
     var n = e[Yo];
     n === void 0 && (n = e[Yo] = new Set());
     var o = t + "__bubble";
@@ -9916,10 +9916,10 @@ Error generating stack: ` +
         o != null && (t.onclick = Ks);
         break;
       case "onScroll":
-        o != null && yt("scroll", t);
+        o != null && bt("scroll", t);
         break;
       case "onScrollEnd":
-        o != null && yt("scrollend", t);
+        o != null && bt("scrollend", t);
         break;
       case "dangerouslySetInnerHTML":
         if (o != null) {
@@ -10027,7 +10027,7 @@ Error generating stack: ` +
           : t.setAttribute(n, o);
         break;
       case "popover":
-        yt("beforetoggle", t), yt("toggle", t), ts(t, "popover", o);
+        bt("beforetoggle", t), bt("toggle", t), ts(t, "popover", o);
         break;
       case "xlinkActuate":
         di(t, "http://www.w3.org/1999/xlink", "xlink:actuate", o);
@@ -10089,10 +10089,10 @@ Error generating stack: ` +
           : (typeof o == "number" || typeof o == "bigint") && Zn(t, "" + o);
         break;
       case "onScroll":
-        o != null && yt("scroll", t);
+        o != null && bt("scroll", t);
         break;
       case "onScrollEnd":
-        o != null && yt("scrollend", t);
+        o != null && bt("scrollend", t);
         break;
       case "onClick":
         o != null && (t.onclick = Ks);
@@ -10146,7 +10146,7 @@ Error generating stack: ` +
       case "li":
         break;
       case "img":
-        yt("error", t), yt("load", t);
+        bt("error", t), bt("load", t);
         var o = !1,
           r = !1,
           h;
@@ -10172,7 +10172,7 @@ Error generating stack: ` +
           o && Ct(t, e, "src", n.src, n, null);
         return;
       case "input":
-        yt("invalid", t);
+        bt("invalid", t);
         var b = (h = p = r = null),
           x = null,
           O = null;
@@ -10210,7 +10210,7 @@ Error generating stack: ` +
         Wr(t, h, b, x, O, p, r, !1), is(t);
         return;
       case "select":
-        yt("invalid", t), (o = p = h = null);
+        bt("invalid", t), (o = p = h = null);
         for (r in n)
           if (n.hasOwnProperty(r) && ((b = n[r]), b != null))
             switch (r) {
@@ -10231,7 +10231,7 @@ Error generating stack: ` +
           e != null ? Qn(t, !!o, e, !1) : n != null && Qn(t, !!o, n, !0);
         return;
       case "textarea":
-        yt("invalid", t), (h = r = o = null);
+        bt("invalid", t), (h = r = o = null);
         for (p in n)
           if (n.hasOwnProperty(p) && ((b = n[p]), b != null))
             switch (p) {
@@ -10265,26 +10265,26 @@ Error generating stack: ` +
             }
         return;
       case "dialog":
-        yt("cancel", t), yt("close", t);
+        bt("cancel", t), bt("close", t);
         break;
       case "iframe":
       case "object":
-        yt("load", t);
+        bt("load", t);
         break;
       case "video":
       case "audio":
-        for (o = 0; o < ga.length; o++) yt(ga[o], t);
+        for (o = 0; o < ga.length; o++) bt(ga[o], t);
         break;
       case "image":
-        yt("error", t), yt("load", t);
+        bt("error", t), bt("load", t);
         break;
       case "details":
-        yt("toggle", t);
+        bt("toggle", t);
         break;
       case "embed":
       case "source":
       case "link":
-        yt("error", t), yt("load", t);
+        bt("error", t), bt("load", t);
       case "area":
       case "base":
       case "br":
@@ -21099,16 +21099,15 @@ const km = [
     let Ut = "custom";
     return (
       E === 58 ? (Ut = "all") : jm.includes(E) && (Ut = String(E)),
-      bt.jsxs("div", {
+      yt.jsxs("div", {
         style: {
-          height: "100vh",
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
         },
         children: [
-          bt.jsxs("div", {
+          yt.jsxs("div", {
             style: {
               width: "75%",
               display: "flex",
@@ -21117,11 +21116,11 @@ const km = [
               marginBottom: "20px",
             },
             children: [
-              bt.jsx("h2", {
+              yt.jsx("h2", {
                 style: { textAlign: "center" },
                 children: "Failure Rates Chart",
               }),
-              bt.jsx("input", {
+              yt.jsx("input", {
                 type: "text",
                 placeholder: "Search for a class...",
                 value: St,
@@ -21129,39 +21128,43 @@ const km = [
                 onKeyDown: U,
                 style: { width: "90%", padding: "10px", marginBottom: "10px" },
               }),
-              bt.jsx("div", {
+              yt.jsx("div", {
                 style: { position: "relative", width: "90%" },
-                children:
-                  g.length > 0 &&
-                  bt.jsx("ul", {
-                    ref: Ht,
-                    style: {
-                      border: "1px solid #ccc",
-                      padding: "5px",
-                      maxHeight: "150px",
-                      overflowY: "auto",
-                      backgroundColor: "Canvas",
-                      listStyle: "none",
-                      margin: 0,
-                    },
-                    children: g.map((q, lt) =>
-                      bt.jsx(
-                        "li",
-                        {
-                          style: {
-                            cursor: "pointer",
-                            padding: "5px",
-                            backgroundColor: lt === _ ? "#ddd" : "transparent",
+                children: yt.jsx("div", {
+                  style: { position: "absolute", width: "100%" },
+                  children:
+                    g.length > 0 &&
+                    yt.jsx("ul", {
+                      ref: Ht,
+                      style: {
+                        border: "1px solid #ccc",
+                        padding: "5px",
+                        maxHeight: "150px",
+                        overflowY: "auto",
+                        backgroundColor: "Canvas",
+                        listStyle: "none",
+                        margin: 0,
+                      },
+                      children: g.map((q, lt) =>
+                        yt.jsx(
+                          "li",
+                          {
+                            style: {
+                              cursor: "pointer",
+                              padding: "5px",
+                              backgroundColor:
+                                lt === _ ? "#ddd" : "transparent",
+                            },
+                            onClick: () => et(q),
+                            children: q,
                           },
-                          onClick: () => et(q),
-                          children: q,
-                        },
-                        q
-                      )
-                    ),
-                  }),
+                          q
+                        )
+                      ),
+                    }),
+                }),
               }),
-              bt.jsx("div", {
+              yt.jsx("div", {
                 style: {
                   marginTop: "10px",
                   width: "90%",
@@ -21169,7 +21172,7 @@ const km = [
                   flexWrap: "wrap",
                 },
                 children: D.map((q) =>
-                  bt.jsxs(
+                  yt.jsxs(
                     "div",
                     {
                       style: {
@@ -21181,16 +21184,16 @@ const km = [
                         borderRadius: "4px",
                       },
                       children: [
-                        bt.jsx("span", {
+                        yt.jsx("span", {
                           style: { flexGrow: 1 },
                           children: q.abbreviatedName,
                         }),
-                        bt.jsx("button", {
+                        yt.jsx("button", {
                           onClick: () => M(q.fullName),
                           style: { marginRight: "10px" },
                           children: q.visible ? "Hide" : "Show",
                         }),
-                        bt.jsx("button", {
+                        yt.jsx("button", {
                           onClick: () => xt(q.fullName),
                           children: "X",
                         }),
@@ -21200,7 +21203,7 @@ const km = [
                   )
                 ),
               }),
-              bt.jsxs("div", {
+              yt.jsxs("div", {
                 style: {
                   marginTop: "20px",
                   marginBottom: "20px",
@@ -21209,10 +21212,10 @@ const km = [
                   justifyContent: "center",
                 },
                 children: [
-                  bt.jsxs("label", {
+                  yt.jsxs("label", {
                     style: { marginRight: "10px" },
                     children: [
-                      bt.jsx("input", {
+                      yt.jsx("input", {
                         type: "checkbox",
                         checked: K,
                         onChange: G,
@@ -21221,10 +21224,10 @@ const km = [
                       "Show Moving Averages",
                     ],
                   }),
-                  bt.jsxs("label", {
+                  yt.jsxs("label", {
                     style: { marginRight: "10px" },
                     children: [
-                      bt.jsx("input", {
+                      yt.jsx("input", {
                         type: "checkbox",
                         checked: Z,
                         onChange: ct,
@@ -21233,10 +21236,10 @@ const km = [
                       "Show Detailed Data Points",
                     ],
                   }),
-                  bt.jsxs("label", {
+                  yt.jsxs("label", {
                     style: { marginRight: "10px" },
                     children: [
-                      bt.jsx("input", {
+                      yt.jsx("input", {
                         type: "checkbox",
                         checked: X,
                         onChange: st,
@@ -21245,10 +21248,10 @@ const km = [
                       "Show Predictions",
                     ],
                   }),
-                  bt.jsxs("label", {
+                  yt.jsxs("label", {
                     style: { marginRight: "10px" },
                     children: [
-                      bt.jsx("input", {
+                      yt.jsx("input", {
                         type: "checkbox",
                         checked: W,
                         onChange: se,
@@ -21257,25 +21260,25 @@ const km = [
                       "Show Combined Probability",
                     ],
                   }),
-                  bt.jsx("label", {
+                  yt.jsx("label", {
                     htmlFor: "windowSizeDropdown",
                     style: { marginRight: "10px" },
                     children: "Moving Average Window Size:",
                   }),
-                  bt.jsxs("select", {
+                  yt.jsxs("select", {
                     id: "windowSizeDropdown",
                     value: Ut,
                     onChange: $,
                     style: { marginRight: "10px" },
                     children: [
                       jm.map((q) =>
-                        bt.jsx("option", { value: q, children: q }, q)
+                        yt.jsx("option", { value: q, children: q }, q)
                       ),
-                      bt.jsx("option", { value: "all", children: "all" }),
-                      bt.jsx("option", { value: "custom", children: "Custom" }),
+                      yt.jsx("option", { value: "all", children: "all" }),
+                      yt.jsx("option", { value: "custom", children: "Custom" }),
                     ],
                   }),
-                  bt.jsx("input", {
+                  yt.jsx("input", {
                     type: "number",
                     min: 0,
                     value: V,
@@ -21287,7 +21290,7 @@ const km = [
               }),
               W &&
                 ot !== null &&
-                bt.jsxs("div", {
+                yt.jsxs("div", {
                   style: {
                     marginTop: "10px",
                     padding: "10px",
@@ -21298,11 +21301,11 @@ const km = [
                     borderRadius: "4px",
                   },
                   children: [
-                    bt.jsx("p", {
+                    yt.jsx("p", {
                       children:
                         "Combined Probability (Fail at Least One) = 100 × (1 - ∏ₖ (1 - pₖ/100))",
                     }),
-                    bt.jsxs("p", {
+                    yt.jsxs("p", {
                       style: { fontWeight: "bold", fontSize: "1.2em" },
                       children: [ot.toFixed(1), "%"],
                     }),
@@ -21310,10 +21313,10 @@ const km = [
                 }),
             ],
           }),
-          bt.jsx("div", {
+          yt.jsx("div", {
             style: { width: "90%", height: "60vh" },
             children: a
-              ? bt.jsx(rx, {
+              ? yt.jsx(rx, {
                   data: a,
                   options: {
                     responsive: !0,
@@ -21335,12 +21338,12 @@ const km = [
                     },
                   },
                 })
-              : bt.jsx("p", { children: "Loading chart..." }),
+              : yt.jsx("p", { children: "Loading chart..." }),
           }),
         ],
       })
     );
   };
 sb.createRoot(document.getElementById("root")).render(
-  bt.jsx(Ot.StrictMode, { children: bt.jsx(gx, {}) })
+  yt.jsx(Ot.StrictMode, { children: yt.jsx(gx, {}) })
 );
