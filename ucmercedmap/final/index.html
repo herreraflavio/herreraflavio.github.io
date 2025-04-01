@@ -32,7 +32,7 @@
                      it should also show the labe;
                      */
       /* Edit1 Override for small screens (mobile) */
-      @media (max-width: 800px) {
+      @media (max-width: 500px) {
         .esri-popup__main-container {
           max-height: 250px !important; /* Limit height on mobile */
         }
@@ -178,14 +178,16 @@
           document.getElementById("sidebar").style.height = "27%";
           centerCordinates = [-120.428845, 37.361569];
           zoomLevel = 17;
-          fontSize = 10;
+          // fontSize = 10;
+          fontSize = 13;
           return "smartphone";
         } else {
           // centerCordinates = [-120.424445, 37.363569];
           //Edit2
           centerCordinates = [-120.422045, 37.365169];
           zoomLevel = 16;
-          fontSize = 12.5;
+          // fontSize = 12.5;
+          fontSize = 15.5;
           return "laptop";
         }
         showLotLabels();
@@ -200,11 +202,11 @@
           baseURL = "http://127.0.0.1:5502/ucmercedmap";
         }
         const deviceType = detectDeviceType();
-        if (deviceType === "smartphone") {
-          document.body.style.fontSize = "14px";
-        } else {
-          document.body.style.fontSize = "18px";
-        }
+        // if (deviceType === "smartphone") {
+        //   document.body.style.fontSize = "14px";
+        // } else {
+        //   document.body.style.fontSize = "18px";
+        // }
 
         //setting up map
 
@@ -866,7 +868,7 @@
                   width="200"
                   height="300"
                 />
-                <h1>P3 Lot Blue Zone</h1>
+                <h1>P3 Lot-Blue Zone</h1>
                 <p>Parking availability:</p>
                 <li>Faculty</li>
                 <li>Staff</li>
@@ -1141,9 +1143,11 @@
             let labelGraphic;
 
             const color = featureCollection.properties?.color || "gray";
-            const nameFontSize =
-              featureCollection.properties?.nameFontSize *
-                Math.pow(1.5, zoomLevel - 17) || fontSize;
+            // const nameFontSize =
+            //   featureCollection.properties?.nameFontSize *
+            //     Math.pow(1.5, zoomLevel - 17) || fontSize;
+
+            const nameFontSize = fontSize;
             // console.log("nameFontSize", nameFontSize);
 
             //  console.log(deviceType);
@@ -1817,8 +1821,8 @@
             // console.log("Original Font Size:", g.attributes.originalFontSize);
 
             let tempFontSize = g.attributes.originalFontSize || 15;
-            let fontSize =
-              tempFontSize * Math.pow(1.5, currentZoom - zoomLevel);
+            // let fontSize =
+            //   tempFontSize * Math.pow(1.5, currentZoom - zoomLevel);
 
             // Ensure font size does not drop below 1px
             fontSize = Math.max(1, fontSize);
@@ -2027,16 +2031,17 @@
 
                 // Base font size at zoom level 17
                 //console.log(g.attributes.originalFontSize);
-                let tempFontSize = g.attributes.originalFontSize
-                  ? g.attributes.originalFontSize
-                  : 15;
-                let fontSize =
-                  tempFontSize * Math.pow(1.5, newZoom - zoomLevel);
+                // let tempFontSize = g.attributes.originalFontSize
+                //   ? g.attributes.originalFontSize
+                //   : 15;
+                // let fontSize =
+                //   tempFontSize * Math.pow(1.5, newZoom - zoomLevel);
 
                 // Ensure font size does not drop below a minimum (e.g., 1px)
                 // console.log(fontSize);
-                fontSize = Math.max(1, fontSize);
-                fontSize = Math.min(20, fontSize);
+                // fontSize = Math.max(1, fontSize);
+                // fontSize = Math.min(20, fontSize);
+                // fontSize = fontsize + 2 * (currentZoom / 10);
 
                 updatedSymbol.font.size = fontSize;
 
@@ -2209,8 +2214,7 @@
                           graphic.attributes.name ===
                             "North Bowl Lot 1-Slate Zone" ||
                           graphic.attributes.name ===
-                            "North Bowl Lot 2-Slate Zone" ||
-                          graphic.attributes.name === "P3 Lot-Blue Zone")
+                            "North Bowl Lot 2-Slate Zone")
                       ) {
                         graphic.attributes.visible = !isVisible;
                       } else if (
@@ -2226,9 +2230,7 @@
                         graphic.attributes.name != "Library Lot 1-Gold Zone" &&
                         graphic.attributes.name !=
                           "North Bowl Lot 1-Slate Zone" &&
-                        graphic.attributes.name !=
-                          "North Bowl Lot 2-Slate Zone" &&
-                        graphic.attributes.name != "P3 Lot-Blue Zone"
+                        graphic.attributes.name != "North Bowl Lot 2-Slate Zone"
                       ) {
                         graphic.attributes.visible = !isVisible;
                       }
@@ -2257,8 +2259,7 @@
                             graphic.attributes.name ===
                               "North Bowl Lot 1-Slate Zone" ||
                             graphic.attributes.name ===
-                              "North Bowl Lot 2-Slate Zone" ||
-                            graphic.attributes.name === "P3 Lot-Blue Zone")
+                              "North Bowl Lot 2-Slate Zone")
                         ) {
                           updateFont(graphic);
                         } else if (
@@ -2279,8 +2280,7 @@
                           graphic.attributes.name !=
                             "North Bowl Lot 1-Slate Zone" &&
                           graphic.attributes.name !=
-                            "North Bowl Lot 2-Slate Zone" &&
-                          graphic.attributes.name != "P3 Lot-Blue Zone"
+                            "North Bowl Lot 2-Slate Zone"
                         ) {
                           updateFont(graphic);
                         }
@@ -2305,8 +2305,7 @@
                             graphic.attributes.name ===
                               "North Bowl Lot 1-Slate Zone" ||
                             graphic.attributes.name ===
-                              "North Bowl Lot 2-Slate Zone" ||
-                            graphic.attributes.name === "P3 Lot-Blue Zone")
+                              "North Bowl Lot 2-Slate Zone")
                         ) {
                           graphic.visible = !graphic.visible;
                         } else if (
@@ -2326,8 +2325,7 @@
                           graphic.attributes.name !=
                             "North Bowl Lot 1-Slate Zone" &&
                           graphic.attributes.name !=
-                            "North Bowl Lot 2-Slate Zone" &&
-                          graphic.attributes.name != "P3 Lot-Blue Zone"
+                            "North Bowl Lot 2-Slate Zone"
                         ) {
                           graphic.visible = !graphic.visible;
                         }
