@@ -512,6 +512,7 @@
               properties: {
                 color: "#00004e78",
                 name: "ECEC Lot-Blue Zone",
+                nameOffset: [-17, 0],
                 category: "/Parking and Transportation/Parking",
                 content_url: `
                               <div>
@@ -1887,26 +1888,31 @@
               // Iterate over points layer
               pointsLayer.graphics.forEach((point) => {
                 // console.log("Checking point:", point.attributes.name);
+                if (
+                  point.attributes.name != "University Transit Center (UTC)-1"
+                ) {
+                  listItems.forEach((item) => {
+                    const itemName = item
+                      .querySelector("div")
+                      .textContent.trim();
+                    const button = item.querySelector("button"); // Select the button inside the item
+                    const imgContainer = button.querySelector("div"); // The div inside the button that contains the image
 
-                listItems.forEach((item) => {
-                  const itemName = item.querySelector("div").textContent.trim();
-                  const button = item.querySelector("button"); // Select the button inside the item
-                  const imgContainer = button.querySelector("div"); // The div inside the button that contains the image
+                    if (itemName === point.attributes.name) {
+                      // console.log("Match found:", itemName);
 
-                  if (itemName === point.attributes.name) {
-                    // console.log("Match found:", itemName);
+                      // Update background color
+                      item.style.opacity = "0.5"; // Light green
 
-                    // Update background color
-                    item.style.opacity = "0.5"; // Light green
-
-                    const img = imgContainer.querySelector("img");
-                    if (img) {
-                      img.remove();
+                      const img = imgContainer.querySelector("img");
+                      if (img) {
+                        img.remove();
+                      }
                     }
-                  }
-                });
+                  });
 
-                point.visible = false;
+                  point.visible = false;
+                }
               });
             }
           }
@@ -1959,32 +1965,37 @@
 
               // Iterate over points layer
               pointsLayer.graphics.forEach((point) => {
+                console.log(point.attributes.name);
                 // console.log("Checking point:", point.attributes.name);
-                if (point.attributes.visible == true) {
-                  listItems.forEach((item) => {
-                    const itemName = item
-                      .querySelector("div")
-                      .textContent.trim();
-                    const button = item.querySelector("button"); // Select the button inside the item
-                    const imgContainer = button.querySelector("div"); // The div inside the button that contains the image
+                if (
+                  point.attributes.name != "University Transit Center (UTC)-1"
+                ) {
+                  if (point.attributes.visible == true) {
+                    listItems.forEach((item) => {
+                      const itemName = item
+                        .querySelector("div")
+                        .textContent.trim();
+                      const button = item.querySelector("button"); // Select the button inside the item
+                      const imgContainer = button.querySelector("div"); // The div inside the button that contains the image
 
-                    if (itemName === point.attributes.name) {
-                      // console.log("Match found:", itemName);
+                      if (itemName === point.attributes.name) {
+                        // console.log("Match found:", itemName);
 
-                      // Update background color
-                      item.style.opacity = "1"; // Light green
+                        // Update background color
+                        item.style.opacity = "1"; // Light green
 
-                      if (!imgContainer.querySelector("img")) {
-                        const img = document.createElement("img");
-                        img.style.height = "15px";
-                        img.style.display = "block";
-                        img.src =
-                          "https://cdn.pixabay.com/photo/2016/03/31/14/37/check-mark-1292787_1280.png";
-                        imgContainer.appendChild(img);
+                        if (!imgContainer.querySelector("img")) {
+                          const img = document.createElement("img");
+                          img.style.height = "15px";
+                          img.style.display = "block";
+                          img.src =
+                            "https://cdn.pixabay.com/photo/2016/03/31/14/37/check-mark-1292787_1280.png";
+                          imgContainer.appendChild(img);
+                        }
                       }
-                    }
-                  });
-                  point.visible = true;
+                    });
+                    point.visible = true;
+                  }
                 }
               });
             }
