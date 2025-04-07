@@ -753,7 +753,7 @@
       }
 
       async function fetchFacultyMeetingTimes(term, crn) {
-        const url = `${baseURL}/api/facultyMeetingTimes?term=${term}&crn=${crn}`;
+        const url = `https://hackerflavio.com/api/facultyMeetingTimes?term=${term}&crn=${crn}`;
         try {
           const res = await fetch(url);
           if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
@@ -764,7 +764,7 @@
         }
       }
       async function fetchClassDetails(term, crn) {
-        const url = `${baseURL}/api/classDetails`;
+        const url = "https://hackerflavio.com/api/classDetails";
         try {
           const res = await fetch(url, {
             method: "POST",
