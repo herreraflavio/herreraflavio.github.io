@@ -245,6 +245,7 @@
     <div class="calendar-wrapper" id="calendarWrapper"></div>
 
     <script>
+      const baseURL = "https://herreraflavio.github.io";
       // ---------------------------
       // CONFIG
       // ---------------------------
@@ -631,7 +632,7 @@
         Saturday: "SA",
       };
       async function getCodeByDescription(desc) {
-        const jsonUrl = "https://flavioherrera.com/subjects.json";
+        const jsonUrl = `${baseURL}/subjects.json`;
         try {
           const res = await fetch(jsonUrl);
           if (!res.ok)
@@ -646,7 +647,7 @@
       }
 
       async function getProfessorRatingByName(name) {
-        const jsonUrl = "https://flavioherrera.com/rate_my_professor.json";
+        const jsonUrl = `${baseURL}/rate_my_professor.json`;
         try {
           const res = await fetch(jsonUrl);
           if (!res.ok)
@@ -752,7 +753,7 @@
       }
 
       async function fetchFacultyMeetingTimes(term, crn) {
-        const url = `https://hackerflavio.com/api/facultyMeetingTimes?term=${term}&crn=${crn}`;
+        const url = `${baseURL}/api/facultyMeetingTimes?term=${term}&crn=${crn}`;
         try {
           const res = await fetch(url);
           if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
@@ -763,7 +764,7 @@
         }
       }
       async function fetchClassDetails(term, crn) {
-        const url = "https://hackerflavio.com/api/classDetails";
+        const url = `${baseURL}/api/classDetails`;
         try {
           const res = await fetch(url, {
             method: "POST",

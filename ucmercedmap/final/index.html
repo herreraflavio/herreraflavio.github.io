@@ -216,13 +216,44 @@
           "esri/Graphic",
           "esri/layers/GraphicsLayer",
           "esri/widgets/Popup",
-        ], function (Map, MapView, Graphic, GraphicsLayer, Popup) {
+          "esri/layers/FeatureLayer",
+        ], function (
+          Map,
+          MapView,
+          Graphic,
+          GraphicsLayer,
+          Popup,
+          FeatureLayer
+        ) {
           // Create the Map currently using open street map
           const map = new Map({
             basemap: "osm",
           });
 
           // Create View
+
+          // const view = new MapView({
+          //   container: "viewDiv",
+          //   map: map,
+          //   center: centerCordinates,
+          //   zoom: zoomLevel,
+          //   popup: {
+          //     dockEnabled: false,
+          //     defaultPopupTemplateEnabled: true,
+          //   },
+          //   //edit3
+          //   constraints: {
+          //     minZoom: 10, // Optional: Set a minimum zoom level
+          //     geometry: {
+          //       type: "extent",
+          //       xmin: -13406500, // Adjust to fit UC Merced's bounding coordinates
+          //       ymin: 4489300,
+          //       xmax: -13404750,
+          //       ymax: 4490700,
+          //       spatialReference: { wkid: 3857 },
+          //     },
+          //   },
+          // });
 
           const view = new MapView({
             container: "viewDiv",
@@ -235,17 +266,85 @@
             },
             //edit3
             constraints: {
-              minZoom: zoomLevel, // Optional: Set a minimum zoom level
-              geometry: {
-                type: "extent",
-                xmin: -13406500, // Adjust to fit UC Merced's bounding coordinates
-                ymin: 4489300,
-                xmax: -13404750,
-                ymax: 4490700,
-                spatialReference: { wkid: 3857 },
-              },
+              minZoom: 10, // Optional: Set a minimum zoom level
             },
           });
+
+          const polylineLayer = new FeatureLayer({
+            url: "https://services2.arcgis.com/wx8u046p68e0iGuj/arcgis/rest/services/FastCat_2_ExportFeatures/FeatureServer/0",
+            renderer: {
+              type: "simple",
+              symbol: {
+                type: "cim",
+                data: {
+                  type: "CIMSymbolReference",
+                  symbol: {
+                    type: "CIMLineSymbol",
+                    symbolLayers: [
+                      {
+                        type: "CIMSolidStroke",
+                        enable: true,
+                        capStyle: "Round",
+                        joinStyle: "Round",
+                        width: 2,
+                        color: [0, 0, 0, 255], // RGBA
+                      },
+                      {
+                        type: "CIMVectorMarker",
+                        enable: true,
+                        colorLocked: true,
+                        size: 10,
+                        markerPlacement: {
+                          type: "CIMMarkerPlacementAlongLineSameSize",
+                          endings: ["WithMarkers"],
+                          placementTemplate: [100],
+                          angleToLine: true,
+                          controlPointPlacement: "WithControlPoint",
+                        },
+                        markerGraphics: [
+                          {
+                            type: "CIMMarkerGraphic",
+                            geometry: {
+                              rings: [
+                                [
+                                  [0, 0],
+                                  [5, 2.5],
+                                  [0, 5],
+                                  [0, 0],
+                                ],
+                              ],
+                            },
+                            symbol: {
+                              type: "CIMPolygonSymbol",
+                              symbolLayers: [
+                                {
+                                  type: "CIMSolidFill",
+                                  enable: true,
+                                  color: [0, 0, 0, 255],
+                                },
+                              ],
+                            },
+                          },
+                        ],
+                        frame: {
+                          xmin: 0,
+                          ymin: 0,
+                          xmax: 5,
+                          ymax: 5,
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+            minScale: 0,
+            maxScale: 0,
+          });
+
+          map.add(polylineLayer);
+
+          // polylineLayer.visible = true;
 
           // create popup instance
 
@@ -1843,6 +1942,14 @@
             }
           }
 
+          function hideAllLabels() {
+            labelsLayer.graphics.forEach((label) => {
+              label.visible = false;
+
+              label.attributes.visible = false;
+            });
+          }
+
           function hideLotLabels() {
             labelsLayer.graphics.forEach((label) => {
               if (
@@ -1878,6 +1985,7 @@
                 label.attributes.visible = true;
               }
             });
+
             // pointsLayer.graphics.forEach((point) => {
             //   console.log("hiding point layer");
             //   point.visible = false;
@@ -2020,6 +2128,102 @@
             // });
           }
 
+          const busPointLayer = new GraphicsLayer();
+          map.add(busPointLayer); // Add to map
+
+          const busSymbol = {
+            type: "simple-marker",
+            color: "blue",
+            size: "12px",
+            outline: {
+              color: "white",
+              width: 1,
+            },
+          };
+
+          // Keep separate state for each bus
+          const trackedBuses = {
+            "Bus 01": {
+              graphic: null,
+              lastCoords: null,
+            },
+            "Bus 07": {
+              graphic: null,
+              lastCoords: null,
+            },
+            "Bus 10": {
+              graphic: null,
+              lastCoords: null,
+            },
+          };
+
+          setInterval(async () => {
+            try {
+              const response = await fetch(
+                "https://cattracks.ridesystems.net/Services/JSONPRelay.svc/GetMapVehiclePoints?apiKey=8882812681&isPublicMap=true"
+              );
+              const buses = await response.json();
+
+              ["Bus 01", "Bus 07", "Bus 10"].forEach((busName) => {
+                const bus = buses.find((b) => b.Name === busName);
+                if (!bus) return;
+
+                const { Latitude: newLat, Longitude: newLon } = bus;
+                const tracked = trackedBuses[busName];
+
+                if (!tracked.graphic) {
+                  // First time: create the graphic
+                  const graphic = new Graphic({
+                    geometry: {
+                      type: "point",
+                      latitude: newLat,
+                      longitude: newLon,
+                    },
+                    symbol: busSymbol,
+                    attributes: { name: busName },
+                    popupTemplate: {
+                      title: "{name}",
+                      content: `Lat: ${newLat}<br>Lon: ${newLon}`,
+                    },
+                  });
+
+                  busPointLayer.add(graphic);
+                  tracked.graphic = graphic;
+                  tracked.lastCoords = { lat: newLat, lon: newLon };
+                  return;
+                }
+
+                // Animate position
+                const duration = 500;
+                const start = performance.now();
+                const { lat: oldLat, lon: oldLon } = tracked.lastCoords;
+
+                function animate(time) {
+                  const elapsed = time - start;
+                  const t = Math.min(1, elapsed / duration);
+                  const interpolatedLat = oldLat + (newLat - oldLat) * t;
+                  const interpolatedLon = oldLon + (newLon - oldLon) * t;
+
+                  tracked.graphic.geometry = {
+                    type: "point",
+                    latitude: interpolatedLat,
+                    longitude: interpolatedLon,
+                  };
+
+                  if (t < 1) {
+                    requestAnimationFrame(animate);
+                  } else {
+                    tracked.lastCoords = { lat: newLat, lon: newLon };
+                  }
+                }
+
+                requestAnimationFrame(animate);
+              });
+            } catch (error) {
+              console.error("Failed to fetch bus data:", error);
+            }
+          }, 1000);
+
           view.watch("zoom", (newZoom) => {
             currentZoom = newZoom;
 
@@ -2030,7 +2234,11 @@
 
               // loop through labels graphics layer, if label.attributes.name == "myLabel", hide
             } else {
-              hideLotLabels();
+              if (currentZoom < 15) {
+                hideAllLabels();
+              } else {
+                hideLotLabels();
+              }
             }
             const updatedGraphics = labelsLayer.graphics.map((g) => {
               if (

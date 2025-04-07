@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Polyline Layer Viewer</title>
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.29/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.29/"></script>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer",
+      ], function (Map, MapView, FeatureLayer) {
+        const map = new Map({
+          basemap: "streets-navigation-vector",
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 13,
+        });
+
+        const polylineLayer = new FeatureLayer({
+          url: "https://services2.arcgis.com/wx8u046p68e0iGuj/arcgis/rest/services/fastcat2_ExportFeatures/FeatureServer/0",
+          renderer: {
+            type: "simple",
+            symbol: {
+              type: "cim",
+              data: {
+                type: "CIMSymbolReference",
+                symbol: {
+                  type: "CIMLineSymbol",
+                  symbolLayers: [
+                    {
+                      type: "CIMSolidStroke",
+                      enable: true,
+                      capStyle: "Round",
+                      joinStyle: "Round",
+                      width: 2,
+                      color: [0, 0, 0, 255], // RGBA
+                    },
+                    {
+                      type: "CIMVectorMarker",
+                      enable: true,
+                      colorLocked: true,
+                      size: 10,
+                      markerPlacement: {
+                        type: "CIMMarkerPlacementAlongLineSameSize",
+                        endings: ["WithMarkers"],
+                        placementTemplate: [100],
+                        angleToLine: true,
+                        controlPointPlacement: "WithControlPoint",
+                      },
+                      markerGraphics: [
+                        {
+                          type: "CIMMarkerGraphic",
+                          geometry: {
+                            rings: [
+                              [
+                                [0, 0],
+                                [5, 2.5],
+                                [0, 5],
+                                [0, 0],
+                              ],
+                            ],
+                          },
+                          symbol: {
+                            type: "CIMPolygonSymbol",
+                            symbolLayers: [
+                              {
+                                type: "CIMSolidFill",
+                                enable: true,
+                                color: [0, 0, 0, 255],
+                              },
+                            ],
+                          },
+                        },
+                      ],
+                      frame: {
+                        xmin: 0,
+                        ymin: 0,
+                        xmax: 5,
+                        ymax: 5,
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          minScale: 0,
+          maxScale: 0,
+        });
+
+        polylineLayer.when(() => {
+          // Zoom to the layer's extent when it's loaded
+          view.goTo(polylineLayer.fullExtent);
+        });
+
+        map.add(polylineLayer);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
