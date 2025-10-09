@@ -631,7 +631,8 @@
         Saturday: "SA",
       };
       async function getCodeByDescription(desc) {
-        const jsonUrl = "https://flavioherrera.com/subjects.json";
+        //const jsonUrl = "https://flavioherrera.com/subjects.json";
+        const jsonUrl = "https://herreraflavio.github.io/subjects.json";
         try {
           const res = await fetch(jsonUrl);
           if (!res.ok)
@@ -752,7 +753,9 @@
       }
 
       async function fetchFacultyMeetingTimes(term, crn) {
-        const url = `https://hackerflavio.com/api/facultyMeetingTimes?term=${term}&crn=${crn}`;
+        // const url = `https://hackerflavio.com/api/facultyMeetingTimes?term=${term}&crn=${crn}`;
+        const url = `http://localhost:4050/api/facultyMeetingTimes?term=${term}&crn=${crn}`;
+
         try {
           const res = await fetch(url);
           if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
@@ -763,7 +766,8 @@
         }
       }
       async function fetchClassDetails(term, crn) {
-        const url = "https://hackerflavio.com/api/classDetails";
+        // const url = "https://hackerflavio.com/api/classDetails";
+        const url = "http://localhost:4050/api/classDetails";
         try {
           const res = await fetch(url, {
             method: "POST",
