@@ -245,6 +245,7 @@
     <div class="calendar-wrapper" id="calendarWrapper"></div>
 
     <script>
+      const baseURL = "https://herreraflavio.github.io";
       // ---------------------------
       // CONFIG
       // ---------------------------
@@ -631,8 +632,7 @@
         Saturday: "SA",
       };
       async function getCodeByDescription(desc) {
-        //const jsonUrl = "https://flavioherrera.com/subjects.json";
-        const jsonUrl = "https://herreraflavio.github.io/subjects.json";
+        const jsonUrl = "https://flavioherrera.com/subjects.json";
         try {
           const res = await fetch(jsonUrl);
           if (!res.ok)
@@ -647,7 +647,7 @@
       }
 
       async function getProfessorRatingByName(name) {
-        const jsonUrl = "https://flavioherrera.com/rate_my_professor.json";
+        const jsonUrl = `${baseURL}/rate_my_professor.json`;
         try {
           const res = await fetch(jsonUrl);
           if (!res.ok)
